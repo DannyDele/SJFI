@@ -1,0 +1,217 @@
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Poppins:ital,wght@0,100;0,400;1,200&display=swap');
+body{
+        font-family: 'Inter', sans-serif;
+
+}
+
+.Login-container{
+    display: flex;
+}
+
+.Login-flex{
+    width: 50%;
+    display: flex;
+     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20vh;
+}
+
+.Login-img{
+    width: 50%;
+    height: 100vh;
+}
+
+.Login-form{
+    display: flex;
+    flex-direction: column;
+}
+
+.Login-greeting{
+    font-family: 'Inter', sans-serif;
+    font-size: 40px;
+    line-height: 48.41px;
+    letter-spacing: 5%;
+    color: #4A0808;
+    margin-bottom: 3rem
+;
+}
+
+.Alternative-login{
+    font-family: 'Inter', sans-serif;
+    size: 25px;
+    line-height: 30.26px;
+    color: #4A08084D;
+    position: relative;
+    margin: 1.5rem 0;
+}
+
+.Alternative-login::before{
+    content: '';
+    height: 1px;
+    width: 50%;
+    top: 15px;
+    left: -120px;
+    background-color: black;
+    position: absolute;
+}
+.Alternative-login::after{
+    content: '';
+    height: 1px;
+    width: 50%;
+    top: 15px;
+    right: -120px;
+    background-color: black;
+    position: absolute;
+}
+
+
+.Login-btn button{
+    padding: 0.4rem 7.8rem;
+    width: 100%; 
+    border: 1px solid #B05A5A;
+    background-color: #FFF7F7;
+    font-size: 20px;
+    line-height: 30.26px;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 .5px 1px #000000;
+    border-radius: 5px;
+
+
+
+}
+
+.Google-icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 0;
+}
+
+.Login-Username{
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-right: 13rem;
+}
+
+.input {
+  padding: 0.9rem 1rem;
+  border: 1px solid #B05A5A;
+  width: 100%;
+  padding-left: 40px; /* Adjust padding-left to accommodate the icon */
+  box-sizing: border-box; /* Ensures padding is included in the width */
+  border-radius: 5px;
+  box-shadow: 0 .5px 1px #000000;
+
+}
+
+.input-wrapper-text{
+  margin-bottom: 1rem;
+}
+
+.faUser,
+.faLock {
+  position: absolute;
+  left: 10px; /* Adjust the left value as needed */
+  top: 50%; /* Center the icon vertically */
+  transform: translateY(-50%);
+  border-right: 1px solid #B05A5A; /* Add a right border */
+  padding-right: 10px; /* Adjust padding as needed */
+}
+
+.faEye {
+  position: absolute;
+  right: 10px; /* Adjust the right value as needed */
+  top: 50%; /* Center the icon vertically */
+  transform: translateY(-50%);
+  cursor: pointer; /* Add pointer cursor for better UX */
+}
+
+.input::placeholder {
+  color: #4A080899;
+  font-family: 'Inter', sans-serif;
+  padding: 0;
+}
+
+.Forgot-password-container{
+  display: flex;
+  justify-content: space-between;
+}
+
+.Login-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-input {
+  margin-right: 8px; /* Adjust margin as needed */
+}
+
+.checkbox-label {
+  flex: 1; /* Allow label to take remaining space */
+  white-space: nowrap; /* Prevent line breaks */
+  text-overflow: ellipsis; /* Show ellipsis (...) for overflow */
+  font-size: 12px;
+  line-height: 30.26px;
+  color: #B05A5A;
+}
+
+
+
+.Forgot-password{
+  font-size: 12px;
+  line-height: 30.26px;
+  color: #B05A5A;
+
+}
+
+
+.Login{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.Login button{
+  /* width: 89px; */
+  height: 36px;
+  padding: 0 3rem;
+  font-size: 1rem;
+  color: #ffff;
+  background-color: #4A0808;
+  border: none;
+  border-radius: 5px;
+}
+
+.No-account{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: 12px;
+}
+
+
+.sign-up a{
+  color: #B05A5A;
+  text-decoration: none;
+}
+
+.Login-img{
+  position: relative;
+}  
+
+
+.Login-img img{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}

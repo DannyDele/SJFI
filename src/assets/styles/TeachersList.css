@@ -1,0 +1,25 @@
+.teachers-list-container {
+  max-height: 300px; /* Set a maximum height */
+  margin: 20px;
+}
+
+.teachers-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.teachers-table th,
+.teachers-table td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.teachers-table th {
+  background-color: #f2f2f2;
+}
+
+.teachers-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
