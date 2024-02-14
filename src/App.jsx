@@ -7,7 +7,7 @@ import Sidebar from './components/scenes/global/Sidebar';
 import Dashboard from './components/scenes/dashboard/Dashboard';
 import Student from './components/scenes/students/Student';
 // import Teacher from './components/scenes/dashboard/Teacher';
-// import Financial from './components/scenes/dashboard/Financial';
+import Financial from './components/scenes/Financial/Financial';
 // import Course from './components/scenes/dashboard/Course';
 // import Calender from './components/scenes/dashboard/Calender';
 
@@ -24,7 +24,7 @@ function App() {
             <Route path='/' element={<Dashboard/> } />
             <Route path='/students' element={<Student/> } />
             {/* <Route path='/teachers' element={<Teacher/> } /> */}
-            {/* <Route path='/financial' element={<Financial/> } /> */}
+            <Route path='/financial' element={<Financial/> } />
             {/* <Route path='/courses' element={<Course/> } /> */}
             {/* <Route path='/calender' element={<Calender/> } /> */}
             {/* <Route path='/' element={<Dashboard/> } /> */}
