@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sidebar as ProSidebar, Menu, MenuItem, sidebarClasses } from "react-pro-sidebar";
+import { Sidebar as ProSidebar, Menu, MenuItem, sidebarClasses, SubMenu } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from 'react-router-dom';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
@@ -9,9 +9,12 @@ import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import QuizIcon from '@mui/icons-material/Quiz';
 import '../../../assets/styles/Sidebar.css'
 
 
@@ -23,7 +26,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
             <MenuItem
                 className="sidebar-item"
                 active={selected === title}
-                style={{ color: '#FFF7F7' }}
+                style={{ color: '#FFF7F7', backgroundColor : '#4A0808', }}
                 onClick={() => setSelected(title)}
                 icon={icon}
             >
@@ -99,21 +102,39 @@ function Sidebar() {
                           icon={<DashboardOutlinedIcon />}
                           selected={selected}
                       setSelected={setSelected}    
-                      />
-                      <Item
-                          title='Student Information'
-                          to='/students'
-                          icon={<SchoolOutlinedIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                      /> 
-                      <Item
-                          title='Teacher Information'
-                          to='/teachers'
-                          icon={<GroupsOutlinedIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                      />
+                              />
+                              
+                              <SubMenu
+                                  label='User Management'
+            title="User Management"
+            icon={<PermIdentityOutlinedIcon />}
+                                  className="submenu"
+          >
+            <Item
+              title="Student Information"
+              to="/students"
+              icon={<SchoolOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              className="student-item"
+              
+            />
+            <Item
+              title="Teacher Information"
+              to="/teachers"
+              icon={<HowToRegOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Public User"
+              to="/publicusers"
+              icon={<GroupsOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+          </SubMenu>
+
                       <Item
                           title='Financial Overview'
                           to='/financial'
@@ -132,6 +153,20 @@ function Sidebar() {
                           title='Calender & Events'
                           to='/calender'
                           icon={<EditCalendarOutlinedIcon />}
+                          selected={selected}
+                      setSelected={setSelected}    
+                              />
+                    <Item
+                          title='Anouncements'
+                          to='/anouncements'
+                          icon={<CampaignIcon />}
+                          selected={selected}
+                      setSelected={setSelected}    
+                      />
+                    <Item
+                          title='Exams'
+                          to='/exams'
+                          icon={<QuizIcon />}
                           selected={selected}
                       setSelected={setSelected}    
                       />
@@ -168,3 +203,5 @@ function Sidebar() {
 }
 
 export default Sidebar
+
+

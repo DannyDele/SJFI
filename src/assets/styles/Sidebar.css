@@ -5,3 +5,17 @@
   color: #fff !important;
   border-radius: 5px;
 }
+
+.submenu {
+  background-color: #4A0808 !important;
+  color: #FFF7F7 !important;
+  font-size: 14px !important;
+  font-weight: normal !important;
+  
+}
+
+.student-item{
+  background-color: black !important;
+}
+
+

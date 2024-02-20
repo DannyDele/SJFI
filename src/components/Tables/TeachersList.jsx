@@ -1,4 +1,5 @@
 import { useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table";
+import { Box, IconButton, useTheme, Typography } from "@mui/material";
 import { useMemo } from "react";
 import { mockDataStudent } from "../data/mockData";
 import '../../assets/styles/TeachersList.css'
@@ -9,7 +10,7 @@ function TeachersList() {
 
   const columns = [
         {
-      header: 'Profile Image', // Update header
+      header: 'Profile', // Update header
       accessorKey: 'profileImage', // Update accessorKey
       footer: 'Profile Image',
     },
@@ -60,11 +61,27 @@ function TeachersList() {
           {row.getVisibleCells().map(cell => (
             <td key={cell.id}>
               {cell.column.columnDef.accessorKey === 'profileImage' ? (
+
+                <Box sx={{
+                  backgroundColor: '#E3A1A1',
+                  borderRadius: '100px',
+                  width: '70px',
+                  height: '70px',
+                  position: 'relative'
+                }}>
                 <img
                   src={cell.value} 
                   alt={`${row.original.name}'s Profile`}
-                  style={{ width: '50px', height: '50px', backgroundColor: 'grey', borderRadius: '75%' }}
-                />
+                    style={{
+                      backgroundColor: '#E3A1A1',
+                      borderRadius: '100%',
+                      position: 'relative',
+                      top: '0',
+                      width: '70%',
+                      height: '70%',
+                    }}
+                  />
+                  </Box>
               ) : (
                 <span style={{ fontSize: '12px', color: '#4A0808' }}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

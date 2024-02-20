@@ -9,7 +9,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 function Topbar() {
     return (
         <>
-      <Box display='flex' justifyContent='space-between' p={2} mt={4}>
+      <Box display='flex' justifyContent='space-between' p={4} mt={4}>
             {/* SEARCH BAR */}
                   <p style={{fontSize:'24px', color: '#4A0808', marginTop: '0.3rem'}}>Dashboard</p>
 

@@ -10,7 +10,7 @@ import { useState } from "react";
 import '../../../assets/styles/Student.css'
 
 
-function Student() {
+function Teacher() {
  
 
   const columns = [
@@ -138,7 +138,7 @@ function Student() {
                           fontSize='20px'
                           color='#4A0808'
                       >
-                          Students</Typography>
+                          Teachers</Typography>
 
                       <Box
                           display='flex'
@@ -160,7 +160,7 @@ function Student() {
             // position: 'absolute',
             // width: '100%',
           }}
-                placeholder="student ID or name"
+                placeholder="teacher ID or name"
                 value={tableName}
                 onChange={(e) => onFilterChange("name", e.target.value)}
 
@@ -302,7 +302,7 @@ function Student() {
                   </Box>
 
           <Box marginTop='1rem' marginRight='2rem'>
-            <Typography sx={{fontSize: '15px', color: '#4A0808#'}}>About Student</Typography>
+            <Typography sx={{fontSize: '15px', color: '#4A0808#'}}>About Teacher</Typography>
               <Typography sx={{color:'#4A080899', fontSize: '10px', width: '190px'}}>
               I love good health, treating patient
               and learning new things. In my free time,
@@ -357,4 +357,4 @@ function Student() {
   )
 }
 
-export default Student
+export default Teacher

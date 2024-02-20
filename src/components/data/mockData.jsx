@@ -4,7 +4,8 @@ export const mockDataStudent = [
         name: 'John Snow',
         email: 'johnsnow@gmail.com',
         program: 'Lesson A',
-        course: "Anatomy",
+    course: "Anatomy",
+        year: '2022',
             profileImage: 'john_snow_profile.jpg', // Add a profileImage property
 
         
@@ -12,20 +13,22 @@ export const mockDataStudent = [
     },
     {
         id: 2,
-        name: 'Cersie Lanniester',
+        name: 'Cersie',
         email: 'cersielannister@gmail.com',
         program: 'Lesson C',
         course: "Physiology",
+        year: '2023',
             profileImage: 'john_snow_profile.jpg', // Add a profileImage property
 
         // access: 'manager'
     },
     {
         id: 3,
-        name: 'Jaime Lannister',
+        name: 'Jaime',
         email: 'jaimelannister@gmail.com',
         program: 'Lesson C',
         course: "Intro to Fert.",
+        year: '2024',
             profileImage: 'john_snow_profile.jpg', // Add a profileImage property
 
         // access: 'user'
@@ -35,7 +38,9 @@ export const mockDataStudent = [
         name: 'Arya Stark',
         email: 'aryastark@gmail.com',
         program: 'Lesson B',
-        course: "Advance Fert.",
+      course: "Advance Fert.",
+                year: '2020',
+
             profileImage: 'john_snow_profile.jpg', // Add a profileImage property
 
         // access: 'user'
@@ -45,7 +50,9 @@ export const mockDataStudent = [
         name: 'Sansa Stark',
         email: 'sansastark@gmail.com',
         program: 'Lesson E',
-        course: "Advance Fert. ",
+      course: "Advance Fert. ",
+                year: '2023',
+
             profileImage: 'john_snow_profile.jpg', // Add a profileImage property
 
         // access: 'user'
