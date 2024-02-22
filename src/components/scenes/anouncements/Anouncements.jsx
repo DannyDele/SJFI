@@ -6,7 +6,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
-import {Box, DialogActions} from '@mui/material';
+import {Box, DialogActions, IconButton} from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -16,11 +16,19 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import InputAdornment from '@mui/material/InputAdornment';
+
 
 function Announcements() {
     const [open, setOpen] = useState(false);
     const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [formData, setFormData] = useState({ title: '' });
+  const [imageFile, setImageFile] = useState(null);
+    const [updatedImage, setUpdatedImage] = useState(null);
+
+    const [selectedFile, setSelectedFile] = useState(null);
+
   const [announcementsData, setAnnouncementsData] = useState([
     { title: 'Announcement 1', body: 'This is the body of Announcement 1', category: 'General' },
     { title: 'Announcement 2', body: 'This is the body of Announcement 2', category: 'Event' },
@@ -49,24 +57,34 @@ function Announcements() {
   };
 
  
-    const handleFormSubmit = () => {
+const handleFormSubmit = () => {
+  const updatedFormData = { ...formData };
+
+    // Set the image property to the URL of the selected file
+  if (imageFile) {
+    updatedFormData.image = URL.createObjectURL(imageFile);
+  }
+
+  
   if (selectedAnnouncement) {
     // Update the selected announcement in announcementsData
     const updatedAnnouncements = announcementsData.map((announcement) =>
-      announcement === selectedAnnouncement ? formData : announcement
+      announcement === selectedAnnouncement ? updatedFormData : announcement
     );
     setAnnouncementsData(updatedAnnouncements);
   } else {
     // If no announcement is selected, add a new announcement
-    setAnnouncementsData([...announcementsData, formData]);
+    setAnnouncementsData([...announcementsData, updatedFormData]);
   }
 
-  // Reset the form data
+  // Reset the form data and image
   setFormData({ title: '', body: '', category: '' });
+  setImageFile(null);
 
   // Close the popup
   setOpen(false);
 };
+
 
 
     const handleDelete = () => {
@@ -85,6 +103,65 @@ function Announcements() {
     setOpen(false);
   };
 
+
+  // Function to handle file upload
+  
+  const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  setSelectedFile(file);
+
+  // Update the formData object with the selected file
+  setFormData({
+    ...formData,
+    image: file,
+  });
+};
+
+  // Funtion to display image wide on the screen
+
+   const [showImageModal, setShowImageModal] = useState(false);
+
+  const handleImageClick = (image, event) => {
+
+    // Prevent event propagation to avoid opening the announcement modal
+  event.stopPropagation();
+
+    setSelectedFile(image);
+    setShowImageModal(true);
+  };
+
+  const closeImageModal = () => {
+        setOpen(false);
+    setShowImageModal(false);
+    
+  };
+
+
+
+
+  // Function to update and delete an announcement image
+ const handleUpdate = () => {
+    // Open the file manager for updating the image
+    document.getElementById('fileInput').click();
+  };
+
+
+     const handleImageDelete = () => {
+    // Delete the image
+    // Assuming you have a function to handle image deletion, replace the following line accordingly
+    console.log('Image Delete:', selectedFile);
+
+    // Reset the updated image state (if any)
+    setUpdatedImage(null);
+
+    // Close the image modal
+    closeImageModal();
+  };
+
+
+  
+
+
   return (
     <div>
       <Box marginTop='1rem' padding='2rem' width='80vw' height='100vh'>
@@ -101,6 +178,8 @@ function Announcements() {
                 <TableCell><b>Title</b></TableCell>
                 <TableCell><b>Body</b></TableCell>
                 <TableCell><b>Category</b></TableCell>
+                <TableCell><b>Image</b></TableCell> {/* New column for Image */}
+
               </TableRow>
             </TableHead>
             <TableBody>
@@ -112,6 +191,18 @@ function Announcements() {
                   <TableCell>{announcement.title}</TableCell>
                   <TableCell>{announcement.body}</TableCell>
                   <TableCell>{announcement.category}</TableCell>
+           <TableCell>
+  {announcement.image && (
+    <img
+      src={URL.createObjectURL(announcement.image)}
+      alt="Announcement Image"
+      style={{ cursor: 'pointer', maxWidth: '100px', maxHeight: '100px' }}
+      onClick={(event) => handleImageClick(announcement.image, event)}      
+    />
+    
+  )}
+</TableCell>
+
                 </TableRow>
               ))}
             </TableBody>
@@ -153,7 +244,27 @@ function Announcements() {
     <MenuItem value="Event">Event</MenuItem>
     <MenuItem value="News">News</MenuItem>
   </Select>
-</FormControl>
+            </FormControl>
+            
+<IconButton
+  color="primary"
+  component="span"
+  onClick={() => document.getElementById('fileInput').click()}
+>
+  <CloudUploadIcon />
+</IconButton>
+<input
+  type="file"
+  id="fileInput"
+  style={{ display: 'none' }}
+  onChange={handleFileChange}
+/>
+      {selectedFile && (
+        <div style={{ marginTop: '8px', fontSize: '14px', color: '#555555' }}>
+          {`Selected file: ${selectedFile.name}`}
+        </div>
+      )}
+
 
           </form>
         </DialogContent>
@@ -173,9 +284,35 @@ function Announcements() {
     </Button>
   )}
 </DialogActions>
-
-
       </Dialog>
+
+
+      {/* full image modal */}
+         {/* Image Modal */}
+<Dialog open={showImageModal} onClose={closeImageModal}>
+  <DialogTitle>Announcement Image</DialogTitle>
+  <DialogContent style={{ overflow: 'hidden' }}>
+    {selectedFile && (
+      <img
+        src={URL.createObjectURL(selectedFile)}
+        alt="Announcement Image"
+        style={{ maxWidth: '100%', maxHeight: '80vh' }}
+      />
+    )}
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleUpdate} color="primary">
+      Update
+    </Button>
+    <Button onClick={handleImageDelete} color="secondary">
+      Delete
+    </Button>
+    <Button onClick={closeImageModal} color="primary">
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
+
     </div>
   );
 }

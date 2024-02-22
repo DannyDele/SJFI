@@ -13,6 +13,7 @@ import Teacher from './components/scenes/teacher/Teacher';
 import Anouncements from './components/scenes/anouncements/Anouncements';
 import PublicUser from './components/scenes/publicUser/PublicUser';
 import Exam from './components/scenes/exams/Exam';
+import Zoom from './components/scenes/Zoom/Zoom';
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
             {/* <Route path='/calender' element={<Calender/> } /> */}
             <Route path='/anouncements' element={<Anouncements/> } />
             <Route path='/exams' element={<Exam/> } />
+            <Route path='/zoom' element={<Zoom/> } />
           </Routes>
         </main>
     </div>

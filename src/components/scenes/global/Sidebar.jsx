@@ -13,6 +13,7 @@ import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import QuizIcon from '@mui/icons-material/Quiz';
 import '../../../assets/styles/Sidebar.css'
@@ -167,6 +168,13 @@ function Sidebar() {
                           title='Exams'
                           to='/exams'
                           icon={<QuizIcon />}
+                          selected={selected}
+                      setSelected={setSelected}    
+                      />
+                    <Item
+                          title='Zoom'
+                          to='/zoom'
+                          icon={<MeetingRoomIcon />}
                           selected={selected}
                       setSelected={setSelected}    
                       />
