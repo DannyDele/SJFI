@@ -37,62 +37,32 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
     );
 };
 
-
-
 function Sidebar() {
-    const [iscollapsed, setIsCollapsed] = useState(false);
-    const [selected,  setSelected] = useState("Dashboard")
-  return (
-      <Box
-        //   sx={{
-        //       "& .pro-sidebar-inner": {
-        //       background: 'blue !important'
-        //       },
-        //       "& .pro-icon-wrapper": {
-        //           backgroundColor: 'transparent !important'
-        //       },
-        //       "& .pro-inner-item": {
-        //           padding: "5px 35px 5px 20px !important"
-        //       },
-        //       "& .pro.inner-item:hover": {
-        //           color: 'yellow !important'
-        //       },
-        //       "& .pro-menu-item-active": {
-        //           color: 'purple !important'
-        //       }
-        //   }}
-      >
-       
+    const [selected,  setSelected] = useState("Dashboard");
+    const [openCourses, setOpenCourses] = useState(false);
+
+    return (
+        <Box>
             {/* MENU ITEMS */}
-          <ProSidebar
-            className="sidebar-container"
+            <ProSidebar
+                className="sidebar-container"
+                rootStyles={{
+                    [`.${sidebarClasses.container}`]: {
+                        backgroundColor: '#4A0808',
+                        height: '110vh',
+                        display: 'flex',
+                        position: 'fixed',
+                        padding: '1rem'
+                    }
+                }}
+            >
+                <Box display='flex' flexDirection='column' justifyContent='space-around'>
 
-            rootStyles={{
-    [`.${sidebarClasses.container}`]: {
-                    backgroundColor: '#4A0808',
-                    height: '110vh',
-                    display: 'flex',
-                    position: 'fixed',
-                    padding: '1rem'
-                    
-                  },
-//     [`.${sidebarClasses.innerItem}:hover`]: {
-//                     backgroundColor: 'yellow', // Set your desired yellow background color
-//                     color: 'black', // Set the text color for better visibility
-//   }
-  }}
-
-          >
-
-              
-              
-              <Box display='flex' flexDirection='column' justifyContent='space-around'>
-                  
-                  <Box marginTop='.5rem'
-                      fontSize='14px'
-                      color='#FFF7F7'
-                      display='flex'
-                      justifyContent='center'> <h4>ST JUDE FERTILITY INSTITUTE</h4></Box>
+                    <Box marginTop='.5rem'
+                        fontSize='14px'
+                        color='#FFF7F7'
+                        display='flex'
+                        justifyContent='center'> <h4>ST JUDE FERTILITY INSTITUTE</h4></Box>
 
                   <Box>
               <Menu>
