@@ -10,9 +10,12 @@ import Student from './components/scenes/students/Student';
 import Financial from './components/scenes/Financial/Financial';
 import Program from './components/scenes/Program/Program';
 import Course from './components/scenes/Courses/Courses';
-import Class from './components/scenes/Class/Classes';
+// import Class from './components/scenes/Class/Classes';
 import Ebook from './components/scenes/Ebook/Ebook';
 // import Calender from './components/scenes/dashboard/Calender';
+import AddPost from './components/scenes/AddPost/AddPost';
+import ViewPost from './components/scenes/ViewPost/ViewPost';
+import Notification from './components/scenes/Notifications/Notifications';
 
 
 function App() {
@@ -30,9 +33,12 @@ function App() {
             <Route path='/financial' element={<Financial/> } />
             <Route path='/program' element={<Program/> } />
             <Route path='/course' element={<Course/> } />
-            <Route path='/class' element={<Class/> } />
+            {/* <Route path='/class' element={<Class/> } /> */}
             <Route path='/ebook' element={<Ebook/> } />
             {/* <Route path='/calender' element={<Calender/> } /> */}
+            <Route path='/addpost' element={<AddPost/> } />
+            <Route path='/viewpost' element={<ViewPost/> } />
+            <Route path='/notifications' element={<Notification/> } />
             {/* <Route path='/' element={<Dashboard/> } /> */}
           </Routes>
         </main>

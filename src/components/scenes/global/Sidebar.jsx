@@ -12,6 +12,12 @@ import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import ComputerOutlinedIcon from '@mui/icons-material/ComputerOutlined'; // Icon for Program
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'; // Icon for Ebook
+import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined'; // Icon for Class
+import BookOutlinedIcon from '@mui/icons-material/BookOutlined'; // Icon for Course
 import '../../../assets/styles/Sidebar.css';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -34,6 +40,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 function Sidebar() {
     const [selected,  setSelected] = useState("Dashboard");
     const [openCourses, setOpenCourses] = useState(false);
+    const [openCommunity, setOpenCommunity] = useState(false);
 
     return (
         <Box>
@@ -105,24 +112,28 @@ function Sidebar() {
                                         to='/program'
                                         selected={selected}
                                         setSelected={setSelected}
+                                        icon={<ComputerOutlinedIcon />} // Icon for Program
                                     />
                                     <Item
                                         title='Course'
                                         to='/course'
                                         selected={selected}
                                         setSelected={setSelected}
+                                        icon={<BookOutlinedIcon />} // Icon for Course
                                     />
                                     <Item
                                         title='Class'
                                         to='/class'
                                         selected={selected}
                                         setSelected={setSelected}
+                                        icon={<ClassOutlinedIcon />} // Icon for Class
                                     />
                                     <Item
                                         title='Ebook'
                                         to='/ebook'
                                         selected={selected}
                                         setSelected={setSelected}
+                                        icon={<DescriptionOutlinedIcon />} // Icon for Ebook
                                     />
                                 </div>
                                 <Item
@@ -132,6 +143,40 @@ function Sidebar() {
                                     selected={selected}
                                     setSelected={setSelected}
                                 />
+                                <MenuItem
+                                    className="sidebar-item"
+                                    active={selected === "Community"}
+                                    style={{ color: '#FFF7F7' }}
+                                    onClick={() => setOpenCommunity(!openCommunity)}
+                                    icon={<GroupsOutlinedIcon />}
+                                    suffixIcon={<ExpandMoreIcon />}
+                                >
+                                    <Typography style={{ fontSize: '15px' }}>Community</Typography>
+                                </MenuItem>
+                                <div style={{ paddingLeft: '30px', display: openCommunity ? 'block' : 'none' }}>
+                                    <Item
+                                        title='Add Post'
+                                        to='/addpost'
+                                        selected={selected}
+                                        setSelected={setSelected}
+                                        icon={<PostAddIcon />}
+                                    />
+                                    <Item
+                                        title='Notifications'
+                                        to='/notifications'
+                                        selected={selected}
+                                        setSelected={setSelected}
+                                        icon={<NotificationsIcon />}
+                                    />
+<Item
+    title='View Post'
+    to='/viewpost'
+    icon={<PostAddIcon />} // You can change the icon as needed
+    selected={selected}
+    setSelected={setSelected}
+/>
+
+                                </div>
                             </Box>
                         </Menu>
                     </Box>
