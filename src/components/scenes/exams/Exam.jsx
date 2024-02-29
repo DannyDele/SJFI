@@ -15,19 +15,17 @@ function Exam() {
   const [openMoreQuestions, setOpenMoreQuestions] = useState(false);
   const [currentTableIndex, setCurrentTableIndex] = useState(null);
   
-  const [formData, setFormData] = useState({
-    questions: [
-      {
-        question: '',
-        options: [''],
-        answer: '', // Add answer field
-      description: '', // Add description field
-      },
-    ],
-    selectedClass: '',
-    selectedCourse: '',
-    selectedProgram: '',
-  });
+const [formData, setFormData] = useState([{
+    question: '',
+    a: '',
+    b: '',
+    c: '',
+    d: '',
+    answer: [{ option: 'a', details: '' }],
+    program: '',
+    course: '',
+    class: '',
+  }]);
 
   const [examQuestions, setExamQuestions] = useState([]);
 
@@ -37,18 +35,17 @@ function Exam() {
 
   const handleSelectClose = () => {
     setOpenSelect(false);
-    // Reset the form data
-    setFormData({
-      questions: [
-        {
-          question: '',
-          options: [''],
-        },
-      ],
-      selectedClass: '',
-      selectedCourse: '',
-      selectedProgram: '',
-    });
+    setFormData([{
+      question: '',
+      a: '',
+      b: '',
+      c: '',
+      d: '',
+      answer: [{ option: 'a', details: '' }],
+      program: '',
+      course: '',
+      class: '',
+    }]);
   };
 
   const handleAddQuestionsOpen = () => {
@@ -57,153 +54,89 @@ function Exam() {
 
   const handleAddQuestionsClose = () => {
     setOpenAddQuestions(false);
-    // Reset the form data
-    setFormData({
-      questions: [
-        {
-          question: '',
-          options: [''],
-        },
-      ],
-      selectedClass: '',
-      selectedCourse: '',
-      selectedProgram: '',
-    });
+    setFormData([{
+      question: '',
+      a: '',
+      b: '',
+      c: '',
+      d: '',
+      answer: [{ option: 'a', details: '' }],
+      program: '',
+      course: '',
+      class: '',
+    }]);
   };
 
-const handleFormChange = (event, index, field) => {
+const handleFormChange = (event) => {
   const { name, value } = event.target;
 
-  if (name === 'question' || name === 'answer' || name === 'description') {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      questions: [
-        {
-          ...prevFormData.questions[0],
-          [name]: value,
-        },
-      ],
-    }));
-  } else if (name.startsWith('options')) {
-    const optionsIndex = parseInt(name.replace('options', ''), 10);
-    setFormData((prevFormData) => {
-      const updatedQuestions = [...prevFormData.questions];
-      updatedQuestions[0].options[optionsIndex] = value;
+  setFormData((prevFormData) => {
+    if (!Array.isArray(prevFormData)) {
+      // If prevFormData is not an array, initialize it as an array
+      return [{ [name]: value, program: prevFormData.program, course: prevFormData.course, class: prevFormData.class }];
+    }
 
-      return {
-        ...prevFormData,
-        questions: updatedQuestions,
-      };
-    });
-  } else {
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  }
-};
-
-
-
-
-const handleAddOptions = () => {
-  setFormData({
-    ...formData,
-    questions: [
-      {
-        ...formData.questions[0],
-        options: [...formData.questions[0].options, ''],
-      },
-    ],
+    // If prevFormData is an array, update the first element
+    return [{ ...prevFormData[0], [name]: value }];
   });
-};
-
-
-const handleOptionsChange = (optionsIndex, value, isEditing) => {
-  if (isEditing) {
-    // Update the temporary edited values
-    setEditedOptions((prevoptions) => {
-      const updatedOptions = [...prevoptions];
-      updatedOptions[optionsIndex] = value;
-      return updatedOptions;
-    });
-  } else {
-    // Update the original form data
-    const updatedQuestions = [...examQuestions];
-    updatedQuestions[viewQuestionIndex.tableIndex].questions[viewQuestionIndex.questionIndex].options[optionsIndex] = value;
-
-    setExamQuestions(updatedQuestions);
-  }
 };
 
 
 
   const handleFormSubmit = () => {
-  // Handle the submission logic (e.g., sending data to the server)
-  console.log('Form Data:', formData);
+    console.log('Form Data:', formData);
 
-  const newQuestion = {
-    question: formData.questions[0].question,
-    options: [...formData.questions[0].options],
-    answer: formData.questions[0].answer,
-    description: formData.questions[0].description,
-  };
-
-  // If the table doesn't exist, create a new table with the question
-  setExamQuestions((prevExamQuestions) => [
-    ...prevExamQuestions,
-    {
-      selectedClass: formData.selectedClass,
-      selectedCourse: formData.selectedCourse,
-      selectedProgram: formData.selectedProgram,
-      numQuestions: 1,
-      questions: [newQuestion],
-    },
-  ]);
-
-  // Reset the form data
-  setFormData({
-    questions: [
-      {
-        question: '',
-        options: [''],
-        answer: '',
-        description: '',
-      },
-    ],
-    selectedClass: '',
-    selectedCourse: '',
-    selectedProgram: '',
-  });
-
-  // Close the popup
-  setOpenAddQuestions(false);
-  setOpenSelect(false);
+ const newQuestion = {
+  question: formData[0].question,
+  a: formData[0].a,
+  b: formData[0].b,
+  c: formData[0].c,
+  d: formData[0].d,
+  answer: formData[0].answer,
+  program: formData[0].program,
+  course: formData[0].course,
+  class: formData[0].class,
 };
 
+
+    setExamQuestions((prevExamQuestions) => [...prevExamQuestions, newQuestion]);
+
+    setFormData([{
+      question: '',
+      a: '',
+      b: '',
+      c: '',
+      d: '',
+      answer: [{ option: 'a', details: '' }],
+      program: '',
+      course: '',
+      class: '',
+    }]);
+
+    setOpenAddQuestions(false);
+    setOpenSelect(false);
+  };
 
 const handleMoreQuestionsOpen = (index) => {
   if (examQuestions && examQuestions.length > index && examQuestions[index]) {
-    setCurrentTableIndex(index);
-
-    setMoreQuestionsFormData({
-      ...moreQuestionsFormData,
-      selectedProgram: examQuestions[index].selectedProgram || '',
-      selectedClass: examQuestions[index].selectedClass || '',
-      selectedCourse: examQuestions[index].selectedCourse || '',
+    setFormData({
+      ...formData,
+      tableIndex: index,
+      question: '', // Reset the question for a new one
+      a: '',
+      b: '',
+      c: '',
+      d: '',
+      answer: [{ option: 'a', details: '' }],
+      program: examQuestions[index].program || '',
+      course: examQuestions[index].course || '',
+      class: examQuestions[index].class || '',
     });
-
-    // Open the "Add More Questions" dialog
     setOpenMoreQuestions(true);
   } else {
-    console.error("Invalid index or examQuestions array.");
+    console.error('Invalid index or examQuestions array.');
   }
 };
-
-
-
-
-
 
 
 
@@ -211,48 +144,80 @@ const handleMoreQuestionsOpen = (index) => {
     setOpenMoreQuestions(false);
   };
 
-  // State to manage the input fields in the "Add More Questions" dialog
- const [moreQuestionsFormData, setMoreQuestionsFormData] = useState({
-  question: '',
-  options: [''],
-});
 
 
-  // Handler to add more options in the "Add More Questions" dialog
-  const handleMoreQuestionsAddOptions = () => {
-    setMoreQuestionsFormData((prevData) => ({
-      ...prevData,
-      options: [...prevData.options, ''],
-    }));
-  };
+  const handleMoreQuestionsSubmit = () => {
+  const { tableIndex, ...newQuestion } = examQuestions;
 
-  // Handler to submit the "Add More Questions" form
-const handleMoreQuestionsSubmit = () => {
-  if (currentTableIndex !== null) {
-    const updatedExamQuestions = [...examQuestions];
-    const newQuestion = {
-      question: moreQuestionsFormData.question,
-      options: [...moreQuestionsFormData.options],
-    };
+  if (tableIndex !== null) {
+    setExamQuestions((prevFormData) => {
+      const updatedFormData = [...prevFormData];
 
-    updatedExamQuestions[currentTableIndex].numQuestions += 1;
-    updatedExamQuestions[currentTableIndex].questions.push(newQuestion);
+      // Append the new question directly to the array
+      updatedFormData[tableIndex] = { ...updatedFormData[tableIndex], ...newQuestion };
 
-    setExamQuestions(updatedExamQuestions);
+      return updatedFormData;
+    });
   }
 
-  // Reset the form data and close the dialog
-  setMoreQuestionsFormData({
+  // Reset the form data
+  setExamQuestions({
+    tableIndex: null,
     question: '',
-    options: [''],
+    a: '',
+    b: '',
+    c: '',
+    d: '',
+    answer: [{ option: 'a', details: '' }],
+    program: '',
+    course: '',
+    class: '',
   });
 
-  setCurrentTableIndex(null);
   setOpenMoreQuestions(false);
 };
 
 
 
+ 
+  // Function for Answer and Details Fields (FormData)
+const handleAnswerChange = (value) => {
+  setFormData((prevFormData) => {
+    const updatedOptions = prevFormData.map((item, index) => {
+      if (index === 0 && item.answer) {
+        return {
+          ...item,
+          answer: item.answer.length > 0
+            ? [{ ...item.answer[0], option: value.charAt(0) }]
+            : [{ option: value.charAt(0), details: '' }],
+        };
+      }
+      return item;
+    });
+
+    return updatedOptions;  // Remove the array wrapping
+  });
+};
+
+
+
+const handleDetailsChange = (value) => {
+  setFormData((prevFormData) => {
+    const updatedOptions = prevFormData.map((item, index) => {
+      if (index === 0 && item.answer) {
+        return {
+          ...item,
+          answer: item.answer.length > 0
+            ? [{ ...item.answer[0], details: value }]
+            : [{ option: 'a', details: value }],
+        };
+      }
+      return item;
+    });
+
+    return updatedOptions;  // Remove the array wrapping
+  });
+  };
 
 
 
@@ -261,39 +226,49 @@ const handleMoreQuestionsSubmit = () => {
   const [openViewQuestion, setOpenViewQuestion] = useState(false);
   const [viewQuestionIndex, setViewQuestionIndex] = useState(null);
   const [editedQuestion, setEditedQuestion] = useState('');
-const [editedOptions, setEditedOptions] = useState(['']);
+  const [editedOptions, setEditedOptions] = useState(['']);
 
+// Update the handleViewQuestionOpen function
 const handleViewQuestionOpen = (tableIndex, questionIndex) => {
   setViewQuestionIndex({ tableIndex, questionIndex });
 
-  const currentQuestion = examQuestions[tableIndex].questions[questionIndex];
+  const currentQuestion = examQuestions[tableIndex];
   setEditedQuestion(currentQuestion.question);
-  setEditedOptions([...currentQuestion.options]);
 
-  // Open the "View" modal
+  // Assuming your answer array is always present and has options 'a', 'b', 'c', 'd'
+  const options = ['a', 'b', 'c', 'd'];
+  const editedOptions = options.map((option) => ({
+    option,
+    details: currentQuestion[option],
+  }));
+  setEditedOptions(editedOptions);
+
   setOpenViewQuestion(true);
 };
 
-
-
-const handleViewQuestionClose = () => {
-  setOpenViewQuestion(false);
-  setViewQuestionIndex(null);
-};
-
-  
-  const handleSaveEdits = () => {
-    // Update the original data with the edited values
-    const updatedQuestions = [...examQuestions];
-    updatedQuestions[viewQuestionIndex.tableIndex].questions[viewQuestionIndex.questionIndex].question = editedQuestion;
-    updatedQuestions[viewQuestionIndex.tableIndex].questions[viewQuestionIndex.questionIndex].options = [...editedOptions];
-
-    setExamQuestions(updatedQuestions);
-
-    // Close the modal
+  const handleViewQuestionClose = () => {
     setOpenViewQuestion(false);
     setViewQuestionIndex(null);
   };
+
+  const handleSaveEdits = () => {
+    const updatedQuestions = [...examQuestions];
+    updatedQuestions[viewQuestionIndex.tableIndex].answer = [...editedOptions];
+
+    setExamQuestions(updatedQuestions);
+
+    setOpenViewQuestion(false);
+    setViewQuestionIndex(null);
+  };
+
+
+
+   console.log('Exam Questions:', examQuestions);
+  console.log('Current Table Index:', currentTableIndex);
+  console.log('Form Data:', formData);
+  console.log('View Question Index:', viewQuestionIndex);
+  console.log('Edited Question:', editedQuestion);
+  console.log('Edited Options:', editedOptions);
 
 
 
@@ -309,10 +284,10 @@ const handleViewQuestionClose = () => {
     </Box>
 
     {/* Display the Exam Questions Tables */}
-{examQuestions.map((question, index) => (
+{examQuestions.map((exam, index) => (
   <div key={index}>
     <TableContainer component={Box} marginTop="1rem">
-      <Typography variant="h6">{` Program: ${question.selectedProgram}  - Class: ${question.selectedClass} - Course: ${question.selectedCourse}`}</Typography>
+  <Typography variant="h6">{`Program: ${exam.program} - Class: ${exam.class} - Course: ${exam.course}`}</Typography>
       <Table>
         <TableHead>
           <TableRow>
@@ -322,30 +297,32 @@ const handleViewQuestionClose = () => {
           </TableRow>
         </TableHead>
         {/* Display questions in the table body */}
-    <TableBody>
-      {question.questions.map((q, qIndex) => (
-        <TableRow key={qIndex}>
-          <TableCell>{qIndex + 1}</TableCell>
-          <TableCell>{q.question}</TableCell>
-          <TableCell>
-           <Button onClick={() => handleViewQuestionOpen(index, qIndex)}>
-                View
-          </Button>
-
-          </TableCell>
-        </TableRow>
-      ))}
-    </TableBody>
+        <TableBody>
+  {Array.isArray(examQuestions) && examQuestions.map((examQuestion, index) => (
+    <TableRow key={index}>
+      <TableCell>{index + 1}</TableCell>
+      <TableCell>{examQuestion.question}</TableCell>
+      <TableCell>
+        <Button onClick={() => handleViewQuestionOpen(index)}>
+          View
+        </Button>
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
 
       </Table>
-
       {/* Add More Questions Button */}
-    <Button onClick={() => handleMoreQuestionsOpen(index)}>
+      <Button onClick={() => handleMoreQuestionsOpen(index)}>
         Add More Questions
+      </Button>
+      <Button>
+        Submit
       </Button>
     </TableContainer>
   </div>
 ))}
+
 
 
 
@@ -357,8 +334,8 @@ const handleViewQuestionClose = () => {
           <FormControl fullWidth margin="normal">
             <InputLabel>Select Program</InputLabel>
             <Select
-              name="selectedProgram"
-              value={formData.selectedProgram}
+              name="program"
+              value={formData.program}
               onChange={handleFormChange}
             >
               <MenuItem value="ProgramA">Program A</MenuItem>
@@ -368,28 +345,28 @@ const handleViewQuestionClose = () => {
           </FormControl>
 
           <FormControl fullWidth margin="normal">
-            <InputLabel>Select Class</InputLabel>
-            <Select
-              name="selectedClass"
-              value={formData.selectedClass}
-              onChange={handleFormChange}
-            >
-              <MenuItem value="ClassA">Class A</MenuItem>
-              <MenuItem value="ClassB">Class B</MenuItem>
-              {/* Add more class options as needed */}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth margin="normal">
             <InputLabel>Select Course</InputLabel>
             <Select
-              name="selectedCourse"
-              value={formData.selectedCourse}
+              name="course"
+              value={formData.course}
               onChange={handleFormChange}
             >
               <MenuItem value="Course1">Course 1</MenuItem>
               <MenuItem value="Course2">Course 2</MenuItem>
               {/* Add more course options as needed */}
+            </Select>
+          </FormControl>
+
+              <FormControl fullWidth margin="normal">
+            <InputLabel>Select Class</InputLabel>
+            <Select
+              name="class"
+              value={formData.class}
+              onChange={handleFormChange}
+            >
+              <MenuItem value="ClassA">Class A</MenuItem>
+              <MenuItem value="ClassB">Class B</MenuItem>
+              {/* Add more class options as needed */}
             </Select>
           </FormControl>
 
@@ -409,51 +386,81 @@ const handleViewQuestionClose = () => {
       <DialogTitle>Add Exam Questions</DialogTitle>
       <DialogContent>
         <form>
-          <TextField
-            label="Question"
-            name="question"
-            value={formData.questions[0].question}
-            onChange={handleFormChange}
-            fullWidth
-            margin="normal"
-          />
+     <TextField
+        label="Question"
+        name="question"
+        value={formData.question}
+        onChange={handleFormChange}
+        fullWidth
+        margin="normal"
+      />
 
-        {formData.questions[0].options.map((options, index) => (
-  <TextField
-    key={index}
-    label={`Options ${index + 1}`}
-    value={options}
-    onChange={(e) => handleFormChange(e)}
-    name={`options${index}`}
-    fullWidth
-    margin="normal"
-  />
-))}
 
-          <Button variant="outlined" onClick={handleAddOptions}>
+
+      <TextField
+        label="Option A"
+        name="a"
+        value={formData.a}
+        onChange={handleFormChange}
+        fullWidth
+        margin="normal"
+      />
+
+      <TextField
+        label="Option B"
+        name="b"
+        value={formData.b}
+        onChange={handleFormChange}
+        fullWidth
+        margin="normal"
+      />
+
+      <TextField
+        label="Option C"
+        name="c"
+        value={formData.c}
+        onChange={handleFormChange}
+        fullWidth
+        margin="normal"
+      />
+
+      <TextField
+        label="Option D"
+        name="d"
+        value={formData.d}
+        onChange={handleFormChange}
+        fullWidth
+        margin="normal"
+      />
+
+
+          {/* <Button variant="outlined" onClick={handleAddOptions}>
             Add More Options
-              </Button>
+              </Button> */}
               
 
-              {/* Add Answer Field */}
+ 
+      {/* Assuming answer is an array in the structure */}
+
 <TextField
   label="Answer (e.g., a, b, c, or d)"
   name="answer"
-  value={formData.questions[0].answer}
-  onChange={handleFormChange}
+  value={formData.length > 0 && formData[0].answer && formData[0].answer.length > 0 ? formData[0].answer[0]?.option || '' : ''}
+  onChange={(e) => handleAnswerChange(e.target.value)}
   fullWidth
   margin="normal"
 />
 
-{/* Add Description Field */}
+
 <TextField
-  label="Description"
-  name="description"
-  value={formData.questions[0].description}
-  onChange={handleFormChange}
+  label="Details"
+  name="details"
+  value={formData.length > 0 && formData[0].answer && formData[0].answer.length > 0 ? formData[0].answer[0]?.details || '' : ''}
+  onChange={(e) => handleDetailsChange(e.target.value)}
   fullWidth
   margin="normal"
 />
+
         </form>
       </DialogContent>
       <DialogActions>
@@ -464,77 +471,154 @@ const handleViewQuestionClose = () => {
     </Dialog>
 
     {/* Add More Questions Dialog */}
-    <Dialog open={openMoreQuestions} onClose={handleMoreQuestionsClose}>
-<DialogTitle>{`Add More Exam Questions - Program: ${moreQuestionsFormData.selectedProgram} - Class: ${moreQuestionsFormData.selectedClass} - Course: ${moreQuestionsFormData.selectedCourse}`}</DialogTitle>
-      <DialogContent>
-        <form>
-          <TextField
-            label="Question"
-            name="question"
-            value={moreQuestionsFormData.question}
-            onChange={(e) => setMoreQuestionsFormData({ ...moreQuestionsFormData, question: e.target.value })}
-            fullWidth
-            margin="normal"
-          />
+<Dialog open={openMoreQuestions} onClose={handleMoreQuestionsClose}>
+  <DialogTitle>{`Add More Exam Questions - Program: ${formData.program} - Course: ${formData.course} - Class: ${formData.class}`}</DialogTitle>
+  <DialogContent>
+    <form>
+     <TextField
+        label="Question"
+        name="question"
+        value={formData.question}
+        onChange={handleFormChange}
+        fullWidth
+        margin="normal"
+      />
 
-          {moreQuestionsFormData.options.map((options, index) => (
-            <TextField
-              key={index}
-              label={`Options ${index + 1}`}
-              value={options}
-              onChange={(e) => {
-                const updatedoptions = [...moreQuestionsFormData.options];
-                updatedoptions[index] = e.target.value;
-                setMoreQuestionsFormData({ ...moreQuestionsFormData, options: updatedoptions });
-              }}
-              fullWidth
-              margin="normal"
-            />
-          ))}
 
-          <Button variant="outlined" onClick={handleMoreQuestionsAddOptions}>
+
+      <TextField
+        label="Option A"
+        name="a"
+        value={formData.a}
+        onChange={handleFormChange}
+        fullWidth
+        margin="normal"
+      />
+
+      <TextField
+        label="Option B"
+        name="b"
+        value={formData.b}
+        onChange={handleFormChange}
+        fullWidth
+        margin="normal"
+      />
+
+      <TextField
+        label="Option C"
+        name="c"
+        value={formData.c}
+        onChange={handleFormChange}
+        fullWidth
+        margin="normal"
+      />
+
+      <TextField
+        label="Option D"
+        name="d"
+        value={formData.d}
+        onChange={handleFormChange}
+        fullWidth
+        margin="normal"
+      />
+
+
+          {/* <Button variant="outlined" onClick={handleAddOptions}>
             Add More Options
-          </Button>
+              </Button> */}
+              
+
+ 
+      {/* Assuming answer is an array in the structure */}
+
+<TextField
+  label="Answer (e.g., a, b, c, or d)"
+  name="answer"
+  value={formData.length > 0 && formData[0].answer && formData[0].answer.length > 0 ? formData[0].answer[0]?.option || '' : ''}
+  onChange={(e) => handleAnswerChange(e.target.value)}
+  fullWidth
+  margin="normal"
+/>
+
+
+<TextField
+  label="Details"
+  name="details"
+  value={formData.length > 0 && formData[0].answer && formData[0].answer.length > 0 ? formData[0].answer[0]?.details || '' : ''}
+  onChange={(e) => handleDetailsChange(e.target.value)}
+  fullWidth
+  margin="normal"
+/>
+
         </form>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleMoreQuestionsSubmit} color="primary">
-          Add Questions
-        </Button>
-        <Button onClick={handleMoreQuestionsClose} color="primary">
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleMoreQuestionsSubmit} color="primary">
+      Add Questions
+    </Button>
+    <Button onClick={handleMoreQuestionsClose} color="primary">
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
+
 
         
     {/* View Exam Questions Dialog */}
 
-
-      <Dialog open={openViewQuestion} onClose={handleViewQuestionClose}>
-  <DialogTitle>Edit Question</DialogTitle>
+<Dialog open={openViewQuestion} onClose={handleViewQuestionClose}>
+  <DialogTitle>View Question</DialogTitle>
   <DialogContent>
     {viewQuestionIndex !== null && (
-  <form>
-    <TextField
-      label="Question"
-      name="question"
-      value={editedQuestion}
-      onChange={(e) => setEditedQuestion(e.target.value)}
-      fullWidth
-      margin="normal"
-    />
+      <form>
+        <TextField
+          label="Question"
+          name="question"
+          value={editedQuestion}
+          fullWidth
+          margin="normal"
+          InputProps={{
+            readOnly: true,
+          }}
+        />
 
-   {editedOptions.map((options, optionsIndex) => (
-  <TextField
-    key={optionsIndex}
-    label={`Options ${optionsIndex + 1}`}
-    value={options}
-    onChange={(e) => handleOptionsChange(optionsIndex, e.target.value, true)}
-    fullWidth
-    margin="normal"
-  />
-))}
+     {editedOptions.map((option, index) => (
+          <div key={index}>
+            <TextField
+              label={`Option ${option.option.toUpperCase()}`}
+              name={option.option}
+              value={option.details}
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+          </div>
+        ))} 
+
+
+        <TextField
+          label="Correct Answer"
+          name="correctAnswer"
+          value={editedOptions[0]?.option || ''}
+          fullWidth
+          margin="normal"
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+
+        <TextField
+          label="Details"
+          name="details"
+          value={editedOptions[0]?.details || ''}
+          fullWidth
+          margin="normal"
+          InputProps={{
+            readOnly: true,
+          }}
+        />
 
   </form>
 )}

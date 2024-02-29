@@ -28,6 +28,7 @@
     "@nivo/pie": "^0.84.0",
     "@nivo/stream": "^0.84.0",
     "@tanstack/react-table": "^8.11.8",
+    "axios": "^1.6.7",
     "formik": "^2.4.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, TextField } from '@mui/material';
 
 const Program = () => {
@@ -67,7 +67,7 @@ const Program = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div  style={{padding: '2rem'}}  className="container mx-auto p-4">
       <h1 className="text-3xl font-bold text-gray-500 mb-6">Programs</h1>
       <Button onClick={handleAddProgram} variant="outlined" color="primary" className="mb-4">Add New Program</Button>
       {showForm && (

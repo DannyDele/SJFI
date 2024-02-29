@@ -12,10 +12,11 @@ import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import QuizIcon from '@mui/icons-material/Quiz';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import '../../../assets/styles/Sidebar.css'
 
 
@@ -105,18 +106,53 @@ function Sidebar() {
               setSelected={setSelected}
             />
           </SubMenu>
+                              <SubMenu
+                                  label='Course Curriculum'
+            title="Course Curriculum"
+            icon={<MenuBookOutlinedIcon />}
+                                  className="submenu"
+          >
+
+                 <Item
+                          title='Program'
+                          to='/programs'
+                          icon={<MenuBookOutlinedIcon />}
+                          selected={selected}
+                          setSelected={setSelected} 
+                          className="student-item"
+                  
+                      />
+                 <Item
+                          title='Courses'
+                          to='/courses'
+                          icon={<MenuBookOutlinedIcon />}
+                          selected={selected}
+                          setSelected={setSelected} 
+                  
+                      />
+                 <Item
+                          title='Classes'
+                          to='/classes'
+                          icon={<MenuBookOutlinedIcon />}
+                          selected={selected}
+                          setSelected={setSelected} 
+                  
+                      />
+                 <Item
+                          title='Ebook'
+                          to='/ebooks'
+                          icon={<MenuBookOutlinedIcon />}
+                          selected={selected}
+                          setSelected={setSelected} 
+                  
+                      />
+
+          </SubMenu>
 
                       <Item
                           title='Financial Overview'
                           to='/financial'
                           icon={<PaymentOutlinedIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                      />
-                      <Item
-                          title='Course Curriculum'
-                          to='/courses'
-                          icon={<MenuBookOutlinedIcon />}
                           selected={selected}
                       setSelected={setSelected}    
                       />
@@ -128,8 +164,15 @@ function Sidebar() {
                       setSelected={setSelected}    
                               />
                     <Item
-                          title='Anouncements'
-                          to='/anouncements'
+                          title='WhatsNew'
+                          to='/whatsNew'
+                          icon={<NotificationsActiveIcon />}
+                          selected={selected}
+                      setSelected={setSelected}    
+                      />
+                    <Item
+                          title='Announcement'
+                          to='/announcements'
                           icon={<CampaignIcon />}
                           selected={selected}
                       setSelected={setSelected}    

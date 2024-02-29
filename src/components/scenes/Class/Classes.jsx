@@ -46,7 +46,7 @@ const Class = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <div style={{padding: '2rem'}} className="container mx-auto p-6">
          <h1 className="text-3xl font-bold text-gray-500 mb-6">Program</h1>
       <Button
         variant="outlined"

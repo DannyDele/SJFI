@@ -70,7 +70,7 @@ const Ebook = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 text-black bg-white">
+    <div style={{padding: '2rem'}} className="container mx-auto p-4 text-black bg-white">
       <h1 className="text-3xl text-gray-500 mb-6">Ebooks</h1>
       <Button
         onClick={handleAddClick}

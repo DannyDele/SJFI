@@ -76,7 +76,7 @@ const Course = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div style={{padding: '2rem'}} className="container mx-auto p-4">
       <h1 className="text-3xl font-bold text-gray-500 mb-6">Courses</h1>
       <Button onClick={handleAddCourse} variant="outlined" color="primary" className="mb-4">Add New Course</Button>
       <Dialog open={showForm} onClose={handleClose}>
