@@ -15,7 +15,9 @@ function Exam() {
   const [openMoreQuestions, setOpenMoreQuestions] = useState(false);
   const [currentTableIndex, setCurrentTableIndex] = useState(null);
   
-const [formData, setFormData] = useState([{
+  const [formData, setFormData] = useState([{
+    tableIndex: null,
+
     question: '',
     a: '',
     b: '',
@@ -117,26 +119,29 @@ const handleFormChange = (event) => {
     setOpenSelect(false);
   };
 
-const handleMoreQuestionsOpen = (index) => {
-  if (examQuestions && examQuestions.length > index && examQuestions[index]) {
+const handleMoreQuestionsOpen = (tableIndex) => {
+  if (examQuestions && examQuestions.length > tableIndex && examQuestions[tableIndex]) {
+    const { program, course, class: classValue } = examQuestions[tableIndex];
+
     setFormData({
-      ...formData,
-      tableIndex: index,
+      tableIndex,
       question: '', // Reset the question for a new one
       a: '',
       b: '',
       c: '',
       d: '',
       answer: [{ option: 'a', details: '' }],
-      program: examQuestions[index].program || '',
-      course: examQuestions[index].course || '',
-      class: examQuestions[index].class || '',
+      program: program || '',
+      course: course || '',
+      class: classValue || '',
     });
+
     setOpenMoreQuestions(true);
   } else {
-    console.error('Invalid index or examQuestions array.');
+    console.error('Invalid tableIndex or examQuestions array.');
   }
 };
+
 
 
 
@@ -144,24 +149,36 @@ const handleMoreQuestionsOpen = (index) => {
     setOpenMoreQuestions(false);
   };
 
-
-
-  const handleMoreQuestionsSubmit = () => {
-  const { tableIndex, ...newQuestion } = examQuestions;
-
-  if (tableIndex !== null) {
-    setExamQuestions((prevFormData) => {
-      const updatedFormData = [...prevFormData];
-
-      // Append the new question directly to the array
-      updatedFormData[tableIndex] = { ...updatedFormData[tableIndex], ...newQuestion };
-
-      return updatedFormData;
+const handleMoreQuestionsSubmit = () => {
+  if (currentTableIndex !== null) {
+    setExamQuestions((prevExamQuestions) => {
+      const updatedExamQuestions = [...prevExamQuestions];
+      updatedExamQuestions[currentTableIndex] = {
+        ...updatedExamQuestions[currentTableIndex],
+        ...formData[0],
+      };
+      return updatedExamQuestions;
     });
+  } else {
+    // Append the new question to examQuestions
+    setExamQuestions((prevExamQuestions) => [
+      ...prevExamQuestions,
+      {
+        question: formData[0].question,
+        a: formData[0].a,
+        b: formData[0].b,
+        c: formData[0].c,
+        d: formData[0].d,
+        answer: formData[0].answer,
+        program: formData[0].program,
+        course: formData[0].course,
+        class: formData[0].class,
+      },
+    ]);
   }
 
-  // Reset the form data
-  setExamQuestions({
+  // Reset only the necessary form fields
+  setFormData({
     tableIndex: null,
     question: '',
     a: '',
@@ -169,14 +186,13 @@ const handleMoreQuestionsOpen = (index) => {
     c: '',
     d: '',
     answer: [{ option: 'a', details: '' }],
-    program: '',
+    program: '', // Add any other fields you want to reset
     course: '',
     class: '',
   });
 
   setOpenMoreQuestions(false);
 };
-
 
 
  
@@ -284,10 +300,10 @@ const handleViewQuestionOpen = (tableIndex, questionIndex) => {
     </Box>
 
     {/* Display the Exam Questions Tables */}
-{examQuestions.map((exam, index) => (
-  <div key={index}>
+{examQuestions.map((examQuestion, tableIndex) => (
+  <div key={tableIndex}>
     <TableContainer component={Box} marginTop="1rem">
-  <Typography variant="h6">{`Program: ${exam.program} - Class: ${exam.class} - Course: ${exam.course}`}</Typography>
+      <Typography variant="h6">{`Program: ${examQuestion.program} - Class: ${examQuestion.class} - Course: ${examQuestion.course}`}</Typography>
       <Table>
         <TableHead>
           <TableRow>
@@ -297,23 +313,20 @@ const handleViewQuestionOpen = (tableIndex, questionIndex) => {
           </TableRow>
         </TableHead>
         {/* Display questions in the table body */}
-        <TableBody>
-  {Array.isArray(examQuestions) && examQuestions.map((examQuestion, index) => (
-    <TableRow key={index}>
-      <TableCell>{index + 1}</TableCell>
-      <TableCell>{examQuestion.question}</TableCell>
-      <TableCell>
-        <Button onClick={() => handleViewQuestionOpen(index)}>
-          View
-        </Button>
-      </TableCell>
-    </TableRow>
-  ))}
-</TableBody>
-
+       <TableBody>
+          <TableRow key={tableIndex}>
+            <TableCell>{ tableIndex + 1}</TableCell>
+            <TableCell>{examQuestion.question}</TableCell>
+            <TableCell>
+              <Button onClick={() => handleViewQuestionOpen(tableIndex)}>
+                View
+              </Button>
+            </TableCell>
+          </TableRow>
+        </TableBody>
       </Table>
       {/* Add More Questions Button */}
-      <Button onClick={() => handleMoreQuestionsOpen(index)}>
+      <Button onClick={() => handleMoreQuestionsOpen(tableIndex)}>
         Add More Questions
       </Button>
       <Button>
