@@ -89,6 +89,14 @@ function Sidebar() {
                                     selected={selected}
                                     setSelected={setSelected}
                                 />
+                                {/* Admissions Component Moved After Teacher Information */}
+                                <Item
+                                    title='Admissions'
+                                    to='/admissions'
+                                    icon={<PermIdentityOutlinedIcon />}
+                                    selected={selected}
+                                    setSelected={setSelected}
+                                />
                                 <Item
                                     title='Financial Overview'
                                     to='/financial'
@@ -168,14 +176,13 @@ function Sidebar() {
                                         setSelected={setSelected}
                                         icon={<NotificationsIcon />}
                                     />
-<Item
-    title='View Post'
-    to='/viewpost'
-    icon={<PostAddIcon />} // You can change the icon as needed
-    selected={selected}
-    setSelected={setSelected}
-/>
-
+                                    <Item
+                                        title='View Post'
+                                        to='/viewpost'
+                                        icon={<PostAddIcon />} // You can change the icon as needed
+                                        selected={selected}
+                                        setSelected={setSelected}
+                                    />
                                 </div>
                             </Box>
                         </Menu>

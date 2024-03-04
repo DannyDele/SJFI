@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, Select, TextField } from '@mui/material';
-import DatePicker from 'react-datepicker'; // Import DatePicker
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from '@mui/material';
+import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const Class = () => {
   const initialCourses = [
-    { title: 'Mathematics', course: 'Maths', program: 'Program A', lecturer: 'John Doe', details: 'Monday 10:00 AM', date: new Date(), startTime: '10:00', endTime: '11:00', zoomLink: '' },
-    { title: 'Science', course: 'Physics', program: 'Program B', lecturer: 'Jane Smith', details: 'Tuesday 9:00 AM', date: new Date(), startTime: '09:00', endTime: '10:00', zoomLink: '' },
-    { title: 'History', course: 'Social Studies', program: 'Program C', lecturer: 'Alice Johnson', details: 'Wednesday 11:00 AM', date: new Date(), startTime: '11:00', endTime: '12:00', zoomLink: '' },
-    { title: 'English', course: 'Language Arts', program: 'Program D', lecturer: 'Bob Brown', details: 'Thursday 10:00 AM', date: new Date(), startTime: '10:00', endTime: '11:00', zoomLink: '' },
+    { title: 'Mathematics', course: 'Maths', program: 'Program A', lecturer: 'John Doe', details: 'Monday 10:00 AM', dateFrom: new Date(), dateTo: new Date(), startTime: '10:00', endTime: '11:00', zoomMeetingLink: '' },
+    { title: 'Science', course: 'Physics', program: 'Program B', lecturer: 'Jane Smith', details: 'Tuesday 9:00 AM', dateFrom: new Date(), dateTo: new Date(), startTime: '09:00', endTime: '10:00', zoomMeetingLink: '' },
+    { title: 'History', course: 'Social Studies', program: 'Program C', lecturer: 'Alice Johnson', details: 'Wednesday 11:00 AM', dateFrom: new Date(), dateTo: new Date(), startTime: '11:00', endTime: '12:00', zoomMeetingLink: '' },
+    { title: 'English', course: 'Language Arts', program: 'Program D', lecturer: 'Bob Brown', details: 'Thursday 10:00 AM', dateFrom: new Date(), dateTo: new Date(), startTime: '10:00', endTime: '11:00', zoomMeetingLink: '' },
   ];
 
   const [courses, setCourses] = useState(initialCourses);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newClass, setNewClass] = useState({ title: '', course: '', program: '', lecturer: '', details: '', dateFrom: new Date(), dateTo: new Date(), startTime: '00:00', endTime: '01:00', zoomLink: '' }); // Changed to dateFrom and dateTo
-  const [errors, setErrors] = useState({ title: '', course: '', program: '', lecturer: '', details: '', dateFrom: '', dateTo: '', startTime: '', endTime: '', zoomLink: '' }); // Changed to dateFrom and dateTo
+  const [showZoomMeetingLinkForm, setShowZoomMeetingLinkForm] = useState(false);
+  const [newClass, setNewClass] = useState({ title: '', course: '', program: '', lecturer: '', details: '', dateFrom: new Date(), dateTo: new Date(), startTime: '00:00', endTime: '01:00', zoomMeetingLink: '' });
+  const [errors, setErrors] = useState({ title: '', course: '', program: '', lecturer: '', details: '', dateFrom: '', dateTo: '', startTime: '', endTime: '', zoomMeetingLink: '' });
   const [viewIndex, setViewIndex] = useState(null);
+  const [zoomMeetingLinkIndex, setZoomMeetingLinkIndex] = useState(null);
 
   const lecturers = ['John Doe', 'Jane Smith', 'Alice Johnson', 'Bob Brown'];
 
@@ -27,7 +29,7 @@ const Class = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!newClass.title || !newClass.course || !newClass.program || !newClass.lecturer || !newClass.details || !newClass.dateFrom || !newClass.dateTo || !newClass.startTime || !newClass.endTime || !newClass.zoomLink) {
+    if (!newClass.title || !newClass.course || !newClass.program || !newClass.lecturer || !newClass.details || !newClass.dateFrom || !newClass.dateTo || !newClass.startTime || !newClass.endTime || !newClass.zoomMeetingLink) {
       setErrors({
         title: newClass.title ? '' : 'Title is required',
         course: newClass.course ? '' : 'Course is required',
@@ -38,7 +40,7 @@ const Class = () => {
         dateTo: newClass.dateTo ? '' : 'Date To is required',
         startTime: newClass.startTime ? '' : 'Start Time is required',
         endTime: newClass.endTime ? '' : 'End Time is required',
-        zoomLink: newClass.zoomLink ? '' : 'Zoom link is required',
+        zoomMeetingLink: newClass.zoomMeetingLink ? '' : 'Zoom Meeting Link is required',
       });
       return;
     }
@@ -48,12 +50,15 @@ const Class = () => {
       setCourses(updatedCourses);
       setViewIndex(null);
     } else {
+      // Add the new class to the courses list
       setCourses([...courses, newClass]);
     }
-    setNewClass({ title: '', course: '', program: '', lecturer: '', details: '', dateFrom: new Date(), dateTo: new Date(), startTime: '00:00', endTime: '01:00', zoomLink: '' });
+    // Reset the newClass state for the next entry
+    setNewClass({ title: '', course: '', program: '', lecturer: '', details: '', dateFrom: new Date(), dateTo: new Date(), startTime: '00:00', endTime: '01:00', zoomMeetingLink: '' });
     setShowAddForm(false);
+    setShowZoomMeetingLinkForm(false);
   };
-
+  
   const handleView = (index) => {
     setNewClass(courses[index]);
     setViewIndex(index);
@@ -70,6 +75,17 @@ const Class = () => {
     setCourses(updatedCourses);
     setViewIndex(null);
     setShowAddForm(false);
+  };
+
+  const handleDeleteZoomMeetingLink = () => {
+    const updatedClass = { ...newClass };
+    updatedClass.zoomMeetingLink = '';
+    setNewClass(updatedClass);
+    setShowZoomMeetingLinkForm(false);
+  };
+  
+  const handleSubmitZoomMeetingLink = () => {
+    setShowZoomMeetingLinkForm(false);
   };
 
   const CustomDatePickerInput = ({ value, onClick }) => (
@@ -93,10 +109,33 @@ const Class = () => {
       >
         Add New Class
       </Button>
-      <Dialog open={showAddForm} onClose={() => setShowAddForm(false)} minWidth="0" fullWidth> {/* Set maxWidth to 'md' and fullWidth */}
-  <DialogTitle>{viewIndex !== null ? 'Edit Class' : 'Add New Class'}</DialogTitle>
-  <DialogContent>
-          <TextField
+      <table className="table-auto w-full">
+        <thead>
+          <tr>
+            <th className="border px-4 py-2 text-gray-800 font-semibold">Class Title</th>
+            <th className="border px-4 py-2 text-gray-800 font-semibold">Class Course</th>
+            <th className="border px-4 py-2 text-gray-800 font-semibold">Program</th>
+            <th className="border px-4 py-2 text-gray-800 font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {courses.map((course, index) => (
+            <tr key={index}>
+              <td className="border px-4 py-2 font-extralight text-gray-600">{course.title}</td>
+              <td className="border px-4 py-2 font-extralight text-gray-600">{course.course}</td>
+              <td className="border px-4 py-2 font-extralight text-gray-600">{course.program}</td>
+              <td className="border px-4 py-2  text-gray-800">
+                <Button variant="outlined" color="primary" onClick={() => handleView(index)}>View</Button>
+                <Button variant="outlined" color="primary" onClick={() => { setShowZoomMeetingLinkForm(true); setZoomMeetingLinkIndex(index); }}>Add/Edit Zoom</Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <Dialog open={showAddForm} onClose={() => setShowAddForm(false)} minWidth="0" fullWidth>
+        <DialogTitle>{viewIndex !== null ? 'Edit Class' : 'Add New Class'}</DialogTitle>
+        <DialogContent>
+        <TextField
             autoFocus
             margin="dense"
             id="title"
@@ -122,7 +161,7 @@ const Class = () => {
               error={!!errors.course}
               helperText={errors.course}
             >
-              {courses.map((course, index) => (
+              {initialCourses.map((course, index) => (
                 <MenuItem key={index} value={course.course}>{course.course}</MenuItem>
               ))}
             </TextField>
@@ -140,7 +179,7 @@ const Class = () => {
               error={!!errors.program}
               helperText={errors.program}
             >
-              {courses.map((course, index) => (
+              {initialCourses.map((course, index) => (
                 <MenuItem key={index} value={course.program}>{course.program}</MenuItem>
               ))}
             </TextField>
@@ -178,20 +217,18 @@ const Class = () => {
             />
           </Box>
           <Box mt={2}>
-            {/* Replace the TextField with DatePicker */}
             <DatePicker
               selected={newClass.dateFrom}
               onChange={(date) => setNewClass({ ...newClass, dateFrom: date })}
               selectsStart
               startDate={newClass.dateFrom}
               endDate={newClass.dateTo}
-              dateFormat="EE dd MMM"
+              dateFormat="MM/dd/yyyy"
               className="form-control"
               customInput={<CustomDatePickerInput />}
             />
           </Box>
           <Box mt={2}>
-            {/* Replace the TextField with DatePicker */}
             <DatePicker
               selected={newClass.dateTo}
               onChange={(date) => setNewClass({ ...newClass, dateTo: date })}
@@ -199,7 +236,7 @@ const Class = () => {
               startDate={newClass.dateFrom}
               endDate={newClass.dateTo}
               minDate={newClass.dateFrom}
-              dateFormat="EE dd MMM"
+              dateFormat="MM/dd/yyyy"
               className="form-control"
               customInput={<CustomDatePickerInput />}
             />
@@ -232,60 +269,43 @@ const Class = () => {
               helperText={errors.endTime}
             />
           </Box>
-          <Box mt={2}>
-            <TextField
-              margin="dense"
-              id="zoomLink"
-              name="zoomLink"
-              label="Zoom Meeting Link"
-              type="text"
-              fullWidth
-              value={newClass.zoomLink}
-              onChange={handleChange}
-              error={!!errors.zoomLink}
-              helperText={errors.zoomLink}
-            />
-          </Box>
         </DialogContent>
-  <DialogActions style={{ justifyContent: 'space-between', width: '50%', padding: '10px' }}> {/* Adjust width and padding */}
-    <div>
-      <Button onClick={() => setShowAddForm(false)}>Cancel</Button>
-      <Button onClick={handleSubmit} color="primary">{viewIndex !== null ? 'Save' : 'Add'}</Button>
-    </div>
-    {viewIndex !== null && (
-      <>
-        <div>
-          <Button onClick={handleEdit} color="primary">Edit</Button>
-          <Button onClick={handleDelete} color="secondary">Delete</Button>
-        </div>
-      </>
-    )}
-  </DialogActions>
-</Dialog>
-
-      {/* Table displaying classes */}
-      <table className="table-auto w-full">
-        <thead>
-          <tr>
-            <th className="border px-4 py-2 text-gray-800 font-semibold">Class Title</th>
-            <th className="border px-4 py-2 text-gray-800 font-semibold">Class Course</th>
-            <th className="border px-4 py-2 text-gray-800 font-semibold">Program</th>
-            <th className="border px-4 py-2 text-gray-800 font-semibold">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {courses.map((course, index) => (
-            <tr key={index}>
-              <td className="border px-4 py-2 font-extralight text-gray-600">{course.title}</td>
-              <td className="border px-4 py-2 font-extralight text-gray-600">{course.course}</td>
-              <td className="border px-4 py-2 font-extralight text-gray-600">{course.program}</td>
-              <td className="border px-4 py-2  text-gray-800">
-                <Button variant="outlined" color="primary" onClick={() => handleView(index)}>View</Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        <DialogActions>
+          <Button onClick={() => setShowAddForm(false)}>Cancel</Button>
+          <Button onClick={handleSubmit} color="primary">{viewIndex !== null ? 'Save' : 'Add'}</Button>
+          {viewIndex !== null && (
+            <>
+              <Button onClick={handleEdit} color="primary">Edit</Button>
+              <Button onClick={handleDelete} color="secondary">Delete</Button>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
+      <Dialog open={showZoomMeetingLinkForm} onClose={() => setShowZoomMeetingLinkForm(false)} minWidth="0" fullWidth>
+        <DialogTitle>{zoomMeetingLinkIndex !== null ? 'Edit Zoom Meeting Link' : 'Add Zoom Meeting Link'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="zoomMeetingLink"
+            name="zoomMeetingLink"
+            label="Zoom Meeting Link"
+            type="text"
+            fullWidth
+            value={newClass.zoomMeetingLink}
+            onChange={handleChange}
+            error={!!errors.zoomMeetingLink}
+            helperText={errors.zoomMeetingLink}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowZoomMeetingLinkForm(false)}>Cancel</Button>
+          <Button onClick={handleSubmitZoomMeetingLink} color="primary">Save</Button>
+          {zoomMeetingLinkIndex !== null && (
+            <Button onClick={handleDeleteZoomMeetingLink} color="secondary">Delete</Button>
+          )}
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
