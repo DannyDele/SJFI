@@ -110,6 +110,7 @@ async function handleFormSubmit() {
         title: formData.title,
         description: formData.description,
         category: formData.category,
+        image: ImageData.path
       }),
     });
 
@@ -118,6 +119,7 @@ async function handleFormSubmit() {
     }
 
     const updatedAnnouncement = await response.json();
+    console.log('Updated Announcement:', updatedAnnouncement)
 
     // Step 2: Upload the image if available
     if (selectedFile) {
@@ -134,6 +136,8 @@ async function handleFormSubmit() {
       }
 
       const imageData = await imageResponse.json();
+            console.log('Image Response:', imageData.path)
+
 
       // Step 3: Update announcement with the image URL
       updatedAnnouncement.image = imageData.path;

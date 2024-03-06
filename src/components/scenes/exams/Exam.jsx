@@ -1,23 +1,224 @@
-import { useState } from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
-import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Typography, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import {
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Checkbox
+} from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
+
+// Function to style the Snackbar Alert
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
+Alert.displayName = 'CustomAlert';
+
+
+
+
+
 
 function Exam() {
-  const [openSelect, setOpenSelect] = useState(false);
-  const [openAddQuestions, setOpenAddQuestions] = useState(false);
-  const [openMoreQuestions, setOpenMoreQuestions] = useState(false);
-  const [currentTableIndex, setCurrentTableIndex] = useState(null);
-  
-  const [formData, setFormData] = useState([{
-    tableIndex: null,
+  const [isSelectDialogOpen, setSelectDialogOpen] = useState(false);
+  const [isAddDialogOpen, setAddDialogOpen] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState('');
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [selectedExamIndex, setSelectedExamIndex] = useState(null);
+  const [isAddMoreQuestionsMode, setAddMoreQuestionsMode] = useState(false);
+  const [examsList, setExamsList] = useState([]);
+  const [isviewDialogOpen, setViewDialogOpen] = useState(false)
+  const [currentExam, setCurrentExam] = useState(null); // New state to track the current exam
+  const [filterProgram, setFilterProgram] = useState('');
+  const [filterCourse, setFilterCourse] = useState('');
+  const [selectedExams, setSelectedExams] = useState([]);
+  const [selectedClass, setSelectedClass] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
+  const [programOptions, setProgramOptions] = useState([]);
+    const [courseOptions, setCourseOptions] = useState([]);
 
+
+
+
+  
+
+
+
+
+ // Updated state for examQuestion
+const [examQuestion, setExamQuestion] = useState({
+  question: '',
+  a: '',
+  b: '',
+  c: '',
+  d: '',
+  answer: [{ option: 'a', details: '' }],
+  program: '',
+  course: '',
+  class: ''
+});
+
+
+
+  const [examQuestionsList, setExamQuestionsList] = useState([]);
+
+
+
+
+
+
+
+
+useEffect(() => {
+  // Fetch program options when the component mounts
+  fetchProgramOptions();
+}, []);
+
+useEffect(() => {
+  // Fetch courses when the program changes
+  console.log('Selected program:', selectedProgram);
+  if (selectedProgram) {
+    fetchCoursesForProgram();
+  }
+}, [selectedProgram]);
+  
+  
+  
+  
+
+// Fetch All Programs
+const fetchProgramOptions = async () => {
+  try {
+    const response = await fetch('https://fis.metaforeignoption.com/api/programs');
+    const data = await response.json();
+    const programNames = data.map(program => ({
+      id: program._id,
+      title: program.title
+    }));
+    console.log('Program Data:', programNames);
+    setProgramOptions(programNames);
+    console.log('Selected Program:', selectedProgram);
+  } catch (error) {
+    console.error('Error fetching program options:', error);
+  }
+};
+
+  
+  
+  
+  
+  
+// Fetch Courses for programs
+const fetchCoursesForProgram = async () => {
+  console.log('Fetching courses for the program...');
+  try {
+    const response = await fetch(`https://fis.metaforeignoption.com/api/courses?program=${selectedProgram}`);
+    const data = await response.json();
+    const courseNames = data.map(course => ({
+      id: course._id,
+      title: course.title
+    }));
+    console.log('Courses related to a program:', courseNames);
+    setCourseOptions(courseNames);
+  } catch (error) {
+    console.error('Error fetching courses for the program:', error);
+  }
+};
+
+
+
+
+
+
+
+
+   const handleAddExam = () => {
+    setSelectDialogOpen(true);
+    setAddMoreQuestionsMode(false); // Reset the mode when opening the first dialog
+  };
+
+  const handleSelectDialogClose = () => {
+    setSelectDialogOpen(false);
+  };
+
+ const handleProceedToAddExam = () => {
+  setSelectDialogOpen(false);
+  setAddDialogOpen(true);
+
+  // Set the program, course, and class in the examQuestion state
+  setExamQuestion((prevExamQuestion) => ({
+    ...prevExamQuestion,
+    program: selectedProgram,
+    course: selectedCourse,
+    class: selectedClass,
+  }));
+};
+
+
+const handleAddDialogClose = () => {
+  setAddDialogOpen(false);
+  setExamQuestion((prevExamQuestion) => ({
+    ...prevExamQuestion,
+    question: '',
+    a: '',
+    b: '',
+    c: '',
+    d: '',
+    answer: [{ option: 'a', details: '' }],
+  }));
+};
+
+
+
+const handleSave = () => {
+  const updatedExamsList = [...examsList];
+
+  const newExam = {
+    question: examQuestion.question,
+    a: examQuestion.a,
+    b: examQuestion.b,
+    c: examQuestion.c,
+    d: examQuestion.d,
+    answer: [...examQuestion.answer],
+    program: selectedProgram || '',
+    course: selectedCourse || '',
+    class: selectedClass || '',
+  };
+
+  console.log('New Exam:', newExam);
+
+  if (selectedExamIndex === null) {
+    // If it's a new exam, add it to the list
+    updatedExamsList.push({ exams: [newExam] });
+    console.log('Updated Exam List:', updatedExamsList);
+  } else {
+    // If it's an existing exam, update the questions for that exam
+    updatedExamsList[selectedExamIndex].exams.push(newExam);
+  }
+
+  setExamsList(updatedExamsList);
+
+  setAddDialogOpen(false);
+  setExamQuestion({
     question: '',
     a: '',
     b: '',
@@ -27,634 +228,516 @@ function Exam() {
     program: '',
     course: '',
     class: '',
-  }]);
+  });
+};
 
-  const [examQuestions, setExamQuestions] = useState([]);
 
-  const handleSelectOpen = () => {
-    setOpenSelect(true);
-  };
 
-  const handleSelectClose = () => {
-    setOpenSelect(false);
-    setFormData([{
-      question: '',
-      a: '',
-      b: '',
-      c: '',
-      d: '',
-      answer: [{ option: 'a', details: '' }],
-      program: '',
-      course: '',
-      class: '',
-    }]);
-  };
+  
+ const handleSubmit = async () => {
+   try {
+        setIsLoading(true);
 
-  const handleAddQuestionsOpen = () => {
-    setOpenAddQuestions(true);
-  };
-
-  const handleAddQuestionsClose = () => {
-    setOpenAddQuestions(false);
-    setFormData([{
-      question: '',
-      a: '',
-      b: '',
-      c: '',
-      d: '',
-      answer: [{ option: 'a', details: '' }],
-      program: '',
-      course: '',
-      class: '',
-    }]);
-  };
-
-const handleFormChange = (event) => {
-  const { name, value } = event.target;
-
-  setFormData((prevFormData) => {
-    if (!Array.isArray(prevFormData)) {
-      // If prevFormData is not an array, initialize it as an array
-      return [{ [name]: value, program: prevFormData.program, course: prevFormData.course, class: prevFormData.class }];
+    // Check if there are exams to submit
+    if (examsList.length === 0) {
+      console.log('No exams to submit.');
+      return;
     }
 
-    // If prevFormData is an array, update the first element
-    return [{ ...prevFormData[0], [name]: value }];
-  });
-};
+    // Extracting all questions from examsList
+    const allExams = examsList.reduce((exams, exam) => {
+      return exams.concat(exam.exams);
+    }, []);
 
+    // Creating the payload for the API
+    const payload = {
+      exams: allExams,
+    };
 
-
-  const handleFormSubmit = () => {
-    console.log('Form Data:', formData);
-
- const newQuestion = {
-  question: formData[0].question,
-  a: formData[0].a,
-  b: formData[0].b,
-  c: formData[0].c,
-  d: formData[0].d,
-  answer: formData[0].answer,
-  program: formData[0].program,
-  course: formData[0].course,
-  class: formData[0].class,
-};
-
-
-    setExamQuestions((prevExamQuestions) => [...prevExamQuestions, newQuestion]);
-
-    setFormData([{
-      question: '',
-      a: '',
-      b: '',
-      c: '',
-      d: '',
-      answer: [{ option: 'a', details: '' }],
-      program: '',
-      course: '',
-      class: '',
-    }]);
-
-    setOpenAddQuestions(false);
-    setOpenSelect(false);
-  };
-
-const handleMoreQuestionsOpen = (tableIndex) => {
-  if (examQuestions && examQuestions.length > tableIndex && examQuestions[tableIndex]) {
-    const { program, course, class: classValue } = examQuestions[tableIndex];
-
-    setFormData({
-      tableIndex,
-      question: '', // Reset the question for a new one
-      a: '',
-      b: '',
-      c: '',
-      d: '',
-      answer: [{ option: 'a', details: '' }],
-      program: program || '',
-      course: course || '',
-      class: classValue || '',
-    });
-
-    setOpenMoreQuestions(true);
-  } else {
-    console.error('Invalid tableIndex or examQuestions array.');
-  }
-};
-
-
-
-
-  const handleMoreQuestionsClose = () => {
-    setOpenMoreQuestions(false);
-  };
-
-const handleMoreQuestionsSubmit = () => {
-  if (currentTableIndex !== null) {
-    setExamQuestions((prevExamQuestions) => {
-      const updatedExamQuestions = [...prevExamQuestions];
-      updatedExamQuestions[currentTableIndex] = {
-        ...updatedExamQuestions[currentTableIndex],
-        ...formData[0],
-      };
-      return updatedExamQuestions;
-    });
-  } else {
-    // Append the new question to examQuestions
-    setExamQuestions((prevExamQuestions) => [
-      ...prevExamQuestions,
-      {
-        question: formData[0].question,
-        a: formData[0].a,
-        b: formData[0].b,
-        c: formData[0].c,
-        d: formData[0].d,
-        answer: formData[0].answer,
-        program: formData[0].program,
-        course: formData[0].course,
-        class: formData[0].class,
+    // Making the API request
+    const response = await fetch('https://fis.metaforeignoption.com/api/tests', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Add any other headers if required
       },
-    ]);
+      body: JSON.stringify(payload),
+    });
+
+    // Check if the request was successful (status code 2xx)
+    if (response.ok) {
+      console.log('Exams submitted successfully!');
+      // Clear the table by setting examsList to an empty array
+      setExamsList([]);
+      
+    // Show the success message
+      setSuccessMessageVisible(true);
+       // Optionally, hide the success message after a certain duration
+    setTimeout(() => {
+      setSuccessMessageVisible(false);
+    }, 5000); // Hide the message after 5 seconds (adjust the duration as needed)
+  
+      
+    } else {
+      console.error('Failed to submit exams. Status:', response.status);
+      // Handle the error as needed
+    }
+  } catch (error) {
+    console.error('Error submitting exams:', error);
+    // Handle the error as needed
+  }finally {
+    // Set loading back to false after the submission is complete (success or failure)
+    setIsLoading(false);
+  }
+};
+
+
+
+
+
+
+const handleViewExam = (examIndex) => {
+  setSelectedExamIndex(examIndex);
+
+  // Retrieve the selected exam from examsList
+  const selectedExam = examsList[examIndex]?.exams[0];
+
+  // Check if the selected exam is defined before setting the state
+  if (selectedExam) {
+    // Set the examQuestion state with the details of the selected exam
+    setExamQuestion({
+      question: selectedExam.question || '',
+      a: selectedExam.a || '',
+      b: selectedExam.b || '',
+      c: selectedExam.c || '',
+      d: selectedExam.d || '',
+      answer: {
+        option: selectedExam.answer[0]?.option || '', 
+        details: selectedExam.answer[0]?.details || '', 
+      },
+      program: selectedExam.program || '',
+      course: selectedExam.course || '',
+      class: selectedExam.class || '',
+    });
   }
 
-  // Reset only the necessary form fields
-  setFormData({
-    tableIndex: null,
-    question: '',
-    a: '',
-    b: '',
-    c: '',
-    d: '',
-    answer: [{ option: 'a', details: '' }],
-    program: '', // Add any other fields you want to reset
-    course: '',
-    class: '',
-  });
-
-  setOpenMoreQuestions(false);
-};
-
-
- 
-  // Function for Answer and Details Fields (FormData)
-const handleAnswerChange = (value) => {
-  setFormData((prevFormData) => {
-    const updatedOptions = prevFormData.map((item, index) => {
-      if (index === 0 && item.answer) {
-        return {
-          ...item,
-          answer: item.answer.length > 0
-            ? [{ ...item.answer[0], option: value.charAt(0) }]
-            : [{ option: value.charAt(0), details: '' }],
-        };
-      }
-      return item;
-    });
-
-    return updatedOptions;  // Remove the array wrapping
-  });
+  setViewDialogOpen(true);
 };
 
 
 
-const handleDetailsChange = (value) => {
-  setFormData((prevFormData) => {
-    const updatedOptions = prevFormData.map((item, index) => {
-      if (index === 0 && item.answer) {
-        return {
-          ...item,
-          answer: item.answer.length > 0
-            ? [{ ...item.answer[0], details: value }]
-            : [{ option: 'a', details: value }],
-        };
-      }
-      return item;
-    });
 
-    return updatedOptions;  // Remove the array wrapping
-  });
-  };
-
-
-
-
-
-  const [openViewQuestion, setOpenViewQuestion] = useState(false);
-  const [viewQuestionIndex, setViewQuestionIndex] = useState(null);
-  const [editedQuestion, setEditedQuestion] = useState('');
-  const [editedOptions, setEditedOptions] = useState(['']);
-
-// Update the handleViewQuestionOpen function
-const handleViewQuestionOpen = (tableIndex, questionIndex) => {
-  setViewQuestionIndex({ tableIndex, questionIndex });
-
-  const currentQuestion = examQuestions[tableIndex];
-  setEditedQuestion(currentQuestion.question);
-
-  // Assuming your answer array is always present and has options 'a', 'b', 'c', 'd'
-  const options = ['a', 'b', 'c', 'd'];
-  const editedOptions = options.map((option) => ({
-    option,
-    details: currentQuestion[option],
-  }));
-  setEditedOptions(editedOptions);
-
-  setOpenViewQuestion(true);
+const isViewDialogClose = () => {
+  setViewDialogOpen(false);
 };
 
-  const handleViewQuestionClose = () => {
-    setOpenViewQuestion(false);
-    setViewQuestionIndex(null);
+
+
+
+  
+
+
+
+   const handleAddMoreQuestions = () => {
+    setAddDialogOpen(true);
+    setAddMoreQuestionsMode(true); // Set the mode when opening the second dialog
   };
 
-  const handleSaveEdits = () => {
-    const updatedQuestions = [...examQuestions];
-    updatedQuestions[viewQuestionIndex.tableIndex].answer = [...editedOptions];
-
-    setExamQuestions(updatedQuestions);
-
-    setOpenViewQuestion(false);
-    setViewQuestionIndex(null);
+    const handleAddNewTable = () => {
+    setExamsList([...examsList, { questions: [] }]);
   };
 
 
+  const handleApplyFilters = () => {
+  // Filter the exams based on selected filters
+  const filteredExams = examsList.filter((exam) => {
+    return (
+      (!filterProgram || exam.program === filterProgram) &&
+      (!filterCourse || exam.course === filterCourse)
+    );
+  });
 
-   console.log('Exam Questions:', examQuestions);
-  console.log('Current Table Index:', currentTableIndex);
-  console.log('Form Data:', formData);
-  console.log('View Question Index:', viewQuestionIndex);
-  console.log('Edited Question:', editedQuestion);
-  console.log('Edited Options:', editedOptions);
+  // Update the state variable holding the displayed exams
+  setExamsList(filteredExams);
+};
+
+  
+  // Check box Function
+  const handleCheckboxChange = (examIndex) => {
+  if (selectedExams.includes(examIndex)) {
+    // If the exam is already selected, remove it from the list
+    setSelectedExams((prevSelectedExams) =>
+      prevSelectedExams.filter((index) => index !== examIndex)
+    );
+  } else {
+    // If the exam is not selected, add it to the list
+    setSelectedExams((prevSelectedExams) => [...prevSelectedExams, examIndex]);
+  }
+};
+
+  
+  // Helper function to get Program, Course and Class by thier names
+
+  const getNamesByIds = (selectedProgramId, selectedCourseId, selectedClassId) => {
+  const selectedProgram = programOptions.find(program => program.id === selectedProgramId);
+  const selectedCourse = courseOptions.find(course => course.id === selectedCourseId);
+  // Assuming you have a similar array for classes
+  // const selectedClass = classOptions.find(className => className.id === selectedClassId);
+
+  return {
+    program: selectedProgram ? selectedProgram.title : '',
+    course: selectedCourse ? selectedCourse.title : '',
+    class: selectedClass ? selectedClass.title : '',
+  };
+};
 
 
 
   return (
-   <div>
-  <Box marginTop='1rem' padding='2rem' width='80vw' height='100vh'>
-    <Typography variant="h5">Exam</Typography>
-
-    <Box>
-      <Button style={{ border: '1px solid #1976D2' }} onClick={handleSelectOpen}>
-        Add Exam Questions
+    <div>
+      <Box>
+        {/* Snackbar for Success Message */}
+        <Snackbar
+          open={isSuccessMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setSuccessMessageVisible(false)}
+        >
+          <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
+            Exam Submission successful! 
+          </Alert>
+        </Snackbar>
+  <Box display="flex" alignItems="center" justifyContent="space-between">
+    <Box marginTop='1rem' padding='2rem' width='30%'>
+      <Button onClick={handleAddExam} color="primary">
+        Add Exam Question
       </Button>
     </Box>
 
-    {/* Display the Exam Questions Tables */}
-{examQuestions.map((examQuestion, tableIndex) => (
-  <div key={tableIndex}>
-    <TableContainer component={Box} marginTop="1rem">
-      <Typography variant="h6">{`Program: ${examQuestion.program} - Class: ${examQuestion.class} - Course: ${examQuestion.course}`}</Typography>
+    <Box display="flex" alignItems="center" width='70%'>
+      <FormControl fullWidth margin="normal" style={{ marginRight: '1rem', flex: 1, minWidth: '120px' }}>
+        <InputLabel id="filter-program-label">Program</InputLabel>
+        <Select
+          labelId="filter-program-label"
+          id="filter-program"
+          value={filterProgram}
+          onChange={(e) => setFilterProgram(e.target.value)}
+        >
+          <MenuItem value="">All Programs</MenuItem>
+          <MenuItem value="program1">Program 1</MenuItem>
+          <MenuItem value="program2">Program 2</MenuItem>
+        </Select>
+            </FormControl>
+            
+
+
+
+            
+
+      <FormControl fullWidth margin="normal" style={{ flex: 1, minWidth: '120px' }}>
+        <InputLabel id="filter-course-label">Course</InputLabel>
+        <Select
+          labelId="filter-course-label"
+          id="filter-course"
+          value={filterCourse}
+          onChange={(e) => setFilterCourse(e.target.value)}
+        >
+          <MenuItem value="">All Courses</MenuItem>
+          <MenuItem value="course1">Course 1</MenuItem>
+          <MenuItem value="course2">Course 2</MenuItem>
+        </Select>
+      </FormControl>
+
+      <Button onClick={handleApplyFilters} color="primary" variant="contained" style={{ marginLeft: '1rem' }}>
+        Apply Filters
+      </Button>
+    </Box>
+  </Box>
+
+  {/* First Dialog for selecting program, course, and class */}
+  <Dialog open={isSelectDialogOpen} onClose={handleSelectDialogClose} fullWidth maxWidth="sm">
+    <DialogTitle>Select Program, Course, and Class</DialogTitle>
+    <DialogContent>
+    <FormControl fullWidth margin="normal">
+  <InputLabel id="program-label">Program</InputLabel>
+  <Select
+    labelId="program-label"
+    id="program"
+    value={selectedProgram}
+    label="Program"
+    onChange={(e) => setSelectedProgram(e.target.value)}
+  >
+    {programOptions.map((program) => (
+      <MenuItem key={program.id} value={program.id}>
+        {program.title}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
+     <FormControl fullWidth margin="normal">
+  <InputLabel id="course-label">Course</InputLabel>
+  <Select
+    labelId="course-label"
+    id="course"
+    value={selectedCourse}
+    label="Course"
+    onChange={(e) => setSelectedCourse(e.target.value)}
+  >
+    {courseOptions.map((course) => (
+      <MenuItem key={course.id} value={course.id}>
+        {course.title}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
+
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="class-label">Class</InputLabel>
+        <Select
+          labelId="class-label"
+          id="class"
+          value={selectedClass}
+          label="Class"
+          onChange={(e) => setSelectedClass(e.target.value)}
+        >
+          <MenuItem value="class1">Class 1</MenuItem>
+          <MenuItem value="class2">Class 2</MenuItem>
+        </Select>
+      </FormControl>
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={handleSelectDialogClose} color="primary">
+        Cancel
+      </Button>
+      <Button onClick={handleProceedToAddExam} color="primary">
+        Proceed to Add Exam
+      </Button>
+    </DialogActions>
+  </Dialog>
+
+  {/* Second Dialog for adding exam questions */}
+  <Dialog open={isAddDialogOpen} onClose={handleAddDialogClose} fullWidth maxWidth="sm">
+    <DialogTitle>Add Exam Question</DialogTitle>
+    <DialogContent>
+      <TextField
+        label="Question"
+        fullWidth
+        margin="normal"
+        value={examQuestion.question}
+        onChange={(e) => setExamQuestion({ ...examQuestion, question: e.target.value })}
+      />
+
+      <TextField
+        label="Option A"
+        fullWidth
+        margin="normal"
+        value={examQuestion.a}
+        onChange={(e) => setExamQuestion({ ...examQuestion, a: e.target.value })}
+      />
+
+      <TextField
+        label="Option B"
+        fullWidth
+        margin="normal"
+        value={examQuestion.b}
+        onChange={(e) => setExamQuestion({ ...examQuestion, b: e.target.value })}
+      />
+
+      <TextField
+        label="Option C"
+        fullWidth
+        margin="normal"
+        value={examQuestion.c}
+        onChange={(e) => setExamQuestion({ ...examQuestion, c: e.target.value })}
+      />
+
+      <TextField
+        label="Option D"
+        fullWidth
+        margin="normal"
+        value={examQuestion.d}
+        onChange={(e) => setExamQuestion({ ...examQuestion, d: e.target.value })}
+      />
+
+     <FormControl fullWidth margin="normal">
+  <InputLabel id="answer-label">Answer (a, b, c, d)</InputLabel>
+  <Select
+    labelId="answer-label"
+    id="answer"
+    value={examQuestion.answer && examQuestion.answer[0]?.option || ''}
+    onChange={(e) => setExamQuestion({ ...examQuestion, answer: [{ ...examQuestion.answer[0], option: e.target.value }] })}
+  >
+    <MenuItem value="a">Option A</MenuItem>
+    <MenuItem value="b">Option B</MenuItem>
+    <MenuItem value="c">Option C</MenuItem>
+    <MenuItem value="d">Option D</MenuItem>
+  </Select>
+</FormControl>
+
+
+      <TextField
+        label="Answer Details"
+        fullWidth
+        margin="normal"
+    value={examQuestion.answer && examQuestion.answer[0]?.details || ''}
+        onChange={(e) => setExamQuestion({ ...examQuestion, answer: [{ ...examQuestion.answer[0], details: e.target.value }] })}
+      />
+    </DialogContent>
+    <DialogActions>
+      {isAddMoreQuestionsMode ? (
+        <Button color="primary">
+          Add Exam
+        </Button>
+      ) : (
+        <>
+          <Button onClick={handleAddDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} color="primary">
+            Save Question
+          </Button>
+        </>
+      )}
+    </DialogActions>
+  </Dialog>
+
+  {/* Table to display saved exam questions */}
+  {examsList.length > 0 && (
+  <Box marginTop="2rem">
+    <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Serial Number</TableCell>
+            <TableCell></TableCell>
+            <TableCell>Number</TableCell>
             <TableCell>Question</TableCell>
             <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
-        {/* Display questions in the table body */}
-       <TableBody>
-          <TableRow key={tableIndex}>
-            <TableCell>{ tableIndex + 1}</TableCell>
-            <TableCell>{examQuestion.question}</TableCell>
-            <TableCell>
-              <Button onClick={() => handleViewQuestionOpen(tableIndex)}>
-                View
-              </Button>
-            </TableCell>
-          </TableRow>
+        <TableBody>
+          {examsList.map((exam, examIndex) => (
+            <TableRow key={examIndex}>
+              <TableCell>
+                <Checkbox
+                  checked={selectedExams.includes(examIndex)}
+                  onChange={() => handleCheckboxChange(examIndex)}
+                />
+              </TableCell>
+              <TableCell>{examIndex + 1}</TableCell>
+              <TableCell>{exam.exams[0].question}</TableCell>
+              <TableCell>
+                <Button color="primary" onClick={() => handleViewExam(examIndex)}>
+                  View
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
-      {/* Add More Questions Button */}
-      <Button onClick={() => handleMoreQuestionsOpen(tableIndex)}>
-        Add More Questions
-      </Button>
-      <Button>
-        Submit
-      </Button>
     </TableContainer>
-  </div>
-))}
 
-
-
-
-    {/* Select Class and Course Dialog */}
-    <Dialog open={openSelect} onClose={handleSelectClose}>
-      <DialogTitle>Select Class and Course</DialogTitle>
-      <DialogContent>
-        <form>
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Select Program</InputLabel>
-            <Select
-              name="program"
-              value={formData.program}
-              onChange={handleFormChange}
-            >
-              <MenuItem value="ProgramA">Program A</MenuItem>
-              <MenuItem value="ProgramB">Program B</MenuItem>
-              {/* Add more class options as needed */}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Select Course</InputLabel>
-            <Select
-              name="course"
-              value={formData.course}
-              onChange={handleFormChange}
-            >
-              <MenuItem value="Course1">Course 1</MenuItem>
-              <MenuItem value="Course2">Course 2</MenuItem>
-              {/* Add more course options as needed */}
-            </Select>
-          </FormControl>
-
-              <FormControl fullWidth margin="normal">
-            <InputLabel>Select Class</InputLabel>
-            <Select
-              name="class"
-              value={formData.class}
-              onChange={handleFormChange}
-            >
-              <MenuItem value="ClassA">Class A</MenuItem>
-              <MenuItem value="ClassB">Class B</MenuItem>
-              {/* Add more class options as needed */}
-            </Select>
-          </FormControl>
-
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddQuestionsOpen}
-          >
-            Proceed to Add Questions
-          </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
-
-    {/* Add Exam Questions Dialog */}
-    <Dialog open={openAddQuestions} onClose={handleAddQuestionsClose}>
-      <DialogTitle>Add Exam Questions</DialogTitle>
-      <DialogContent>
-        <form>
-     <TextField
-        label="Question"
-        name="question"
-        value={formData.question}
-        onChange={handleFormChange}
-        fullWidth
-        margin="normal"
-      />
-
-
-
-      <TextField
-        label="Option A"
-        name="a"
-        value={formData.a}
-        onChange={handleFormChange}
-        fullWidth
-        margin="normal"
-      />
-
-      <TextField
-        label="Option B"
-        name="b"
-        value={formData.b}
-        onChange={handleFormChange}
-        fullWidth
-        margin="normal"
-      />
-
-      <TextField
-        label="Option C"
-        name="c"
-        value={formData.c}
-        onChange={handleFormChange}
-        fullWidth
-        margin="normal"
-      />
-
-      <TextField
-        label="Option D"
-        name="d"
-        value={formData.d}
-        onChange={handleFormChange}
-        fullWidth
-        margin="normal"
-      />
-
-
-          {/* <Button variant="outlined" onClick={handleAddOptions}>
-            Add More Options
-              </Button> */}
-              
-
- 
-      {/* Assuming answer is an array in the structure */}
-
-<TextField
-  label="Answer (e.g., a, b, c, or d)"
-  name="answer"
-  value={formData.length > 0 && formData[0].answer && formData[0].answer.length > 0 ? formData[0].answer[0]?.option || '' : ''}
-  onChange={(e) => handleAnswerChange(e.target.value)}
-  fullWidth
-  margin="normal"
-/>
-
-
-<TextField
-  label="Details"
-  name="details"
-  value={formData.length > 0 && formData[0].answer && formData[0].answer.length > 0 ? formData[0].answer[0]?.details || '' : ''}
-  onChange={(e) => handleDetailsChange(e.target.value)}
-  fullWidth
-  margin="normal"
-/>
-
-        </form>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleFormSubmit} color="primary">
-          Add Exam Question
-        </Button>
-      </DialogActions>
-    </Dialog>
-
-    {/* Add More Questions Dialog */}
-<Dialog open={openMoreQuestions} onClose={handleMoreQuestionsClose}>
-  <DialogTitle>{`Add More Exam Questions - Program: ${formData.program} - Course: ${formData.course} - Class: ${formData.class}`}</DialogTitle>
-  <DialogContent>
-    <form>
-     <TextField
-        label="Question"
-        name="question"
-        value={formData.question}
-        onChange={handleFormChange}
-        fullWidth
-        margin="normal"
-      />
-
-
-
-      <TextField
-        label="Option A"
-        name="a"
-        value={formData.a}
-        onChange={handleFormChange}
-        fullWidth
-        margin="normal"
-      />
-
-      <TextField
-        label="Option B"
-        name="b"
-        value={formData.b}
-        onChange={handleFormChange}
-        fullWidth
-        margin="normal"
-      />
-
-      <TextField
-        label="Option C"
-        name="c"
-        value={formData.c}
-        onChange={handleFormChange}
-        fullWidth
-        margin="normal"
-      />
-
-      <TextField
-        label="Option D"
-        name="d"
-        value={formData.d}
-        onChange={handleFormChange}
-        fullWidth
-        margin="normal"
-      />
-
-
-          {/* <Button variant="outlined" onClick={handleAddOptions}>
-            Add More Options
-              </Button> */}
-              
-
- 
-      {/* Assuming answer is an array in the structure */}
-
-<TextField
-  label="Answer (e.g., a, b, c, or d)"
-  name="answer"
-  value={formData.length > 0 && formData[0].answer && formData[0].answer.length > 0 ? formData[0].answer[0]?.option || '' : ''}
-  onChange={(e) => handleAnswerChange(e.target.value)}
-  fullWidth
-  margin="normal"
-/>
-
-
-<TextField
-  label="Details"
-  name="details"
-  value={formData.length > 0 && formData[0].answer && formData[0].answer.length > 0 ? formData[0].answer[0]?.details || '' : ''}
-  onChange={(e) => handleDetailsChange(e.target.value)}
-  fullWidth
-  margin="normal"
-/>
-
-        </form>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleMoreQuestionsSubmit} color="primary">
-      Add Questions
-    </Button>
-    <Button onClick={handleMoreQuestionsClose} color="primary">
-      Close
-    </Button>
-  </DialogActions>
-</Dialog>
-
-
-        
-    {/* View Exam Questions Dialog */}
-
-<Dialog open={openViewQuestion} onClose={handleViewQuestionClose}>
-  <DialogTitle>View Question</DialogTitle>
-  <DialogContent>
-    {viewQuestionIndex !== null && (
-      <form>
-        <TextField
-          label="Question"
-          name="question"
-          value={editedQuestion}
-          fullWidth
-          margin="normal"
-          InputProps={{
-            readOnly: true,
-          }}
-        />
-
-     {editedOptions.map((option, index) => (
-          <div key={index}>
-            <TextField
-              label={`Option ${option.option.toUpperCase()}`}
-              name={option.option}
-              value={option.details}
-              fullWidth
-              margin="normal"
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-          </div>
-        ))} 
-
-
-        <TextField
-          label="Correct Answer"
-          name="correctAnswer"
-          value={editedOptions[0]?.option || ''}
-          fullWidth
-          margin="normal"
-          InputProps={{
-            readOnly: true,
-          }}
-        />
-
-        <TextField
-          label="Details"
-          name="details"
-          value={editedOptions[0]?.details || ''}
-          fullWidth
-          margin="normal"
-          InputProps={{
-            readOnly: true,
-          }}
-        />
-
-  </form>
-)}
-
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleViewQuestionClose} color="primary">
-      Close
-    </Button>
-    <Button onClick={handleSaveEdits} color="primary">
-      Save Edits
-    </Button>
-  </DialogActions>
-</Dialog>
-
-
+    {/* Submit Button */}
+    <Box marginTop="1rem" textAlign="right">
+               <Button
+    color="primary"
+    onClick={handleSubmit}
+    disabled={isLoading}
+    style={{ backgroundColor: '#1976D2', color: '#ffffff' }}
+    startIcon={isLoading && <CircularProgress size={20} color="inherit" />}
+  >
+    Submit
+  </Button>
+    </Box>
   </Box>
+)}
+  <Dialog open={isviewDialogOpen} onClose={isViewDialogClose} fullWidth maxWidth="sm">
+<DialogTitle>{`View Exam Question - ${getNamesByIds(
+    examsList[selectedExamIndex]?.exams[0]?.program,
+    examsList[selectedExamIndex]?.exams[0]?.course,
+    examsList[selectedExamIndex]?.exams[0]?.class
+  ).program} | ${getNamesByIds(
+    examsList[selectedExamIndex]?.exams[0]?.program,
+    examsList[selectedExamIndex]?.exams[0]?.course,
+    examsList[selectedExamIndex]?.exams[0]?.class
+  ).course} | ${getNamesByIds(
+    examsList[selectedExamIndex]?.exams[0]?.program,
+    examsList[selectedExamIndex]?.exams[0]?.course,
+    examsList[selectedExamIndex]?.exams[0]?.class
+  ).class}`}</DialogTitle>    <DialogContent>
+      <TextField
+        label="Question"
+        fullWidth
+        margin="normal"
+        value={examsList[selectedExamIndex]?.exams[0]?.question}
+        onChange={(e) => setExamQuestion({ ...examQuestion, question: e.target.value })}
+      />
 
-</div>
+      <TextField
+        label="Option A"
+        fullWidth
+        margin="normal"
+        value={examsList[selectedExamIndex]?.exams[0]?.a}
+        onChange={(e) => setExamQuestion({ ...examQuestion, a: e.target.value })}
+      />
+
+      <TextField
+        label="Option B"
+        fullWidth
+        margin="normal"
+        value={examsList[selectedExamIndex]?.exams[0]?.b}
+        onChange={(e) => setExamQuestion({ ...examQuestion, b: e.target.value })}
+      />
+
+      <TextField
+        label="Option C"
+        fullWidth
+        margin="normal"
+        value={examsList[selectedExamIndex]?.exams[0]?.c}
+        onChange={(e) => setExamQuestion({ ...examQuestion, c: e.target.value })}
+      />
+
+      <TextField
+        label="Option D"
+        fullWidth
+        margin="normal"
+        value={examsList[selectedExamIndex]?.exams[0]?.d}
+        onChange={(e) => setExamQuestion({ ...examQuestion, d: e.target.value })}
+      />
+
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="answer-label">Answer (a, b, c, d)</InputLabel>
+        <Select
+          labelId="answer-label"
+          id="answer"
+          value={examsList[selectedExamIndex]?.exams[0]?.answer[0].option}
+          onChange={(e) => setExamQuestion({ ...examQuestion, answer: [{ ...examQuestion.answer[0], option: e.target.value }] })}
+        >
+          <MenuItem value="a">Option A</MenuItem>
+          <MenuItem value="b">Option B</MenuItem>
+          <MenuItem value="c">Option C</MenuItem>
+          <MenuItem value="d">Option D</MenuItem>
+        </Select>
+      </FormControl>
+
+      <TextField
+        label="Answer Details"
+        fullWidth
+        margin="normal"
+        value={examsList[selectedExamIndex]?.exams[0]?.answer[0].details}
+        onChange={(e) => setExamQuestion({ ...examQuestion, answer: [{ ...examQuestion.answer[0], details: e.target.value }] })}
+      />
+    </DialogContent>
+    <DialogActions>
+      {/* Add any actions or buttons you need */}
+    </DialogActions>
+        </Dialog>
+        
+
+</Box>
+
+    </div>
   );
 }
 
 export default Exam;
-
-
- 

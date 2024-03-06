@@ -17,12 +17,16 @@ function Student() {
   
   {
       accessorKey: 'profileImage', // Update accessorKey
-      header: 'Profile',
+      header: (
+<div style={{ fontSize: '16px', width: '100%', paddingRight: '30px' }}>
+      Profile
+    </div>
+      ),
       cell: (props) => (
     
         <Box sx={{ position:'relative', borderRadius: '100px',
-                  width: '70px',
-              height: '70px',
+                  width: '40px',
+              height: '40px',
           backgroundColor: '#E3A1A1',
         }} >
       <img
@@ -42,18 +46,41 @@ function Student() {
   
     {
       accessorKey: 'name',
-      header: 'Name',
-      cell: (props) => <p>{ props.getValue()}</p>
+      header: (
+        <div style={{ fontSize: '16px', width: '100%', whiteSpace: 'nowrap', paddingRight: '30px' }}>
+      Name
+    </div>
+      ),
+      cell: (props) => <p
+      style= {{fontSize: '12px', width:'100%'}}
+      
+      >{props.getValue()}</p>
+      
   },
     {
       accessorKey: 'id',
-      header: 'Studen ID',
-      cell: (props) => <p>{ props.getValue()}</p>
+      header: (
+        <div style={{ fontSize: '16px', width: '100%', paddingRight: '30px' }}>
+      Student ID
+    </div>
+      ),
+      cell: (props) => <p
+            style= {{fontSize: '12px', width:'100%'}}
+
+      
+      >{props.getValue()}</p>
   },
     {
       accessorKey: 'year',
-      header: 'Year',
-      cell: (props) => <p>{ props.getValue()}</p>
+      header: (
+        <div style={{ fontSize: '16px', width: '100%', paddingRight: '30px' }}>
+      Year
+    </div>
+      ),
+      cell: (props) => <p
+            style= {{fontSize: '12px', width:'100%'}}
+
+      >{props.getValue()}</p>
   },
   
 ]  
@@ -105,7 +132,7 @@ function Student() {
       <>
           <Box display='grid'
               
-              gridTemplateColumns='1.5fr 1fr 1fr 1fr'
+              gridTemplateColumns='2fr 1fr 1fr 1fr'
               boxSizing='border-box'
               gap='1rem'
         padding='.5rem 2rem'
