@@ -3,21 +3,32 @@ import { Button, Container, Typography, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import Interview from './Interview';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'; // Import appropriate icon
 import Applications from './Applications';
+import Interview from './Interview';
+import Admitted from './Admitted'; // Import AdmittedApplications component
 
 const Admissions = () => {
     const [showApplications, setShowApplications] = useState(false);
     const [showInterviews, setShowInterviews] = useState(false);
+    const [showAdmitted, setShowAdmitted] = useState(false); // Add state for admitted section
 
     const handleViewApplications = () => {
         setShowApplications(!showApplications); // Toggle showApplications state
         setShowInterviews(false); // Close interviews section
+        setShowAdmitted(false); // Close admitted section
     };
 
     const handleViewInterviews = () => {
         setShowInterviews(!showInterviews); // Toggle showInterviews state
         setShowApplications(false); // Close applications section
+        setShowAdmitted(false); // Close admitted section
+    };
+
+    const handleViewAdmitted = () => {
+        setShowAdmitted(!showAdmitted); // Toggle showAdmitted state
+        setShowApplications(false); // Close applications section
+        setShowInterviews(false); // Close interviews section
     };
 
     return (
@@ -59,25 +70,26 @@ const Admissions = () => {
                 >
                     View Interviews
                 </Button>
-                 
-                  {/* <Button
-                    variant="contained"
-                    component={Link}
-                    to="/view-admitted"
-                    startIcon={<YourAdmittedIcon />} // Replace with appropriate icon
+                
+                <Button
+                    variant="outlined"
+                    startIcon={<ArrowForwardIcon />} // Use appropriate icon
+                    onClick={handleViewAdmitted}
                     sx={{
-                        height: '48px', // Adjust the height as needed
-                        backgroundColor: '#FEE2E2', // Light red background color
+                        mr:2,
+                        height: '60px', // Adjust the height as needed
+                        backgroundColor: showAdmitted ? '#FCA5A5' : '#FEE2E2', // Light red background color if admitted section is open
                         color: '#B91C1C', // Dark red text color
                         '&:hover': {
-                            backgroundColor: '#FCA5A5', // Light red background color on hover
+                            backgroundColor: showAdmitted ? '#FCA5A5' : '#FEE2E2', // Light red background color on hover if admitted section is open
                         }
                     }}
                 >
                     View Admitted
-                </Button> */}
+                </Button>
                 {showApplications && <Applications />}
                 {showInterviews && <Interview />}
+                {showAdmitted && <Admitted />} {/* Render AdmittedApplications if showAdmitted is true */}
             </Box>
         </Container>
     );

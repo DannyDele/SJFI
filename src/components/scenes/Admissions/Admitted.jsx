@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Table, TableContainer, TableHead, TableBody, TableRow, TableCell, Paper, Button, Dialog, DialogTitle, DialogContent, TextField, Box, Grid, Menu, MenuItem, Typography, ButtonGroup } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { Avatar } from '@mui/material';
 
 const dummyData = [
@@ -11,56 +9,50 @@ const dummyData = [
     // Add more dummy data as needed
 ];
 
-const Applications = () => {
+const Admitted = () => {
     const [open, setOpen] = useState(false);
     const [selectedApplication, setSelectedApplication] = useState(null);
-    const [acceptFormOpen, setAcceptFormOpen] = useState(false);
-    const [interviewDate, setInterviewDate] = useState(new Date());
-    const [interviewTime, setInterviewTime] = useState(new Date());
-    const [interviewLink, setInterviewLink] = useState('');
-    const [acceptedApplication, setAcceptedApplication] = useState(null);
-    const [surname, setSurname] = useState('Doe'); // Dummy data
-    const [otherName, setOtherName] = useState('John'); // Dummy data
-    const [sex, setSex] = useState('Male'); // Dummy data
-    const [maritalStatus, setMaritalStatus] = useState('Single'); // Dummy data
-    const [dateOfBirth, setDateOfBirth] = useState('6th Feb'); // Dummy data
-    const [placeOfBirth, setPlaceOfBirth] = useState('Nigeria'); // Dummy data
-    const [nationality, setNationality] = useState('Nigerian'); // Dummy data
-    const [stateOfOrigin, setStateOfOrigin] = useState('Benue'); // Dummy data
-    const [mailingAddress, setMailingAddress] = useState('No 5 Suncity'); // Dummy data
-    const [telephone, setTelephone] = useState('0905635276'); // Dummy data
-    const [email, setEmail] = useState('johndoe@gmail.com'); // Dummy data
-    const [education, setEducation] = useState(''); // Dummy data
-    const [motivation, setMotivation] = useState('I\'m happy when doing what I love'); // Dummy data
-    const [referee, setReferee] = useState('Name: Dr. John.'); // Dummy data
-
-
+    const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+    const [surname, setSurname] = useState('');
+    const [otherName, setOtherName] = useState('');
+    const [sex, setSex] = useState('');
+    const [maritalStatus, setMaritalStatus] = useState('');
+    const [dateOfBirth, setDateOfBirth] = useState('');
+    const [placeOfBirth, setPlaceOfBirth] = useState('');
+    const [nationality, setNationality] = useState('');
+    const [stateOfOrigin, setStateOfOrigin] = useState('');
+    const [mailingAddress, setMailingAddress] = useState('');
+    const [telephone, setTelephone] = useState('');
+    const [email, setEmail] = useState('');
+    const [education, setEducation] = useState('');
+    const [motivation, setMotivation] = useState('');
+    const [referee, setReferee] = useState('');
+    const [data, setData] = useState(dummyData); // State to hold dummy data
 
     // Function to handle preview button click
     const handlePreview = (application) => {
         setSelectedApplication(application);
-        setOpen(true); // Open the dialog
+        setOpen(true);
+        setFormData(application);
     };
 
-    // Function to handle accept button click
-    const handleAccept = (data) => {
+    // Function to handle delete button click
+    const handleDelete = (data) => {
         setSelectedApplication(data);
-        setAcceptFormOpen(true);
+        setDeleteConfirmationOpen(true);
+    };
+
+    // Function to confirm and delete the selected application
+    const confirmDelete = () => {
+        const updatedData = data.filter(item => item.id !== selectedApplication.id); // Filter out the selected application
+        setData(updatedData); // Update the data state
+        setDeleteConfirmationOpen(false);
     };
 
     // Function to handle form submission
     const handleSubmit = () => {
-        // Implement form submission logic here
         console.log("Submitted!");
-        setOpen(false); // Close the dialog after submission
-        setAcceptFormOpen(false); // Close the accept form
-        // Store the accepted application data
-        setAcceptedApplication({
-            ...selectedApplication,
-            interviewDate,
-            interviewTime,
-            interviewLink
-        });
+        setOpen(false);
     };
 
     // Function to handle printing
@@ -68,27 +60,39 @@ const Applications = () => {
         window.print();
     };
 
-    const handleDeny = (data) => {
-        // Implement deny logic here
-        console.log("Application denied:", data);
+    // Function to set form data based on selected application
+    const setFormData = (application) => {
+        setSurname(application.surname || 'DOE');
+        setOtherName(application.otherName || 'JOHN');
+        setSex(application.sex || 'MALE');
+        setMaritalStatus(application.maritalStatus || 'SINGLE');
+        setDateOfBirth(application.dateOfBirth || '6TH FEB');
+        setPlaceOfBirth(application.placeOfBirth || 'NIGERIA');
+        setNationality(application.nationality || 'NIGERIAN');
+        setStateOfOrigin(application.stateOfOrigin || 'BENUE');
+        setMailingAddress(application.mailingAddress || 'NO 5 SUNCITY');
+        setTelephone(application.telephone || '0905635276');
+        setEmail(application.email || 'JOHNDOE@GMAIL.COM');
+        setEducation(application.education || '');
+        setMotivation(application.motivation || 'IM HAPPY WHEN DOING WHAT I LOVE');
+        setReferee(application.referee || 'NAME:DR JOHN.');
     };
 
     return (
-        <Box sx={{ marginTop: 4, paddingLeft: 0, paddingRight: 0 }}> {/* Remove padding */}
-            {/* Adjust margin and padding as needed */}
-            <TableContainer component={Paper} sx={{ width: '100%', padding: 0 }}> {/* Expand width and remove padding */}
+        <Box sx={{ marginTop: 4, paddingLeft: 0, paddingRight: 0 }}>
+            <TableContainer component={Paper} sx={{ width: '100%', padding: 0 }}>
                 <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell align="left" colSpan={3}>
-                                <Typography variant="h5" gutterBottom>APPLICATIONS</Typography>
+                                <Typography variant="h5" gutterBottom>ADMITTED </Typography>
                             </TableCell>
                             <TableCell align="right" colSpan={4}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                                     <Menu
                                         id="bulk-action-menu"
                                         anchorEl={null}
-                                        open={false} // Set to true to open the menu
+                                        open={false}
                                         onClose={() => { }}
                                         MenuListProps={{
                                             'aria-labelledby': 'bulk-action-button',
@@ -96,7 +100,6 @@ const Applications = () => {
                                     >
                                         <MenuItem onClick={() => { }}>Action 1</MenuItem>
                                         <MenuItem onClick={() => { }}>Action 2</MenuItem>
-                                        {/* Add more menu items as needed */}
                                     </Menu>
                                     <Button
                                         id="bulk-action-button"
@@ -121,7 +124,7 @@ const Applications = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {dummyData.map((data, index) => (
+                        {data.map((data, index) => (
                             <TableRow key={data.id}>
                                 <TableCell><input type="checkbox" /></TableCell>
                                 <TableCell>{data.id}</TableCell>
@@ -132,8 +135,7 @@ const Applications = () => {
                                 <TableCell>
                                     <ButtonGroup variant="outlined" color="primary" aria-label="outlined primary button group">
                                         <Button onClick={() => handlePreview(data)}>Preview</Button>
-                                        <Button onClick={() => handleAccept(data)}>Accept</Button>
-                                        <Button onClick={() => handleDeny(data)}>Deny</Button>
+                                        <Button onClick={() => handleDelete(data)}>Delete</Button>
                                     </ButtonGroup>
                                 </TableCell>
                             </TableRow>
@@ -141,11 +143,9 @@ const Applications = () => {
                     </TableBody>
                 </Table>
 
-                {/* Dialog for preview form */}
-                <Dialog open={open} onClose={() => setOpen(false)} >
+                <Dialog open={open} onClose={() => setOpen(false)}>
                     <DialogContent>
-                        <Box>
-                        <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit}>
                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                 <Avatar sx={{ width: 100, height: 100 }} />
             </Box>
@@ -332,62 +332,22 @@ const Applications = () => {
                                     <Button variant="contained" onClick={handlePrint} sx={{ backgroundColor: '##4A0808', color: '#fff' }}>Print</Button>
                                 </Box>
                             </form>
-                        </Box>
                     </DialogContent>
                 </Dialog>
 
-                {/* Dialog for accept form */}
-                <Dialog open={acceptFormOpen} onClose={() => setAcceptFormOpen(false)} >
-                <DialogTitle>Accept Application</DialogTitle>
-<DialogContent>
-    <form onSubmit={handleSubmit} style={{ height: '400px' }}>
-        <Grid container spacing={2}>
-            <Grid item xs={6}>
-                <div style={{ height: '200px' }}> {/* Adjust the height here */}
-                    <DatePicker
-                        selected={interviewDate}
-                        onChange={date => setInterviewDate(date)}
-                        dateFormat="dd/MM/yyyy"
-                        className="form-control"
-                        placeholderText="Select Interview Date"
-                    />
-                </div>
-            </Grid>
-            <Grid item xs={6}>
-                <div style={{ height: '200px' }}> {/* Adjust the height here */}
-                    <DatePicker
-                        selected={interviewTime}
-                        onChange={time => setInterviewTime(time)}
-                        showTimeSelect
-                        showTimeSelectOnly
-                        timeIntervals={15}
-                        timeCaption="Time"
-                        dateFormat="h:mm aa"
-                        className="form-control"
-                        placeholderText="Select Interview Time"
-                    />
-                </div>
-            </Grid>
-            <Grid item xs={12}>
-                <TextField
-                    label="Interview Link"
-                    variant="outlined"
-                    fullWidth
-                    value={interviewLink}
-                    onChange={(e) => setInterviewLink(e.target.value)}
-                />
-            </Grid>
-        </Grid>
-        <Box sx={{ mt: 2 }}>
-            <Button variant="contained" type="submit">Submit</Button>
-        </Box>
-    </form>
-</DialogContent>
-
+                <Dialog open={deleteConfirmationOpen} onClose={() => setDeleteConfirmationOpen(false)}>
+                    <DialogTitle>Delete Application</DialogTitle>
+                    <DialogContent>
+                        <Typography>Are you sure you want to delete this application?</Typography>
+                        <Box sx={{ mt: 2 }}>
+                            <Button variant="outlined" onClick={confirmDelete} color="error">Delete</Button>
+                            <Button variant="outlined" onClick={() => setDeleteConfirmationOpen(false)}>Cancel</Button>
+                        </Box>
+                    </DialogContent>
                 </Dialog>
             </TableContainer>
         </Box>
     );
 };
 
-export default Applications;
+export default Admitted;
