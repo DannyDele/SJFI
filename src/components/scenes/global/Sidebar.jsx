@@ -72,6 +72,7 @@ function Sidebar() {
                         display='flex'
                         justifyContent='center'> <h4>ST JUDE FERTILITY INSTITUTE</h4></Box>
 
+
                   <Box>
               <Menu>
                   <Box >
@@ -177,7 +178,18 @@ function Sidebar() {
                           selected={selected}
                       setSelected={setSelected}    
                       />
-                              <MenuItem
+                              
+
+                                {/* Admissions Component Moved After Teacher Information */}
+                                <Item
+                                    title='Admissions'
+                                    to='/admissions'
+                                    icon={<PermIdentityOutlinedIcon />}
+                                    selected={selected}
+                                    setSelected={setSelected}
+                                />
+                              
+                                <MenuItem
                                     className="sidebar-item"
                                     active={selected === "Community"}
                                     style={{ color: '#FFF7F7' }}
@@ -202,14 +214,13 @@ function Sidebar() {
                                         setSelected={setSelected}
                                         icon={<NotificationsIcon />}
                                     />
-<Item
-    title='View Post'
-    to='/viewpost'
-    icon={<PostAddIcon />} // You can change the icon as needed
-    selected={selected}
-    setSelected={setSelected}
-/>
-
+                                    <Item
+                                        title='View Post'
+                                        to='/viewpost'
+                                        icon={<PostAddIcon />} // You can change the icon as needed
+                                        selected={selected}
+                                        setSelected={setSelected}
+                                    />
                                 </div>
                   </Box>
                       </Menu>
