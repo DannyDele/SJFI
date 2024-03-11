@@ -121,27 +121,7 @@ async function handleFormSubmit() {
     const updatedAnnouncement = await response.json();
     console.log('Updated Announcement:', updatedAnnouncement)
 
-    // Step 2: Upload the image if available
-    if (selectedFile) {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-
-      const imageResponse = await fetch('https://fis.metaforeignoption.com/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!imageResponse.ok) {
-        throw new Error('Error uploading image');
-      }
-
-      const imageData = await imageResponse.json();
-            console.log('Image Response:', imageData.path)
-
-
-      // Step 3: Update announcement with the image URL
-      updatedAnnouncement.image = imageData.path;
-    }
+   
 
     // Step 4: Update state with the new announcement
     setAnnouncementsData((prevData) =>
@@ -154,32 +134,11 @@ async function handleFormSubmit() {
 
     // Reset the form data and image
     setFormData({ title: '', description: '', category: '' });
-    setSelectedFile(null);
 
     // Close the popup
     setOpen(false);
 
-    // Fetch the image separately and update the state
-    if (updatedAnnouncement.image) {
-      const imagePath = updatedAnnouncement.image;
-      const imageUrl = `https://fis.metaforeignoption.com/file/${imagePath}`;
 
-      const imageResponse = await fetch(imageUrl);
-      if (imageResponse.ok) {
-        // Assuming the response is an image, you may need to adjust the logic accordingly
-        const blob = await imageResponse.blob();
-        const imageUrlObject = URL.createObjectURL(blob);
-
-        // Update state with the image URL
-        setAnnouncementsData((prevData) =>
-          prevData.map((announcement) =>
-            announcement._id === updatedAnnouncement._id
-              ? { ...announcement, image: imageUrlObject }
-              : announcement
-          )
-        );
-      }
-    }
   } catch (error) {
     console.error(`Error ${selectedAnnouncement ? 'updating' : 'creating'} announcement:`, error);
     // Handle the error appropriately (e.g., show an error message to the user)
@@ -234,62 +193,7 @@ async function handleFormSubmit() {
 
 
 
-  // Function to handle file upload
-  
-  const handleFileChange = (event) => {
-  const file = event.target.files[0];
-  setSelectedFile(file);
-
-  // Update the formData object with the selected file
-  setFormData({
-    ...formData,
-    image: file,
-  });
-};
-
-  // Funtion to display image wide on the screen
-
-   const [showImageModal, setShowImageModal] = useState(false);
-
-  const handleImageClick = (image, event) => {
-
-    // Prevent event propagation to avoid opening the announcement modal
-  event.stopPropagation();
-
-    setSelectedFile(image);
-    setShowImageModal(true);
-  };
-
-  const closeImageModal = () => {
-        setOpen(false);
-    setShowImageModal(false);
-    
-  };
-
-
-
-
-  // Function to update and delete an announcement image
- const handleUpdate = () => {
-    // Open the file manager for updating the image
-    document.getElementById('fileInput').click();
-  };
-
-
-     const handleImageDelete = () => {
-    // Delete the image
-    // Assuming you have a function to handle image deletion, replace the following line accordingly
-    console.log('Image Delete:', selectedFile);
-
-    // Reset the updated image state (if any)
-    setUpdatedImage(null);
-
-    // Close the image modal
-    closeImageModal();
-  };
-
-
-  
+ 
 
 
   return (
@@ -321,7 +225,6 @@ async function handleFormSubmit() {
                     <TableCell><b>Title</b></TableCell>
                     <TableCell><b>Description</b></TableCell>
                     <TableCell><b>Category</b></TableCell>
-                    <TableCell><b>Image</b></TableCell> {/* New column for Image */}
 
                   </TableRow>
                 </TableHead>
@@ -334,17 +237,7 @@ async function handleFormSubmit() {
                       <TableCell>{announcement.title}</TableCell>
                       <TableCell>{announcement.description}</TableCell>
                       <TableCell>{announcement.category}</TableCell>
-                      <TableCell>
-                        {announcement.image && (
-                          <img
-                            src={announcement.image}
-                            alt="Announcement Image"
-                            style={{ cursor: 'pointer', maxWidth: '100px', maxHeight: '100px' }}
-                            onClick={(event) => handleImageClick(announcement.image, event)}
-                          />
-                        )}
-
-                      </TableCell>
+                  
 
                     </TableRow>
                   ))}
@@ -389,26 +282,8 @@ async function handleFormSubmit() {
                   </Select>
                 </FormControl>
             
-                <IconButton
-                  color="primary"
-                  component="span"
-                  onClick={() => document.getElementById('fileInput').click()}
-                >
-                  <CloudUploadIcon />
-                </IconButton>
-                <input
-                  type="file"
-                  id="fileInput"
-                  style={{ display: 'none' }}
-                  onChange={handleFileChange}
-                />
-              {selectedFile ? (
-  <div style={{ marginTop: '8px', fontSize: '14px', color: '#555555' }}>
-    {`Selected file: ${selectedFile.name || defaultFileName}`}
-  </div>
-) : (
-  <span style={{ marginLeft: '8px', paddingTop: '7rem', fontSize: '12px', color: '#555555' }}>Choose an image</span>
-)}
+
+  
               </form>
             </DialogContent>
             <DialogActions>
@@ -432,32 +307,6 @@ async function handleFormSubmit() {
             </DialogActions>
           </Dialog>
 
-
-          {/* full image modal */}
-          {/* Image Modal */}
-          <Dialog open={showImageModal} onClose={closeImageModal}>
-            <DialogTitle>Announcement Image</DialogTitle>
-            <DialogContent style={{ overflow: 'hidden' }}>
-              {selectedFile && (
-                <img
-                  src={selectedFile}
-                  alt="Announcement Image"
-                  style={{ maxWidth: '100%', maxHeight: '80vh' }}
-                />
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleUpdate} color="primary">
-                Update
-              </Button>
-              <Button onClick={handleImageDelete} color="secondary">
-                Delete
-              </Button>
-              <Button onClick={closeImageModal} color="primary">
-                Close
-              </Button>
-            </DialogActions>
-          </Dialog>
         
         </Box>
       )}

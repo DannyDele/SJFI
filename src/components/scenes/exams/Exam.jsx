@@ -49,12 +49,14 @@ function Exam() {
   const [currentExam, setCurrentExam] = useState(null); // New state to track the current exam
   const [filterProgram, setFilterProgram] = useState('');
   const [filterCourse, setFilterCourse] = useState('');
+  const [filterClass, setFilterClass] = useState('');
   const [selectedExams, setSelectedExams] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
   const [programOptions, setProgramOptions] = useState([]);
     const [courseOptions, setCourseOptions] = useState([]);
+    const [classOptions, setClassOptions] = useState([]);
 
 
 
@@ -92,6 +94,7 @@ useEffect(() => {
   // Fetch program options when the component mounts
   fetchProgramOptions();
 }, []);
+  
 
 useEffect(() => {
   // Fetch courses when the program changes
@@ -353,7 +356,8 @@ const isViewDialogClose = () => {
   const filteredExams = examsList.filter((exam) => {
     return (
       (!filterProgram || exam.program === filterProgram) &&
-      (!filterCourse || exam.course === filterCourse)
+      (!filterCourse || exam.course === filterCourse) &&
+      (!filterClass || exam.class === filterClass)
     );
   });
 
@@ -382,7 +386,7 @@ const isViewDialogClose = () => {
   const selectedProgram = programOptions.find(program => program.id === selectedProgramId);
   const selectedCourse = courseOptions.find(course => course.id === selectedCourseId);
   // Assuming you have a similar array for classes
-  // const selectedClass = classOptions.find(className => className.id === selectedClassId);
+  const selectedClass = classOptions.find(className => className.id === selectedClassId);
 
   return {
     program: selectedProgram ? selectedProgram.title : '',
@@ -417,33 +421,49 @@ const isViewDialogClose = () => {
       <FormControl fullWidth margin="normal" style={{ marginRight: '1rem', flex: 1, minWidth: '120px' }}>
         <InputLabel id="filter-program-label">Program</InputLabel>
         <Select
-          labelId="filter-program-label"
-          id="filter-program"
-          value={filterProgram}
-          onChange={(e) => setFilterProgram(e.target.value)}
-        >
-          <MenuItem value="">All Programs</MenuItem>
-          <MenuItem value="program1">Program 1</MenuItem>
-          <MenuItem value="program2">Program 2</MenuItem>
+           labelId="program-label"
+    id="program"
+    value={selectedProgram}
+    label="Program"
+    onChange={(e) => setSelectedProgram(e.target.value)}
+  >
+    {programOptions.map((program) => (
+      <MenuItem key={program.id} value={program.id}>
+        {program.title}
+      </MenuItem>
+    ))}
         </Select>
             </FormControl>
             
-
-
-
             
 
-      <FormControl fullWidth margin="normal" style={{ flex: 1, minWidth: '120px' }}>
+      <FormControl fullWidth margin="normal" style={{ marginRight: '1rem', flex: 1, minWidth: '120px' }}>
         <InputLabel id="filter-course-label">Course</InputLabel>
         <Select
-          labelId="filter-course-label"
-          id="filter-course"
-          value={filterCourse}
-          onChange={(e) => setFilterCourse(e.target.value)}
+            id="course"
+    value={selectedCourse}
+    label="Course"
+    onChange={(e) => setSelectedCourse(e.target.value)}
+  >
+    {courseOptions.map((course) => (
+      <MenuItem key={course.id} value={course.id}>
+        {course.title}
+      </MenuItem>
+    ))}
+        </Select>
+            </FormControl>
+            
+      <FormControl fullWidth margin="normal" style={{ flex: 1, minWidth: '120px' }}>
+        <InputLabel id="filter-class-label">class</InputLabel>
+        <Select
+          labelId="filter-class-label"
+          id="filter-class"
+          value={filterClass}
+          onChange={(e) => setFilterClass(e.target.value)}
         >
-          <MenuItem value="">All Courses</MenuItem>
-          <MenuItem value="course1">Course 1</MenuItem>
-          <MenuItem value="course2">Course 2</MenuItem>
+          <MenuItem value="">All classs</MenuItem>
+          <MenuItem value="class1">class 1</MenuItem>
+          <MenuItem value="class2">class 2</MenuItem>
         </Select>
       </FormControl>
 

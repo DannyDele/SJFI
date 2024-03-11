@@ -136,12 +136,14 @@ useEffect(() => {
 
 
 
-  const openModal = (index) => {
-    setSelectedCourseIndex(index);
-    setCourseData(courses[index] || { title: '', category: '', lesson: '', days: '',  program: '', credit: ''
- });
-    setIsModalOpen(true);
-  };
+ const openModal = (index) => {
+  setSelectedCourseIndex(index);
+  const selectedCourse = courses[index] || { title: '', category: '', lesson: '', days: '', program: '', credit: '' };
+  console.log('Selected Course Index:', index);
+  console.log('Selected Course:', selectedCourse);
+  setCourseData(selectedCourse);
+  setIsModalOpen(true);
+};
 
   const closeModal = () => {
     setIsModalOpen(false);

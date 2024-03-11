@@ -1,57 +1,189 @@
-import React, { useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, MenuItem } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  MenuItem,
+  Select,
+  Box,
+  InputLabel,
+  FormControl,
+  Input,
+  InputAdornment,
+} from '@mui/material';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+
+
+
+
+
+
+
+// Function to style the Snackbar Alert
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
+Alert.displayName = 'CustomAlert';
+
 
 const Ebook = () => {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [programTitle, setProgramTitle] = useState('');
-  const [courseTitle, setCourseTitle] = useState('');
-  const [ebookTitle, setEbookTitle] = useState('');
-  const [ebookFile, setEbookFile] = useState('');
   const [fileError, setFileError] = useState('');
-  const [editEbookId, setEditEbookId] = useState(null);
+  const [ebookFile, setEbookFile] = useState(null);  // Add this line for the file state
+  
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+  const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
 
-  // New state variables for caption and the current selected ebook
+  const [editEbookId, setEditEbookId] = useState(null);
+  const [programOptions, setProgramOptions] = useState([]);
+    const [ebooks, setEbooks] = useState([]); // New state to store the list of ebooks
+  const [courseOptions, setCourseOptions] = useState([]);
+  const [newEbook, setNewEbook] = useState({
+    title: '',
+    caption: '',
+    program: '', // id
+    course: '', // id
+    class: '', // id
+    url: '',
+  });
   const [caption, setCaption] = useState('');
   const [selectedEbook, setSelectedEbook] = useState(null);
 
-  const [ebooks, setEbooks] = useState([
-    { id: 1, title: 'Introduction to Science', file: 'introtosci.pdf', content: 'This is an introduction to Science.', caption: 'Science Ebook' },
-    { id: 2, title: 'Intro to Physics', file: 'introtophy.pdf', content: 'This is an introduction to Physics.', caption: 'Physics Ebook' },
-    { id: 3, title: 'Mathematics', file: 'maths.pdf', content: 'This is about Mathematics.', caption: 'Mathematics Ebook' },
-    { id: 4, title: 'Statistics', file: 'stats.pdf', content: 'This is about Statistics.', caption: 'Statistics Ebook' },
-  ]);
+  useEffect(() => {
+    fetchProgramOptions();
+  }, [programOptions]);
+
+  useEffect(() => {
+    fetchCoursesForProgram();
+  }, [newEbook.program]);
+
+  const fetchProgramOptions = async () => {
+    try {
+      const response = await fetch('https://fis.metaforeignoption.com/api/programs');
+      const data = await response.json();
+      const programNames = data.map(program => ({
+        id: program._id,
+        title: program.title
+      }));
+
+      setProgramOptions(programNames);
+    } catch (error) {
+      console.error('Error fetching program options:', error);
+    }
+  };
+
+  const fetchCoursesForProgram = async () => {
+    try {
+      if (newEbook.program) {
+        const response = await fetch(`https://fis.metaforeignoption.com/api/courses?program=${newEbook.program}`);
+        const data = await response.json();
+        const courseNames = data.map(course => ({
+          id: course._id,
+          title: course.title
+        }));
+
+        setCourseOptions(courseNames);
+
+        if (!newEbook.course && courseNames.length > 0) {
+          setNewEbook((prevEbook) => ({ ...prevEbook, course: courseNames[0].id }));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching courses for the program:', error);
+    }
+  };
+
+  const handleChange = (e) => {
+    setNewEbook((prevEbook) => ({ ...prevEbook, [e.target.name]: e.target.value }));
+  };
 
   const handleAddClick = () => {
     setShowAddForm(true);
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    if (!ebookTitle.trim()) {
-      return;
+
+// FUNCTION TO SUMMIT EBOOK
+
+const handleFormSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    setIsLoading(true);
+
+    // Step 1: Create a new FormData object
+    const fileData = new FormData();
+    // Step 2: Append the actual file to the FormData object
+    fileData.append('file', ebookFile);
+
+    const fileUploadResponse = await fetch('https://fis.metaforeignoption.com/upload', {
+      method: 'POST',
+      body: fileData,
+    });
+
+    const filePath = await fileUploadResponse.json();
+    const path = filePath.path;
+
+    // Step 2: Send a POST request with ebook information and file path
+    const ebookData = {
+      title: newEbook.title,
+      caption: newEbook.caption,
+      program: newEbook.program,
+      course: newEbook.course,
+      class: newEbook.class,
+      url: path,
+    };
+
+    const ebookPostResponse = await fetch('https://fis.metaforeignoption.com/api/ebook', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(ebookData),
+    });
+
+    if (!ebookPostResponse.ok) {
+      throw new Error(`Failed to Upload Ebook. Status: ${ebookPostResponse.status}`);
     }
-    if (!ebookFile) {
-      setFileError('Please select a file.');
-      return;
-    }
-    if (editEbookId !== null) {
-      const updatedEbooks = ebooks.map(ebook => {
-        if (ebook.id === editEbookId) {
-          return { ...ebook, title: ebookTitle, file: ebookFile.name };
-        }
-        return ebook;
-      });
-      setEbooks(updatedEbooks);
-      setEditEbookId(null);
-    } else {
-      const newEbook = { id: Date.now(), title: ebookTitle, file: ebookFile.name };
-      setEbooks([...ebooks, newEbook]);
-    }
-    setEbookTitle('');
-    setEbookFile('');
+
+    const uploadedEbook = await ebookPostResponse.json();
+    console.log('Uploaded Ebook', uploadedEbook);
+
+   
+      // Update the list of ebooks state with the response data
+// Update the list of ebooks state with the response data
+setEbooks((prevEbooks) => [...prevEbooks, { ...uploadedEbook, id: uploadedEbook._id }]);
+
+    setSuccessMessageVisible(true);
+
+    // Reset form and state
+    setNewEbook({
+      title: '',
+      caption: '',
+      program: '',
+      course: '',
+      class: '',
+      url: '',
+    });
     setFileError('');
     setShowAddForm(false);
-  };
+  } catch (error) {
+    // Handle errors
+    console.error('Error:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
 
   const handleEditClick = (ebook) => {
     setProgramTitle(ebook.programTitle); // Assuming programTitle is a property of the ebook object
@@ -85,9 +217,19 @@ const Ebook = () => {
     setEbooks(ebooks.filter(ebook => ebook.id !== selectedEbook.id));
     setSelectedEbook(null);
   };
+return (
+  <div className="container mx-auto p-4" style={{ marginLeft: '20px' }}>
+    
+ <Snackbar
+          open={isSuccessMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setSuccessMessageVisible(false)}
+        >
+          <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
+            Ebook Created successfully! 
+          </Alert>
+        </Snackbar>
 
-  return (
-    <div className="container mx-auto p-4 text-black style={{ marginLeft: '20px' }} bg-white">
       <h1 className="text-3xl text-gray-500 mb-6">Ebooks</h1>
       <Button
         onClick={handleAddClick}
@@ -97,66 +239,80 @@ const Ebook = () => {
       >
         Add New Ebook
       </Button>
-      <Dialog open={showAddForm} onClose={() => setShowAddForm(false)}>
+<Dialog open={showAddForm} onClose={() => setShowAddForm(false)}  fullWidth>
         <DialogTitle>{editEbookId !== null ? 'Edit Ebook' : 'Add New Ebook'}</DialogTitle>
         <DialogContent>
           <DialogContentText>Please fill out the form below:</DialogContentText>
-          <TextField
-            select
-            label="Program Title"
-            value={programTitle}
-            onChange={(e) => setProgramTitle(e.target.value)}
-            fullWidth
-            margin="normal"
-          >
-            {/* Replace this with your actual program title options */}
-            <MenuItem value="Program 1">Program 1</MenuItem>
-            <MenuItem value="Program 2">Program 2</MenuItem>
-            <MenuItem value="Program 3">Program 3</MenuItem>
-          </TextField>
-          <TextField
-            select
-            label="Course Title"
-            value={courseTitle}
-            onChange={(e) => setCourseTitle(e.target.value)}
-            fullWidth
-            margin="normal"
-          >
-            {/* Replace this with your actual course title options */}
-            <MenuItem value="Course 1">Course 1</MenuItem>
-            <MenuItem value="Course 2">Course 2</MenuItem>
-            <MenuItem value="Course 3">Course 3</MenuItem>
-          </TextField>
+          <Box mt={2}>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Select Program</InputLabel>
+              <Select
+                name="program"
+                value={newEbook.program}
+                onChange={handleChange}
+              >
+                {programOptions.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.title}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+          <Box mt={2}>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Select Course</InputLabel>
+              <Select
+                name="course"
+                value={newEbook.course}
+                onChange={handleChange}
+              >
+                {courseOptions.map((course, index) => (
+                  <MenuItem key={index} value={course.id}>
+                    {course.title}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
           <TextField
             label="Ebook Title"
-            value={ebookTitle}
-            onChange={(e) => setEbookTitle(e.target.value)}
+            value={newEbook.title}
+            onChange={(e) => handleChange(e)}
             fullWidth
             margin="normal"
+            name="title"
           />
-          {/* Input field for the caption */}
-          <TextField
-            label="Caption"
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-          <input
-            type="file"
-            onChange={(e) => {
-              setEbookFile(e.target.files[0]);
-              setFileError('');
-            }}
-            accept=".pdf"
-          />
+          {/* File input */}
+            <InputLabel>Choose Ebook File</InputLabel>
+        <Input
+    type="file"
+    onChange={(e) => {
+      setEbookFile(e.target.files[0]);
+      setFileError('');
+    }}
+    accept=".pdf"
+    fullWidth
+    margin="normal"
+  />
+
+
+          {/* Existing error handling */}
           {fileError && (
             <p className="text-red-500 text-sm mt-1">{fileError}</p>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowAddForm(false)}>Cancel</Button>
-          <Button onClick={handleFormSubmit} color="primary">{editEbookId !== null ? 'Edit Ebook' : 'Add Ebook'}</Button>
+        <Button
+  onClick={handleFormSubmit}
+  color="primary"
+  disabled={isLoading} // Disable the button while loading
+  startIcon={isLoading && <CircularProgress size={20} />} // Display spinner as startIcon
+>
+  {editEbookId !== null ? 'Edit Ebook' : 'Add Ebook'}
+</Button>
+
         </DialogActions>
       </Dialog>
       <Dialog open={selectedEbook !== null} onClose={() => setSelectedEbook(null)}>
@@ -171,29 +327,44 @@ const Ebook = () => {
           <Button onClick={handleDeleteEbook} color="error">Delete</Button>
           <Button onClick={() => setSelectedEbook(null)}>Close</Button>
         </DialogActions>
-      </Dialog>
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr>
-            <th className="border border-gray-300 p-3">Ebook Title</th>
-            <th className="border border-gray-300 p-3">File</th>
-            <th className="border border-gray-300 p-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ebooks.map((ebook) => (
-            <tr key={ebook.id}>
-              <td className="border font-extralight border-gray-300 p-3">{ebook.title}</td>
-              <td className="border border-gray-300 p-3">{ebook.file}</td>
-              <td className="border border-gray-300 p-3">
-                <Button variant="outlined" onClick={() => handleViewContents(ebook)}>View Contents</Button>
-                {/* <Button variant="outlined" onClick={() => handleEditClick(ebook)}>Edit</Button> */}
-                {/* <Button variant="outlined" color='error' onClick={() => handleDeleteClick(ebook.id)}>Delete</Button> */}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    </Dialog>
+
+
+
+
+
+        <div style={{ height: 500, width: "90%", }}>
+    <DataGrid
+          rows={ebooks} // Use the ebooks state for the rows
+        id="ebooks-table"
+        style={{ marginTop: '2rem', marginLeft: '2rem' }}
+        autoHeight
+        columns={[
+          { field: 'title', headerName: 'Ebook Title', flex: 1 },
+          { field: 'url', headerName: 'File', flex: 1 },
+          {
+            field: 'actions',
+            headerName: 'Actions',
+            flex: 1,
+            renderCell: (params) => (
+              <Button
+                variant="outlined"
+                onClick={() => handleViewContents(params.row)}
+              >
+                View Contents
+              </Button>
+            ),
+          },
+        ]}
+        pageSize={10}
+        components={{
+          Toolbar: GridToolbar,
+        }}
+        checkboxSelection={false}
+        disableSelectionOnClick
+      />
+      </div>
+
     </div>
   );
 };

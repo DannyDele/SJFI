@@ -5,6 +5,8 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { DataGrid } from '@mui/x-data-grid';
+
 
 
 const Program = () => {
@@ -20,7 +22,10 @@ const Program = () => {
   const [open, setOpen] = useState(false);
   const [formMode, setFormMode] = useState('add');
   const [submitting, setSubmitting] = useState(false); // Added submitting state
-    const [loading, setLoading] = useState(true); // Added loading state
+  const [loading, setLoading] = useState(true); // Added loading state
+  
+
+  
 
 
 
@@ -187,20 +192,14 @@ const Program = () => {
               margin="normal"
             />
           
-              <FormControl fullWidth margin="normal" disabled={formMode === 'view'}
->
-                <InputLabel>Fee</InputLabel>
-                <Select
-                  name="program"
+  <TextField
+              label="Fee"
               value={programData.price}
               onChange={handleFeeChange}
-                  >
-                  <MenuItem>
-                    #2,000,000
-                    </MenuItem>
-                  
-                </Select>
-              </FormControl>
+              fullWidth
+              margin="normal"
+              disabled={formMode === 'view'}
+            />               
             <TextField
               label="Description"
               value={programData.description}
@@ -239,31 +238,29 @@ const Program = () => {
             </Button>
           </DialogActions>
         </Dialog>
-        <table className="table-auto w-full">
-          <thead>
-            <tr>
-              <th className="border px-4 py-2 text-gray-800 font-semibold">Title</th>
-              <th className="border px-4 py-2 text-gray-800 font-semibold">Category</th>
-              <th className="border px-4 py-2 text-gray-800 font-semibold">Lesson</th>
-              <th className="border px-4 py-2 text-gray-800 font-semibold">Actions</th>
-            </tr>
-          </thead>
-     <tbody>
-  {programs.map(program => (
-    <tr key={program._id}>
-      <td className="border px-4 py-2 text-gray-800">{program.title}</td>
-      <td className="border px-4 py-2 text-gray-800">{program.category}</td>
-      <td className="border px-4 py-2 text-gray-800">{program.lesson}</td>
-      <td className="border px-4 py-2 text-gray-800">
-        <Button  color="primary" onClick={() => handleViewProgram(program)}>View</Button>
-        {/* Add a unique key to the following button */}
-        {/* <Button variant="outlined" color="secondary" onClick={() => handleDeleteProgram(program.id)}>Delete</Button> */}
-      </td>
-    </tr>
-  ))}
-</tbody>
+    <DataGrid
+  rows={programs}
+  columns={[
+    { field: 'title', headerName: 'TITLE', flex: 5 },
+    { field: 'lesson', headerName: 'LESSON', flex: 5 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      flex: 1,
+      renderCell: (params) => (
+        <Button color="primary" onClick={() => handleViewProgram(params.row)}>
+          View
+        </Button>
+      ),
+    },
+  ]}
+  pageSize={5} // Number of items per page
+  pagination
+            getRowId={(row) => row._id} // Specify the unique identifier for each row
+              style={{ height: '500', width: '90%', margin: '1rem 0 0 4rem' }} // Set a height and width for the DataGrid
 
-          </table>
+/>
+
           
       </Box>
       )}

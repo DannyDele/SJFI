@@ -1,387 +1,254 @@
-import { Box, Typography, IconButton, useTheme } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { mockDataStudent } from "../../data/mockData"; 
-import Topbar from "../global/Topbar";
-import InputBase from "@mui/material/InputBase";
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { useReactTable, getCoreRowModel, flexRender, getFilteredRowModel } from "@tanstack/react-table";
-import { mockDataStudent as Data } from "../../data/mockData";
-import { useState } from "react";
-import '../../../assets/styles/Student.css'
-
-
-function Student() {
- 
-
-  const columns = [
-  
-  {
-      accessorKey: 'profileImage', // Update accessorKey
-      header: (
-<div style={{ fontSize: '16px', width: '100%', paddingRight: '30px' }}>
-      Profile
-    </div>
-      ),
-      cell: (props) => (
-    
-        <Box sx={{ position:'relative', borderRadius: '100px',
-                  width: '40px',
-              height: '40px',
-          backgroundColor: '#E3A1A1',
-        }} >
-      <img
-        src={`path/to/your/images/${props.getValue()}`}
-        alt="Profile"
- style={{
-                      borderRadius: '100%',
-                      position: 'relative',
-                      top: '0',
-                      width: '70%',
-                      height: '70%',
-           
-          objectFit: 'cover',   
-            }} />
-          </Box>
-    ),  },
-  
-    {
-      accessorKey: 'name',
-      header: (
-        <div style={{ fontSize: '16px', width: '100%', whiteSpace: 'nowrap', paddingRight: '30px' }}>
-      Name
-    </div>
-      ),
-      cell: (props) => <p
-      style= {{fontSize: '12px', width:'100%'}}
-      
-      >{props.getValue()}</p>
-      
-  },
-    {
-      accessorKey: 'id',
-      header: (
-        <div style={{ fontSize: '16px', width: '100%', paddingRight: '30px' }}>
-      Student ID
-    </div>
-      ),
-      cell: (props) => <p
-            style= {{fontSize: '12px', width:'100%'}}
-
-      
-      >{props.getValue()}</p>
-  },
-    {
-      accessorKey: 'year',
-      header: (
-        <div style={{ fontSize: '16px', width: '100%', paddingRight: '30px' }}>
-      Year
-    </div>
-      ),
-      cell: (props) => <p
-            style= {{fontSize: '12px', width:'100%'}}
-
-      >{props.getValue()}</p>
-  },
-  
-]  
-
-
- 
-  
-  
-  
-  
-  
-    // State to store the currently clicked student's information
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [data, setData] = useState(Data)
-  const [columnFilters, setColumnFilters] = useState([])
+  import React, { useState, useEffect } from "react";
+  import { DataGrid, GridHeader } from "@mui/x-data-grid";
+  import {
+    Box,
+    Typography,
+    Button,
+    Dialog,
+    TextField,
+    Select,
+    IconButton, useTheme, InputAdornment
+  } from "@mui/material";
+  import InputBase from "@mui/material/InputBase";
+  import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+  import "../../../assets/styles/Student.css";
+import CircularProgress from '@mui/material/CircularProgress';
+  import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 
 
 
- // Function to handle row click
-  const handleRowClick = (row) => {
-    // Set the selected student when a row is clicked
-    setSelectedStudent(row.original);
-  };
+// Function to style the Snackbar Alert
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
+Alert.displayName = 'CustomAlert';
 
 
 
-  const tableName = columnFilters.find((f) => f.id === 'name')?.value || "";
-
-  const onFilterChange = (id, value) => {
-    setColumnFilters(
-      prev => prev.filter(f => f.id !== id).concat({
-        id, value
-      })
-    )
+  function CustomHeader(props) {
+    return <GridHeader {...props} className="bold-header" />;
   }
 
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      columnFilters
-    },
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel()
-  });
-  console.log(table.getHeaderGroups())
-  return (
-      <>
-          <Box display='grid'
-              
-              gridTemplateColumns='2fr 1fr 1fr 1fr'
-              boxSizing='border-box'
-              gap='1rem'
-        padding='.5rem 2rem'
-        gridAutoRows = 'minmax(100px, auto)'
-              backgroundColor='#FFF7F7'
-        
-          
-          
-          >
-              <Box
-                  display='flex'
-                  flexDirection='column'
-                  backgroundColor='#fff'
-                       borderRadius='5px'
-                    border='1px solid #fff'
-                    boxShadow='.7px .7px .7px .7px black'
-                //   padding='5rem'
-                  gridRow='1/5'
-                  //   gridColumn='1/5'
-                  overflow='auto'
-              >
-                  <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent='space-between'
-                      marginTop='1rem'>
-                      <Typography
-                          mr={2}
-                          pl={2}
-                          fontSize='20px'
-                          color='#4A0808'
-                      >
-                          Students</Typography>
-
-                      <Box
-                          display='flex'
-                      borderRadius='15px'
-                    backgroundColor='#FFE3E3'
-                      
-                      >
-        <IconButton type="button" sx={{ p: 1 }}>
-          <SearchOutlinedIcon />
-        </IconButton>
-
-        <InputBase
-          sx={{
-            // ml: 2,
-            // flex: 1,
-            backgroundColor: '#FFE3E3',
-            borderRadius: '15px',
-            // pr: '5rem',
-            // position: 'absolute',
-            // width: '100%',
-          }}
-                placeholder="student ID or name"
-                value={tableName}
-                onChange={(e) => onFilterChange("name", e.target.value)}
-
-        />
-      </Box>
-                  </Box>
-                  <hr style={{marginTop: '1rem', marginLeft: '1rem', width: '90%'}} />
-
-                  <Box>
-            <Box className = "table">
-              {table.getHeaderGroups().map((headerGroup) => (<Box className='tr' key={headerGroup.id}>
-              
-                {headerGroup.headers.map(header => (<Box className='th' key={header.id}>
-                
-                  {header.column.columnDef.header}
-                  
-                </Box>
-              ))}
-              
-              </Box>))}
-
-              {
-                table.getRowModel().rows.map(row => <Box className='tr' key={row.id} onClick={() => handleRowClick(row)}>
-                  {row.getVisibleCells().map(cell => <Box className='td' key={cell.id} >
-                  
-                    {
-                      flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )
-                    }
-                </Box> )}
-                
-                </Box>)
-              }
-            </Box>
-            
-
-                  </Box> 
-                  
-              </Box>
-
-
-              <Box backgroundColor='#fff'
-                  borderRadius='5px'
-          border='1px solid #fff'
-              boxShadow='.7px .7px .7px .7px black'
-
-              //   padding='5rem'
-                  display='flex'
-                  flexDirection='column'
-                //   justifyContent='space-between'
-                  alignItems='center'
-                  gridRow='1/4'
-                //   gridColumn='2/4' 
-              >
-                  <Typography
-                   style={{fontSize:'20px', color:'#4A0808'}}
-                  >Personal Information</Typography>
-
-
-                  <Box display='flex' flexDirection='column' alignItems='center' marginTop='1rem'>
-                      <Box backgroundColor='grey' width='50px' height='50px' position='relative' borderRadius='50px'>
-                          <img src="" alt="" style={{position:'absolute'}} />
-                      </Box>
-                      <Box><p style={{fontSize:'16px', color: '#4A0808'}}>Jenny Walman</p></Box>
-                      <Box><p style={{fontSize: '14px', color: '#4A08084D'}}>Stu ID: #21991</p></Box>
-                  </Box>
-                  
-                  <Box marginTop='1rem' marginRight='2rem'>
-                      <Typography
-                      style={{fontSize: '20px', color: '#4A0808'}}
-                      >Basic Details</Typography>
-           <Box display='flex' justifyContent='space-between'>
-            <Box display='flex' flexDirection='column' color='#4A080899' fontSize= '12px'>
-              
-              <Box>
-                <Typography sx={{ fontSize: '12px' }}>Program</Typography>
-                
-              </Box>
-              <Box>
-                
-                <Typography sx={{ fontSize: '12px' }}>Class</Typography>
-              
-              
-              
-              </Box>
-              <Box >
-                <Typography sx={{ fontSize: '12px' }}>Gender</Typography>
-              
-              
-              
-              </Box>
-              <Box>
-                <Typography sx={{ fontSize: '12px' }}>Mobile</Typography>
-              
-              
-              
-              </Box>
-              <Box>
-                <Typography sx={{ fontSize: '12px' }}>Email</Typography>
-              
-              
-              
-              </Box>
-              <Box>
-                <Typography sx={{ fontSize: '12px' }}>Date of Birth</Typography>
-              
-              
-              
-              </Box>
-              <Box>
-                <Typography sx={{ fontSize: '12px' }}>Address</Typography>
-              
-              
-              
-              </Box>
-                    </Box>
-            <Box color='#4A080899' fontSize= '12px'> 
-              
-                
-              <Typography sx={{ fontSize: '12px' }}> <span style={{fontSize: '12px', position: 'relative', right:'4px'}}>:</span>  Fertility Study</Typography>
-              <Typography sx={{ fontSize: '12px' }} > <span style={{fontSize: '12px', position: 'relative', right:'4px'}}>:</span>Lesson A</Typography>
-              <Typography sx={{ fontSize: '12px' }} > <span style={{fontSize: '12px', position: 'relative', right:'4px'}}>:</span>Female</Typography>
-              <Typography sx={{ fontSize: '12px' }}> <span style={{fontSize: '12px', position: 'relative', right:'4px'}}>:</span>+235 5656</Typography>
-              <Typography sx={{ fontSize: '12px' }}> <span style={{fontSize: '12px', position: 'relative', right:'4px'}}>:</span>jenny@gmail.com</Typography>
-              <Typography sx={{ fontSize: '12px' }}> <span style={{fontSize: '12px'}}>:</span>09 june 1882</Typography>
-              <Typography sx={{ fontSize: '12px' }}> <span style={{fontSize: '12px', position: 'relative', right:'4px'}}>:</span>Mortland Delta</Typography>
 
 
 
+  function Student() {
+    const [data, setData] = useState([]);
+    const [selectedStudent, setSelectedStudent] = useState(null);
+    const [searchText, setSearchText] = useState("");
+    const [openDialog, setOpenDialog] = useState(false);
+    const [loading, setLoading] = useState(true); // State to track loading
+    const [loadingDelete, setLoadingDelete] = useState(false); // State to track delete loading
+      const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
 
 
 
+    useEffect(() => {
+      fetchStudents();
+    }, []); // Fetch data when the component mounts
 
-                    </Box>
+    const columns = [
+      { field: "profileimage", headerName: "Profile", width: 100, renderCell: (params) => <img src={params.value} alt="Profile" style={{ width: 50, height: 50, borderRadius: '50%' }} /> },
+      { field: "username", headerName: "Username", width: 150 },
+      { field: "country", headerName: "Country", width: 120 },
+      { field: "phone", headerName: "Phone", width: 120 },
+      { field: "vstatus", headerName: "VStatus", width: 120 },
+      { field: "email", headerName: "Email", width: 200 },
+      { field: "role", headerName: "Role", width: 120 },
+    ];
 
-                  </Box>
-                  </Box>
+    const token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkRhbm55SXllIiwidXNlcklkIjoiNjVlODViNDUyNDU3N2JmZDMyMGNjMmVjIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzA5NzQwNTQ2fQ.i4K-14N5_X0dmj7GK6m8wNVJH5Fb3M14g5z20bAkDTQ";
 
-          <Box marginTop='1rem' marginRight='2rem'>
-            <Typography sx={{fontSize: '15px', color: '#4A0808#'}}>About Student</Typography>
-              <Typography sx={{color:'#4A080899', fontSize: '10px', width: '190px'}}>
-              I love good health, treating patient
-              and learning new things. In my free time,
-              I enjoy writing, reading, and playing guitar.</Typography>
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch(
+          "https://fis.metaforeignoption.com/api/users?type=student",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `bearer ${token}`,
+            },
+          }
+        );
+        const studentsData = await response.json();
+        setData(studentsData);
+              setLoading(false); // Set loading to false when data is fetched
 
-                  </Box>
+      } catch (error) {
+        console.error("Error fetching students:", error);
+        setLoading(false); // Set loading to false when data is fetched
+
+      }
+    };
+
+    // Specify a custom getRowId function
+    const getRowId = (row) => row._id;
+
+    const handleOpenDialog = () => {
+      setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+      setOpenDialog(false);
+    };
+
+    const handleSave = () => {
+      // Handle saving logic here
+      handleCloseDialog();
+    };
 
 
-              </Box>
-              <Box backgroundColor='#fff'
-                  borderRadius='5px'
-                  border='1px solid #fff'
-                    boxShadow='.7px .7px .7px .7px black'
 
-                  padding='5rem'
-                  gridColumn='3/5'
-              // gridRow='1/3'
-              >
-                  <p>Box3</p>
-              </Box>
-              <Box backgroundColor='#fff'
-                  borderRadius='5px'
-                  border='1px solid #fff'
-                    boxShadow='.7px .7px .7px .7px black'
+// Function to Delete a User
 
-                  padding='1rem'
-                  gridRow=''
-              >
-                  <p>Box4</p>
-              </Box>
-              <Box backgroundColor='#fff'
-          borderRadius='5px'
-          padding='1rem'
-                border='1px solid #fff'
-                    boxShadow='.7px .7px .7px .7px black'
->
-                  <p>Box5</p>
-              </Box>
-              <Box backgroundColor='#fff'
-                  borderRadius='5px'
-                border='1px solid #fff'
-                    boxShadow='.7px .7px .7px .7px black'
+   const handleDelete = async () => {
+    try {
+      if (!selectedStudent || !selectedStudent.email) {
+        console.error("No user selected for deletion");
+        return;
+      }
 
-                  padding='1rem'
-                  gridColumn='3/4'
-              >
-                  <p>Box6</p>
-              </Box>
-              
+      console.log("Selected Student:", selectedStudent.email)
+      setLoadingDelete(true); // Set loading state to true when starting deletion
+
+      const response = await fetch(
+        `https://fis.metaforeignoption.com/api/users?email=${selectedStudent.email}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        console.log("User deleted successfully");
+        // Optionally, you can refetch the updated user list after deletion
+        fetchStudents();
+        setSuccessMessageVisible(true)
+      } else {
+        console.error("Failed to delete user");
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    } finally {
+      setLoadingDelete(false); // Set loading state to false when deletion process is complete
+      handleCloseDialog(); // Close the dialog regardless of success or failure
+    }
+    };
+    
+
+
+
+    return (
+      <Box marginTop="1rem" padding="2rem" width="80vw" height="100vh">
+
+      <Snackbar
+          open={isSuccessMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setSuccessMessageVisible(false)}
+        >
+          <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
+            User Deleted successfully! 
+          </Alert>
+        </Snackbar>
+
+
+
+        <Box display="flex" alignItems="center" marginBottom="1rem">
+          <TextField
+            placeholder="Search..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{
+              backgroundColor: "#FFE3E3",
+              borderRadius: "5px",
+              color: "#000",
+            }}
+            InputProps={{
+              startAdornment: (
+                <SearchOutlinedIcon style={{ marginRight: "8px" }} />
+              ),
+            }}
+          />
         </Box>
-      </>
-  )
-}
+    {loading ? ( // Render loader when loading is true
+          <Box display="flex" justifyContent="center" alignItems="center" height={500}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <div style={{ height: 500, width: "100%" }}>
+            <DataGrid
+              rows={data.filter(
+                (row) =>
+                  Object.values(row)
+                    .join(" ")
+                    .toLowerCase()
+                    .includes(searchText.toLowerCase())
+              )}
+              columns={columns}
+              pageSize={10}
+              style={{ cursor: 'pointer' }}
+              onRowClick={(params) => {
+                setSelectedStudent(params.row);
+                handleOpenDialog();
+              }}
+              getRowId={getRowId} // Specify the custom getRowId function
+            />
+          </div>
+        )}
 
-export default Student
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md">
+    <Box p={2} style={{ minWidth: '500px' }}>
+      <Typography variant="h6">User Details</Typography>
+      {selectedStudent && (
+        <form>
+      {Object.keys(selectedStudent).map((property) => (
+                  <div key={property}>
+                    {property === 'profileImage' ? (
+                      <img src={selectedStudent[property]} alt="Profile" style={{ width: 100, height: 100, borderRadius: '50%' }} />
+                    ) : (
+                      <TextField
+                        label={property.charAt(0).toUpperCase() + property.slice(1)}
+                        value={selectedStudent[property]}
+                        fullWidth
+                        margin="normal"
+                        key={property}
+                      />
+                    )}
+                  </div>
+                ))}
+                <Box mt={2} display="flex" justifyContent="space-between">
+                  <Button variant="outlined" color="primary" onClick={handleSave}>
+                    Save
+                  </Button>
+                 <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleDelete}
+            disabled={loadingDelete} // Disable the button when loading
+          >
+            <Box display="flex" alignItems="center">
+              {loadingDelete && (
+                <CircularProgress size={24} color="secondary" style={{ marginRight: '8px' }} />
+              )}
+              Delete
+            </Box>
+          </Button>
+                </Box>
+              </form>
+            )}
+    </Box>
+  </Dialog>
+
+      </Box>
+    );
+  }
+
+  export default Student;
+
+
+

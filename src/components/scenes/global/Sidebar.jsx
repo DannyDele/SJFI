@@ -98,20 +98,6 @@ function Sidebar() {
               className="student-item"
               
             />
-            <Item
-              title="Teacher Information"
-              to="/teachers"
-              icon={<HowToRegOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Public User"
-              to="/publicusers"
-              icon={<GroupsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
           </SubMenu>
                               <SubMenu
                                   label='Course Curriculum'

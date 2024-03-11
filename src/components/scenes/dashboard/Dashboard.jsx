@@ -4,11 +4,10 @@ import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined'
 import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
-import { mockDataStudent } from "../../data/mockData";
 import BarChart from "../../charts/BarChart";
-import PieChart from "../../charts/PieChart";
+// import PieChart from "../../charts/PieChart";
 import FlowChart from "../../charts/FlowChart";
-import TeachersList from "../../Tables/TeachersList";
+// import TeachersList from "../../Tables/TeachersList";
 
 
 const Dashboard = () => {
@@ -132,7 +131,7 @@ const Dashboard = () => {
               </select>
               </Box>
             </Box>
-          <PieChart/>
+          {/* <PieChart/> */}
      
           </Box>
 
@@ -158,7 +157,7 @@ const Dashboard = () => {
               </Box>
             </Box>
    
-         <TeachersList/>
+         {/* <TeachersList/> */}
           </Box>
 
           <Box
