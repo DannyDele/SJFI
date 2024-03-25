@@ -20,7 +20,10 @@ import TableCell from '@mui/material/TableCell';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-import { colors } from '@mui/material';
+import { colors, Typography } from '@mui/material';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+
+
 
 
 
@@ -33,6 +36,8 @@ Alert.displayName = 'CustomAlert';
 
 function Courses() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+
   const [courseData, setCourseData] = useState({
     title: '',
     category: '',
@@ -44,13 +49,44 @@ function Courses() {
   const [selectedCourseIndex, setSelectedCourseIndex] = useState(null);
   const [courses, setCourses] = useState([])
   const [programOptions, setProgramOptions] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
+    const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
+    const [isUpdateMessageVisible, setUpdateMessageVisible] = useState(false);
+    const [isCategoryMessageVisible, setCategoryMessageVisible] = useState(false);
+
   const [selectedProgramFilter, setSelectedProgramFilter] = useState('');
 const [isFilterApplied, setIsFilterApplied] = useState(false);
 
 
+  const [formValid, setFormValid] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false); // Added formSubmitted state
+    const [newCategory, setNewCategory] = useState('');
+
+
+
+  
+useEffect(() => {
+  // Check form validity whenever programData changes
+  if(formSubmitted){
+  const isValid = Object.entries(courseData).every(([key, value]) => {
+    // If value is a string, trim and check for empty string
+    if (typeof value === 'string') {
+      return value.trim() !== '';
+    }
+    // // If value is a number (like price), check for non-zero
+    // if (typeof value === 'number') {
+    //   return value !== 0;
+    // }
+    // For other types of values, consider them valid
+    return true;
+  });
+    setFormValid(isValid);
+    }
+  }, [courseData, formSubmitted]);
 
 
 
@@ -59,6 +95,11 @@ const [isFilterApplied, setIsFilterApplied] = useState(false);
 useEffect(() => {
     // Fetch program options when the component mounts
     fetchProgramOptions();
+}, []);
+  
+useEffect(() => {
+    // Fetch program options when the component mounts
+    fetchCategoryOptions();
   }, []);
 
 
@@ -92,6 +133,27 @@ useEffect(() => {
       setProgramOptions(programOptions);
     } catch (error) {
       console.error('Error fetching program options:', error);
+    }
+  };
+
+
+  const fetchCategoryOptions = async () => {
+    try {
+      const response = await fetch('https://fis.metaforeignoption.com/api/category');
+      const data = await response.json();
+
+      // Assuming data is an array of programs with 'id' and 'title' properties
+      const categoryOptions = data.map(category => ({
+        id: category._id,
+        title: category.category,
+      }));
+      
+      console.log('Category Options:', categoryOptions);
+
+      // Set the array of program options in state
+      setCategoryOptions(categoryOptions);
+    } catch (error) {
+      console.error('Error fetching Category options:', error);
     }
   };
 
@@ -236,20 +298,67 @@ const handleAddCourse = async () => {
     // Set loading back to false after the submission is complete (success or failure)
     setIsLoading(false);
   }
-};
+  };
+  
+
+    const handleSubmit = () => {
+    // Set formSubmitted to true when attempting to submit the form
+    setFormSubmitted(true);
+    // If form is valid, proceed with adding new program
+    if (formValid) {
+      handleAddCourse();
+    }
+  };
 
 
   
-  // Function to Save changes in a Course
-  const handleSaveChanges = () => {
-    // Implement your logic to update the course data in the courses array
+  // Function to Update a Course
+ const handleSaveChanges = async () => {
+  try {
+    setUpdateLoading(true);
+
+    // Retrieve the courseId of the course to be updated
+    const courseIdToUpdate = courses[selectedCourseIndex]._id;
+
+    // Make a PUT request to update the course data
+    const response = await fetch(`https://fis.metaforeignoption.com/api/courses/${courseIdToUpdate}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(courseData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update course');
+    }
+
+    // Show the success message
+    setUpdateMessageVisible(true);
+    // Optionally, hide the success message after a certain duration
+    setTimeout(() => {
+      setSuccessMessageVisible(false);
+    }, 5000); // Hide the message after 5 seconds (adjust the duration as needed)
+
+    // Assuming the response from the server contains the updated course data
+    const updatedCourse = await response.json();
+
+    // Update the courses array with the updated course data
     const updatedCourses = [...courses];
-    updatedCourses[selectedCourseIndex] = courseData;
+    updatedCourses[selectedCourseIndex] = updatedCourse;
     setCourses(updatedCourses);
 
     // Close the modal after saving changes
     closeModal();
-  };
+  } catch (error) {
+    console.error('Error updating course:', error);
+    // Handle error as needed (e.g., show an error message to the user)
+  } finally {
+    // Set loading back to false after the submission is complete (success or failure)
+    setUpdateLoading(false);
+  }
+};
+
 
 
 
@@ -273,11 +382,11 @@ const handleAddCourse = async () => {
       throw new Error('Failed to delete course');
      }
      
-     // Show the success message
-      setSuccessMessageVisible(true);
+    // Show the success message
+      setDeleteMessageVisible(true);
        // Optionally, hide the success message after a certain duration
     setTimeout(() => {
-      setSuccessMessageVisible(false);
+      setDeleteMessageVisible(false);
     }, 5000); // Hide the message after 5 seconds (adjust the duration as needed)
   
 
@@ -298,9 +407,20 @@ const handleAddCourse = async () => {
   }
 };
 
-  const handleViewCourse = (index) => {
-    openModal(index);
-  };
+ const handleViewCourse = (course) => {
+  // Set courseData with individual properties
+  setCourseData({
+    title: course.title,
+    category: course.category,
+    lesson: course.lesson,
+    days: course.days,
+    program: course.program,
+    credit: course.credit,
+  });
+
+  openModal(course.id); // Assuming course.id is the unique identifier for the course
+};
+;
 
   // Add this function to your component
 const getProgramNameById = (programId) => {
@@ -309,27 +429,91 @@ const getProgramNameById = (programId) => {
 };
 
   
-  
-//   const filterCoursesByProgram = (programId) => {
-//   if (programId === '') {
-//     // If no program is selected, display all courses
-//     setCourses(courses);
-//   } else {
-//     // Filter courses based on the selected program
-//     const filteredCourses = courses.filter((course) => course.program === programId);
-//     setCourses(filteredCourses);
-//   }
-// };
+  // function to add category
+
+  const handleAddCategory = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await fetch('https://fis.metaforeignoption.com/api/category', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ category: newCategory }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add category');
+      }
 
 
+      const categoryData = response.json();
+
+      console.log('Category Data:', categoryData)
+      
+      setCategoryMessageVisible(true)
+          setIsCategoryModalOpen(false);
 
 
-  
+      // Clear the input field after successful addition
+      setNewCategory('');
+
+      // Optionally, you can perform additional actions after successful addition
+
+    } catch (error) {
+      console.error('Error adding category:', error);
+      // Handle error as needed (e.g., show an error message to the user)
+    } finally {
+      setIsLoading(false);
+      closeModal(); // Close the dialog regardless of success or failure
+    }
+  };
+
+
+// Function to open the category modal
+  const openCategoryModal = () => {
+    setIsCategoryModalOpen(true);
+  };
+
+  // Function to close the category modal
+  const closeCategoryModal = () => {
+    setIsCategoryModalOpen(false);
+  };
+
+
+  // Funtion to delete category
+
+ 
+  const handleDeleteCategory = async (e, categoryId) => {
+    e.stopPropagation();
+    try {
+      const response = await fetch(`https://fis.metaforeignoption.com/api/category/${categoryId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete category');
+      }
+      console.log('Category Deleted!')
+      // Update the category options after successful deletion
+      const updatedCategoryOptions = categoryOptions.filter(option => option.id !== categoryId);
+      setCategoryOptions(updatedCategoryOptions);
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      // Handle error as needed
+    }
+  };
+
+
 
   return (
     <div>
       <Box marginTop='1rem' padding='2rem' width='80vw' height='100vh'>
+            <Typography variant="h4" className="mb-4 font-bold text-gray-500">Courses</Typography>
 
+        
+        {/* Create Class Message */}
           <Snackbar
           open={isSuccessMessageVisible}
           autoHideDuration={5000} // Hide the message after 5 seconds
@@ -340,13 +524,54 @@ const getProgramNameById = (programId) => {
           </Alert>
         </Snackbar>
 
-        <Box display='flex' justifyContent='center' alignItems='center'>
+        {/* Delete Class Message */}
+
+           <Snackbar
+          open={isDeleteMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setDeleteMessageVisible(false)}
+        >
+          <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
+            Course Deleted successfully! 
+          </Alert>
+        </Snackbar>
+
+        {/* Update Class Message */}
+           <Snackbar
+          open={isUpdateMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setUpdateMessageVisible(false)}
+        >
+          <Alert onClose={() => setUpdateMessageVisible(false)} severity="success">
+            Course Updated successfully! 
+          </Alert>
+        </Snackbar>
+
+
+        {/* ADD CATEGORY Message */}
+           <Snackbar
+          open={isCategoryMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setCategoryMessageVisible(false)}
+        >
+          <Alert onClose={() => setCategoryMessageVisible(false)} severity="success">
+           Category added successfully! 
+          </Alert>
+        </Snackbar>
+
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
 
   <Box flex="1">
     <Button variant="outlined" color="primary" onClick={() => openModal(null)}>
       Add New Course
     </Button>
   </Box>
+
+          <Box marginRight='1rem'>
+        <Button variant="outlined" color="primary" onClick={openCategoryModal}>
+            Add Category
+          </Button>
+          </Box>
 
   <Box flex="2">
     <FormControl fullWidth margin="normal">
@@ -397,21 +622,36 @@ const getProgramNameById = (programId) => {
                 onChange={handleInputChange}
                 fullWidth
                 margin="normal"
+                 error={formSubmitted && !courseData.title.trim()}
+  helperText={formSubmitted && !courseData.title.trim() && "Course Name cannot be empty"}
               />
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Category</InputLabel>
-                <Select
-                  name="category"
-                  value={courseData.category}
-                  onChange={handleInputChange}
-                  >
-                  <MenuItem value="math">Math</MenuItem>
-                  <MenuItem value="science">Science</MenuItem>
-                  <MenuItem value="history">History</MenuItem>
-                  {/* Add more options as needed */}
-                </Select>
-              </FormControl>
-           <FormControl fullWidth margin="normal">
+                  <FormControl fullWidth
+                margin="normal"
+                  error={formSubmitted && !courseData.category.trim()}
+  helperText={formSubmitted && !courseData.category.trim() && "Course category cannot be empty"}
+              >
+        <InputLabel>Category</InputLabel>
+        <Select
+          name="category"
+          value={courseData.category}
+          onChange={handleInputChange}
+        >
+          {categoryOptions.map((option) => (
+        <MenuItem key={option.id} value={option.id} style={{ position: 'relative' }}>
+  {option.title}
+  <DeleteIcon
+    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: 'red', cursor: 'pointer' }}
+    onClick={(e) => handleDeleteCategory(e, option.id)}
+  />
+</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+              <FormControl fullWidth
+                margin="normal"
+                  error={formSubmitted && !courseData.category.trim()}
+  helperText={formSubmitted && !courseData.category.trim() && "Course category cannot be empty"}
+              >
         <InputLabel>Program</InputLabel>
         <Select
           name="program"
@@ -426,12 +666,14 @@ const getProgramNameById = (programId) => {
         </Select>
       </FormControl>
               <TextField
-                label="Lesson"
+                label="Course Tag"
                 name="lesson"
                 value={courseData.lesson}
                 onChange={handleInputChange}
                 fullWidth
                 margin="normal"
+                 error={formSubmitted && !courseData.lesson.trim()}
+  helperText={formSubmitted && !courseData.title.trim() && "Course lesson cannot be empty"}
               />
               <TextField
                 label="Credit"
@@ -440,6 +682,8 @@ const getProgramNameById = (programId) => {
                 onChange={handleInputChange}
                 fullWidth
                 margin="normal"
+                  error={formSubmitted && !courseData.credit.trim()}
+  helperText={formSubmitted && !courseData.credit.trim() && "Course credit cannot be empty"}
               />
               <TextField
                 label="Days"
@@ -448,6 +692,8 @@ const getProgramNameById = (programId) => {
                 onChange={handleInputChange}
                 fullWidth
                 margin="normal"
+                 error={formSubmitted && !courseData.days.trim()}
+  helperText={formSubmitted && !courseData.days.trim() && "Course days cannot be empty"}
               />
             </form>
           </DialogContent>
@@ -467,55 +713,91 @@ onClick={handleDelete}
             <Button onClick={closeModal}>Cancel</Button>
             {selectedCourseIndex !== null ? (
               <Button onClick={handleSaveChanges}>
-                Save Changes
+            { updateLoading && <CircularProgress color="inherit" size={16} style={{ marginRight: 8 }} />}
+
+                Update
               </Button>
             ) : (
               <Button
     color="primary"
-onClick={handleAddCourse}  
-  disabled={isLoading}
+          onClick={handleSubmit}
+            disabled={isLoading}
     style={{ backgroundColor: '#1976D2', color: '#ffffff' }}
     startIcon={isLoading && <CircularProgress size={20} color="inherit" />} >
                     Add Course </Button>
             )}
           </DialogActions>
         </Dialog>
+
+
+
+
+ {/* Dialog for adding category */}
+        <Dialog open={isCategoryModalOpen} onClose={closeCategoryModal}>
+          <DialogTitle>Add Category</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Category"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleAddCategory} color="primary" disabled={isLoading}>
+              {isLoading ? <CircularProgress size={24} /> : 'Add'}
+            </Button>
+            <Button onClick={closeCategoryModal} color="secondary" disabled={isLoading}>
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+
         
+
       {isLoading ? (
-  // Show loading spinner while data is being fetched
-  <Box display="flex" justifyContent="center" marginTop="2rem">
-    <CircularProgress />
-  </Box>
-) : (
-  courses.length > 0 && (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>Title</TableCell>
-          <TableCell>Category</TableCell>
-          <TableCell>Program</TableCell>
-          <TableCell>Lesson</TableCell>
-          <TableCell>Days</TableCell>
-          <TableCell>Action</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {courses.map((course, index) => (
-          <TableRow key={index}>
-            <TableCell>{course.title}</TableCell>
-            <TableCell>{course.category}</TableCell>
-            <TableCell>{getProgramNameById(course.program)}</TableCell>
-            <TableCell>{course.lesson}</TableCell>
-            <TableCell>{course.days}</TableCell>
-            <TableCell>
-              <Button onClick={() => handleViewCourse(index)}>View</Button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
-)}
+        // Show loading spinner while data is being fetched
+        <Box display="flex" justifyContent="center" marginTop="2rem">
+          <CircularProgress />
+        </Box>
+      ) : (
+        courses.length > 0 && (
+          <DataGrid
+            columns={[
+              { field: 'title', headerName: 'Title', width: 200 },
+              { field: 'category', headerName: 'Category', width: 200 },
+              { field: 'program', headerName: 'Program', width: 200 },
+              { field: 'lesson', headerName: 'Course Tag', width: 200 },
+              {
+                field: 'action',
+                headerName: 'Action',
+                width: 200,
+                renderCell: (params) => (
+                  <Button onClick={() => handleViewCourse(params.row)}>View</Button>
+                ),
+              },
+            ]}
+            rows={courses.map((course, index) => ({
+              id: index,
+              title: course.title,
+              category: course.category,
+              program: getProgramNameById(course.program),
+              lesson: course.lesson,
+              days: course.days,
+            }))}
+                        style={{ marginTop: '2rem', marginLeft: '2rem' }}
+
+            pageSize={10}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+                pagination
+                  components={{
+          Toolbar: GridToolbar,
+        }}
+          />
+        )
+      )}
 
       </Box>
     </div>

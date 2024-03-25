@@ -16,6 +16,8 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import Cookies from 'js-cookie';
+
 
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -35,6 +37,8 @@ Alert.displayName = 'CustomAlert';
 
 
 const Ebook = () => {
+    const [token, setToken] = useState('');
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [fileError, setFileError] = useState('');
   const [ebookFile, setEbookFile] = useState(null);  // Add this line for the file state
@@ -42,6 +46,7 @@ const Ebook = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
+  const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
 
   const [editEbookId, setEditEbookId] = useState(null);
   const [programOptions, setProgramOptions] = useState([]);
@@ -58,13 +63,30 @@ const Ebook = () => {
   const [caption, setCaption] = useState('');
   const [selectedEbook, setSelectedEbook] = useState(null);
 
+
+
+
   useEffect(() => {
+      const authToken = Cookies.get('authToken');
+
+ if (authToken) {
+      setToken(authToken);
+      console.log('Token:', token)
+    }
+
+
     fetchProgramOptions();
-  }, [programOptions]);
+        fetchEbooksAndObjectives(authToken);
+
+  }, []);
 
   useEffect(() => {
     fetchCoursesForProgram();
   }, [newEbook.program]);
+
+
+
+  // Function to Fetch Program
 
   const fetchProgramOptions = async () => {
     try {
@@ -80,6 +102,9 @@ const Ebook = () => {
       console.error('Error fetching program options:', error);
     }
   };
+
+
+  // Function to Course for Program
 
   const fetchCoursesForProgram = async () => {
     try {
@@ -101,6 +126,32 @@ const Ebook = () => {
       console.error('Error fetching courses for the program:', error);
     }
   };
+
+
+// Funtion to fetch all Ebook
+  
+    const fetchEbooksAndObjectives = async (authToken) => {
+      try {
+      setIsLoading(true)
+      const response = await fetch('https://fis.metaforeignoption.com/api/ebook_and_objective', {
+        headers: {
+          "Authorization": `bearer ${authToken}`
+        }
+      });
+      const data = await response.json();
+      setEbooks(data.ebooks); // Assuming the response data is an array of ebooks
+      console.log('Ebook Data:',data )
+    } catch (error) {
+      console.error('Error fetching ebooks and objectives:', error);
+      } finally {
+        setIsLoading(false)
+    }
+  };
+
+
+
+
+
 
   const handleChange = (e) => {
     setNewEbook((prevEbook) => ({ ...prevEbook, [e.target.name]: e.target.value }));
@@ -193,32 +244,76 @@ setEbooks((prevEbooks) => [...prevEbooks, { ...uploadedEbook, id: uploadedEbook.
     setShowAddForm(true);
   };
 
-  const handleDeleteClick = (id) => {
-    setEbooks(ebooks.filter(ebook => ebook.id !== id));
-  };
+  
+ 
 
-  const handleViewContents = (ebook) => {
-    setSelectedEbook(ebook);
-    setCaption(ebook.caption); // Set the caption when viewing contents
-    setProgramTitle(ebook.programTitle); // Set programTitle for editing
-    setCourseTitle(ebook.courseTitle); // Set courseTitle for editing
-    setEbookTitle(ebook.title); // Set ebookTitle for editing
-  };  
+ const handleViewContents = (ebook) => {
+  setSelectedEbook(ebook);
+  // setCaption(ebook.caption); // Set the caption when viewing contents
+  // setProgramTitle(ebook.programTitle); // Set programTitle for editing
+  // setCourseTitle(ebook.courseTitle); // Set courseTitle for editing
+  // setEbookTitle(ebook.title); // Set ebookTitle for editing
 
-  const handleEditEbook = () => {
-    setProgramTitle(selectedEbook.programTitle); // Assuming programTitle is a property of the ebook object
-    setCourseTitle(selectedEbook.courseTitle); // Assuming courseTitle is a property of the ebook object
-    setEbookTitle(selectedEbook.title);
-    setEditEbookId(selectedEbook.id);
-    setShowAddForm(true);
-  };
+  // Prepopulate the form fields with the selected ebook data
+  setNewEbook({
+    ...newEbook,
+    title: ebook.title,
+    caption: ebook.caption,
+    program: ebook.program, // Assuming program ID is stored in ebook.program
+    course: ebook.course, // Assuming course ID is stored in ebook.course
+  });
+};
 
-  const handleDeleteEbook = () => {
-    setEbooks(ebooks.filter(ebook => ebook.id !== selectedEbook.id));
-    setSelectedEbook(null);
-  };
+ const handleViewEbook = () => {
+  // Assuming the URL of the PDF is stored in selectedEbook.url
+  const pdfViewerUrl = `https://fis.metaforeignoption.com/file/${selectedEbook.url}`;
+  window.open(pdfViewerUrl, '_blank'); // Open the PDF in a new tab
+};
+
+  
+  // Funtion to Delete Ebook
+
+const handleDeleteEbook = async () => {
+  try {
+    setIsLoadingDelete(true); // Set loading state to true
+
+    const response = await fetch(`https://fis.metaforeignoption.com/api/ebook/${selectedEbook._id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        // Add any other headers if needed
+      },
+      // Add any body if required
+    });
+
+    if (response.ok) {
+      // If deletion is successful, remove the ebook from the state
+      setEbooks(ebooks.filter(ebook => ebook.id !== selectedEbook.id));
+      console.log('Ebook deleted successfully');
+      setSelectedEbook(null);
+      
+          setDeleteMessageVisible(true);
+
+
+    } else {
+      console.error('Failed to delete ebook:', response.status);
+      // Handle error if deletion fails
+    }
+  } catch (error) {
+    console.error('Error deleting ebook:', error);
+    // Handle network error if request fails
+  } finally {
+    setIsLoadingDelete(false); // Reset loading state
+  }
+};
+
+
+
+
+      // Specify a custom getRowId function
+    const getRowId = (row) => row._id;
 return (
-  <div className="container mx-auto p-4" style={{ marginLeft: '20px' }}>
+  <div className="container mx-auto p-4" style={{ marginLeft: '20px', width:"80vw" }}>
     
  <Snackbar
           open={isSuccessMessageVisible}
@@ -227,6 +322,16 @@ return (
         >
           <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
             Ebook Created successfully! 
+          </Alert>
+    </Snackbar>
+    {/* Snackbar for deleted Ebook */}
+ <Snackbar
+          open={isDeleteMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setDeleteMessageVisible(false)}
+        >
+          <Alert onClose={() => setDeleteMessageVisible(false)} severity="success">
+            Ebook Deleted successfully! 
           </Alert>
         </Snackbar>
 
@@ -283,6 +388,14 @@ return (
             margin="normal"
             name="title"
           />
+          <TextField
+            label="Ebook Caption"
+            value={newEbook.caption}
+            onChange={(e) => handleChange(e)}
+            fullWidth
+            margin="normal"
+            name="caption"
+          />
           {/* File input */}
             <InputLabel>Choose Ebook File</InputLabel>
         <Input
@@ -313,27 +426,88 @@ return (
   {editEbookId !== null ? 'Edit Ebook' : 'Add Ebook'}
 </Button>
 
-        </DialogActions>
+      </DialogActions>
       </Dialog>
-      <Dialog open={selectedEbook !== null} onClose={() => setSelectedEbook(null)}>
-        <DialogTitle>{selectedEbook?.title}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{selectedEbook?.content}</DialogContentText>
-          {/* Display the caption along with the contents */}
-          <DialogContentText><strong>Caption: </strong>{caption}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleEditEbook} color="primary">Edit</Button>
-          <Button onClick={handleDeleteEbook} color="error">Delete</Button>
-          <Button onClick={() => setSelectedEbook(null)}>Close</Button>
-        </DialogActions>
-    </Dialog>
+
+    
+{/* Dialoog to view/update Ebook */}
+
+    <Dialog open={selectedEbook !== null} onClose={() => setSelectedEbook(null)} fullWidth>
+  <DialogTitle>{selectedEbook?.title}</DialogTitle>
+  <DialogContent>
+    <form>
+      <TextField
+        label="Ebook Title"
+        value={selectedEbook ? selectedEbook.title : ''}
+        onChange={(e) => setNewEbook((prevEbook) => ({ ...prevEbook, title: e.target.value }))}
+        fullWidth
+        margin="normal"
+        name="title"
+          />
+              <TextField
+        label="Caption"
+        value={selectedEbook ? selectedEbook.caption : ''}
+        onChange={(e) => setNewEbook((prevEbook) => ({ ...prevEbook, caption: e.target.value }))}
+        fullWidth
+        margin="normal"
+        name="caption"
+      />
+      <FormControl fullWidth margin="normal">
+        <InputLabel>Select Program</InputLabel>
+        <Select
+          name="program"
+          value={selectedEbook ? selectedEbook.program : ''}
+          onChange={(e) => setNewEbook((prevEbook) => ({ ...prevEbook, program: e.target.value }))}
+        >
+          {programOptions.map((option) => (
+            <MenuItem key={option.id} value={option.id}>
+              {option.title}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+     <FormControl fullWidth margin="normal">
+        <InputLabel>Select Course</InputLabel>
+        <Select
+          name="course"
+          value={selectedEbook ? selectedEbook.course : ''}
+          onChange={(e) => setNewEbook((prevEbook) => ({ ...prevEbook, course: e.target.value }))}
+        >
+          {courseOptions.map((option) => (
+            <MenuItem key={option.id} value={option.id}>
+              {option.title}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </form>
+  </DialogContent>
+      <DialogActions>
+    <Button onClick={handleViewEbook} color="primary">View Ebook</Button>
+    <Button  color="primary">Save Changes</Button>
+        <Button
+            startIcon={isLoadingDelete && <CircularProgress color='inherit' size={20} />} // Display spinner as startIcon
+
+          onClick={handleDeleteEbook} color="error">Delete
+        
+        </Button>
+    <Button onClick={() => setSelectedEbook(null)}>Close</Button>
+  </DialogActions>
+</Dialog>
+
+
+    
 
 
 
 
 
-        <div style={{ height: 500, width: "90%", }}>
+    <div style={{ height: 500, width: "90%", }}>
+      
+      {isLoading ? ( <Box display="flex" justifyContent="center" alignItems="center" height={500}>
+            <CircularProgress />
+          </Box>) : (
+        
     <DataGrid
           rows={ebooks} // Use the ebooks state for the rows
         id="ebooks-table"
@@ -341,7 +515,27 @@ return (
         autoHeight
         columns={[
           { field: 'title', headerName: 'Ebook Title', flex: 1 },
-          { field: 'url', headerName: 'File', flex: 1 },
+          // { field: 'url', headerName: 'File', flex: 1 },
+           { 
+      field: 'program', 
+      headerName: 'Program', 
+      flex: 1,
+      valueGetter: (params) => {
+        // Find the corresponding program name based on the ID
+        const program = programOptions.find(option => option.id === params.value);
+        return program ? program.title : '';
+      }
+    },
+    { 
+      field: 'course', 
+      headerName: 'Course', 
+      flex: 1,
+      valueGetter: (params) => {
+        // Find the corresponding course name based on the ID
+        const course = courseOptions.find(option => option.id === params.value);
+        return course ? course.title : '';
+      }
+    },
           {
             field: 'actions',
             headerName: 'Actions',
@@ -361,8 +555,12 @@ return (
           Toolbar: GridToolbar,
         }}
         checkboxSelection={false}
-        disableSelectionOnClick
-      />
+            disableSelectionOnClick
+            getRowId={getRowId} // Specify the custom getRowId function
+
+        />
+        )
+      }
       </div>
 
     </div>

@@ -1,52 +1,148 @@
-import React, { useState } from 'react';
-import { Table, TableContainer, TableHead, TableBody, TableRow, TableCell, Paper, Button, Dialog, DialogTitle, DialogContent, TextField, Box, Grid, Menu, MenuItem, Typography, ButtonGroup } from '@mui/material';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Button, Dialog, TextField, ButtonGroup, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Avatar } from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Cookies from 'js-cookie';
 
-const dummyData = [
-    { id: 1, name: 'John Doe', program: 'Computer Science', applicationId: 'ABC123', email: 'john@example.com' },
-    { id: 2, name: 'Jane Smith', program: 'Engineering', applicationId: 'XYZ456', email: 'jane@example.com' },
-    // Add more dummy data as needed
-];
+
+
+
+
+
+// Function to style the Snackbar Alert
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
+Alert.displayName = 'CustomAlert';
+
+
 
 const Applications = () => {
-    const [open, setOpen] = useState(false);
-    const [selectedApplication, setSelectedApplication] = useState(null);
-    const [acceptFormOpen, setAcceptFormOpen] = useState(false);
-    const [interviewDate, setInterviewDate] = useState(new Date());
-    const [interviewTime, setInterviewTime] = useState(new Date());
-    const [interviewLink, setInterviewLink] = useState('');
-    const [acceptedApplication, setAcceptedApplication] = useState(null);
-    const [surname, setSurname] = useState('Doe'); // Dummy data
-    const [otherName, setOtherName] = useState('John'); // Dummy data
-    const [sex, setSex] = useState('Male'); // Dummy data
-    const [maritalStatus, setMaritalStatus] = useState('Single'); // Dummy data
-    const [dateOfBirth, setDateOfBirth] = useState('6th Feb'); // Dummy data
-    const [placeOfBirth, setPlaceOfBirth] = useState('Nigeria'); // Dummy data
-    const [nationality, setNationality] = useState('Nigerian'); // Dummy data
-    const [stateOfOrigin, setStateOfOrigin] = useState('Benue'); // Dummy data
-    const [mailingAddress, setMailingAddress] = useState('No 5 Suncity'); // Dummy data
-    const [telephone, setTelephone] = useState('0905635276'); // Dummy data
-    const [email, setEmail] = useState('johndoe@gmail.com'); // Dummy data
-    const [education, setEducation] = useState(''); // Dummy data
-    const [motivation, setMotivation] = useState('I\'m happy when doing what I love'); // Dummy data
-    const [referee, setReferee] = useState('Name: Dr. John.'); // Dummy data
+    const [token, setToken] = useState('');
+
+const [selectedStudent, setSelectedStudent] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [scheduleData, setScheduleData] = useState({
+    email: '',
+    date: '',
+    time: '',
+    userid: '',
+    program: '',
+    meeting_link: 'http://',
+  });
+
+  const [openScheduleModal, setOpenScheduleModal] = useState(false);
+    const [openPreviewModal, setOpenPreviewModal] = useState(false);
+     const [datePickerValue, setDatePickerValue] = useState(new Date());
+    const [timePickerValue, setTimePickerValue] = useState(new Date());
+    
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+  const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
+    const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
+    const [isDenyMessageVisible, setDenyMessageVisible] = useState(false);
+  const [openDenyDialog, setOpenDenyDialog] = useState(false);
+    const [rows, setRows] = useState([]);
 
 
+
+    
+
+
+
+// State to store fetched student applications
+    const [studentApplications, setStudentApplications] = useState([]);
+
+
+
+  // Fetch student applications when the component mounts
+  useEffect(() => {
+  const authToken = Cookies.get('authToken');
+
+     if (authToken) {
+      setToken(authToken);
+      console.log('Token:', token)
+    }
+    const fetchData = async (authToken) => {
+        try {
+            setIsLoading(true);
+
+            const response = await fetch('https://fis.metaforeignoption.com/api/enroll', {
+                headers: {
+                    "Authorization": `bearer ${authToken}`
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            
+            // Filtering students without a schedule property
+            const studentsWithoutSchedule = data.filter(student => !student.schedule);
+            console.log('Students without schedule:', studentsWithoutSchedule);
+            
+          setStudentApplications(studentsWithoutSchedule);
+                setRows(studentsWithoutSchedule);
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    fetchData(authToken);
+}, []);
+
+
+
+
+    
 
     // Function to handle preview button click
     const handlePreview = (application) => {
-        setSelectedApplication(application);
-        setOpen(true); // Open the dialog
-    };
+    setSelectedApplication(application);
+    setOpenPreviewModal(true); // Open the preview modal
+  };
 
+
+    
+      const handleDateChange = (date) => {
+    setDatePickerValue(date);
+  };
+
+  const handleTimeChange = (time) => {
+    setTimePickerValue(time);
+  };
+    
+    
     // Function to handle accept button click
-    const handleAccept = (data) => {
-        setSelectedApplication(data);
-        setAcceptFormOpen(true);
-    };
+  const handleAccept = (data) => {
+  setSelectedApplication(data);
+  setScheduleData({
+    email: data.student_application.email,
+    userid: data.student,
+      program: data.program._id,
+    studying: data._id,
+    meeting_link: 'http://',
+     date: datePickerValue.toLocaleDateString(),
+    time: timePickerValue.toLocaleTimeString(),
+    programName: data.program.title
+  });
+  setOpenScheduleModal(true);
+};
+
+
+
+    const handleOpenDialog = () => {
+  setOpenDialog(true);
+};
 
     // Function to handle form submission
     const handleSubmit = () => {
@@ -68,325 +164,450 @@ const Applications = () => {
         window.print();
     };
 
-    const handleDeny = (data) => {
-        // Implement deny logic here
-        console.log("Application denied:", data);
+
+// Function to Schedule Interview
+const handleScheduleInterview = async () => {
+  try {
+    setIsLoading(true);
+
+    // Prepare schedule data
+    const formattedScheduleData = {
+      ...scheduleData,
+      // Ensure proper formatting of date and time
+      date: formatDate(datePickerValue),
+      time: formatTime(timePickerValue)
     };
 
+       // Create a new object without the program property
+    const dataToSend = Object.keys(formattedScheduleData).reduce((acc, key) => {
+      if (key !== 'programName') {
+        acc[key] = formattedScheduleData[key];
+      }
+      return acc;
+    }, {});
+
+    // Function to schedule interview
+    const response = await fetch('https://fis.metaforeignoption.com/api/schedule-interview', {
+      method: 'POST',
+      headers: {
+        'Authorization': `bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dataToSend),
+    });
+
+    console.log('Schedule Data:', dataToSend);
+
+    if (!response.ok) {
+      throw new Error('Failed to schedule interview');
+    }
+
+    // Parse JSON response
+    const responseData = await response.json();
+    console.log('Interview Scheduled:', responseData);
+    setSuccessMessageVisible(true);
+
+    // Remove the student from the table
+    const updatedInterviews = studentApplications.filter(student => student._id !== scheduleData.studying);
+    setStudentApplications(updatedInterviews);
+
+    // Handle success or close the modal
+    setOpenScheduleModal(false);
+  } catch (error) {
+    console.error('Error scheduling interview:', error);
+    // Handle error if needed
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+    
+
+// Helper function to format date (you may need to adjust the format)
+const formatDate = (date) => {
+  return date.toLocaleDateString('en-US'); // Example: 'MM/dd/yyyy'
+};
+
+// Helper function to format time (you may need to adjust the format)
+const formatTime = (time) => {
+  return time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); // Example: 'hh:mm AM/PM'
+};
+
+
+
+
+
+
+   const handleDeny = (data) => {
+  setSelectedApplication(data);
+  setOpenDenyDialog(true);
+    };
+    
+    // Function to handle deny confirmation dialog close
+  const handleCloseDenyDialog = () => {
+    setOpenDenyDialog(false);
+    };
+    
+
+     // Function to handle deny confirmation and make the request
+const handleConfirmDeny = async () => {
+  try {
+    setIsLoadingDelete(true);
+
+    const response = await fetch(`https://fis.metaforeignoption.com/api/enroll/${selectedApplication._id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to deny application');
+    }
+
+    // Close the deny confirmation dialog
+    setOpenDenyDialog(false);
+
+    // Verify if the application is removed from the table
+    console.log('Before removal:', studentApplications);
+
+    // Remove the denied application from the table
+    const updatedApplications = studentApplications.filter(student => student._id !== selectedApplication._id);
+    setStudentApplications(updatedApplications);
+
+    console.log('After removal:', updatedApplications);
+
+    // Optionally, you can show a success message or perform additional logic
+
+  } catch (error) {
+    console.error('Error denying application:', error);
+    // Handle error if needed
+  } finally {
+    setIsLoadingDelete(false);
+  }
+};
+
+
+
+    
+
+   const DenyConfirmationDialog = ({ open, onClose, onDeny }) => {
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Deny Confirmation</DialogTitle>
+      <DialogContent>
+        <p style={{color:'red'}}>Are you sure you want to deny this application?</p>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="primary" style={{ backgroundColor:'green', color: 'white'}}>
+          Cancel
+        </Button>
+              <Button onClick={onDeny} color="primary" style={{ backgroundColor: 'red', color: 'white' }}>
+                  
+                        <Box display='flex' justifyContent= 'center' alignItems= 'center'>
+                    {isLoadingDelete && <CircularProgress size={20} color="inherit" />}
+                      Deny
+                      </Box>
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+
+     const handleCloseDialog = () => {
+    setOpenDialog(false);
+    };
+    
+
+// Counter variable for serial number
+  let serialNumberCounter = 1;
+
+
+const columns = [
+  {
+    field: '1',
+    headerName: 'S/N',
+    flex: 0.5,
+     renderCell: (params) => (
+      <span>{params.rowIndex != null ? params.rowIndex + 1 : ''}</span>
+    ),
+   
+   
+  },
+    {
+    field: 'student_application.name',
+    headerName: 'Name',
+    flex: 0.5,
+    renderCell: (params) => (
+      <span>{`${params.row.student_application.frist_name} ${params.row.student_application.sur_name}`}</span>
+    ),
+  },
+  {
+    field: 'student_application.email',
+    headerName: 'Email',
+    flex: 1,
+    renderCell: (params) => (
+      <span>{params.row.student_application.email}</span>
+    ),
+    },
+  {
+    field: '_id',
+    headerName: 'Program',
+    flex: 0.5,
+    renderCell: (params) => (
+      <span>{params.row.program.title}</span>
+    ),
+    },
+
+  // ... other columns
+
+
+  {
+    field: 'action',
+    headerName: 'Action',
+    flex: 1.5,
+renderCell: (params) => (
+  <ButtonGroup size="small">
+    <Button      style={{ backgroundColor: '#1976D2', color: '#ffffff', marginRight:'.3rem' }}
+onClick={() => handlePreview(params.row)}>Preview</Button>
+    <Button      style={{ backgroundColor: 'green', color: '#ffffff', marginRight:'.3rem' }}
+  onClick={() => handleAccept(params.row)}>Accept</Button>
+    <Button    variant="contained"
+          color="error"
+ onClick={() => handleDeny(params.row)}>Deny</Button>
+  </ButtonGroup>
+),
+
+  },
+    ];   
+    
+    
+//   console.log('Columns:', columns);
+//   console.log('Student Applications:', studentApplications);
+    
+    
+    
+    
+    
+    // Recursive function to render form fields
+const renderFormFields = (data, parentKey = '') => {
+  // Mapping object for custom labels
+  const customLabels = {
+    sur_name: 'Last Name',
+    email: 'Email Address',
+    other_name: 'Other name',
+    frist_name: 'First name',
+    marital_status: 'Marital Status',
+    dob: 'Date of birth',
+    pob: 'Place of birth',
+    state: 'State',
+    nationality: 'Nationality',
+    address: 'Address',
+    phone_number: 'Phone Number',
+    office_number: 'Office Number',
+    mailing_address: 'Mailing Address',
+    institution: 'Institution',
+    level: 'Level',
+    subject: 'Subject',
+    grade: 'Grade',
+    date: 'Date',
+    name: 'Name',
+    nature: 'Nature',
+    position: 'Position',
+    rank: 'Rank',
+    phone: 'Phone Number',
+    explaination: 'What are you looking to achieve taking this Program',
+    // Add more custom labels as needed
+  };
+
+ 
+  return Object.keys(data).map((property) => (
+    <div key={parentKey + property} style={{ display: 'inline-block', marginRight: '1px' }}> {/* Adjust margin as needed */}
+      {Array.isArray(data[property]) ? (
+        <>
+          <Typography style={{ fontWeight: 'bold', fontSize: '1.5rem', color: 'grey' }} variant="subtitle1">{property.charAt(0).toUpperCase() + property.slice(1)} Info</Typography>
+          {data[property].map((item) => (
+            <div key={item._id}>
+              {renderFormFields(item, parentKey + property)}
+            </div>
+          ))}
+        </>
+      ) : typeof data[property] === 'object' ? (
+        property.includes('_id') ? null : renderFormFields(data[property], parentKey + property)
+      ) : (
+        property.includes('_id') ? null : (
+          <TextField
+            label={customLabels[property] || property.charAt(0).toUpperCase() + property.slice(1)}
+            value={data[property]}
+            fullWidth
+            margin="normal"
+            key={parentKey + property}
+          />
+        )
+      )}
+    </div>
+  ));
+};
+
+
+    
+    
+    
+    // Specify a custom getRowId function
+    const getRowId = (row) => row._id;
+
     return (
-        <Box sx={{ marginTop: 4, paddingLeft: 0, paddingRight: 0 }}> {/* Remove padding */}
-            {/* Adjust margin and padding as needed */}
-            <TableContainer component={Paper} sx={{ width: '100%', padding: 0 }}> {/* Expand width and remove padding */}
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell align="left" colSpan={3}>
-                                <Typography variant="h5" gutterBottom>APPLICATIONS</Typography>
-                            </TableCell>
-                            <TableCell align="right" colSpan={4}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                    <Menu
-                                        id="bulk-action-menu"
-                                        anchorEl={null}
-                                        open={false} // Set to true to open the menu
-                                        onClose={() => { }}
-                                        MenuListProps={{
-                                            'aria-labelledby': 'bulk-action-button',
-                                        }}
-                                    >
-                                        <MenuItem onClick={() => { }}>Action 1</MenuItem>
-                                        <MenuItem onClick={() => { }}>Action 2</MenuItem>
-                                        {/* Add more menu items as needed */}
-                                    </Menu>
-                                    <Button
-                                        id="bulk-action-button"
-                                        variant="outlined"
-                                        endIcon={<ArrowDropDownIcon />}
-                                        sx={{ mr: 2 }}
-                                    >
-                                        Bulk Action
-                                    </Button>
-                                    <Button variant="contained" onClick={() => console.log("Apply clicked")}>Apply</Button>
-                                </Box>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell><input type="checkbox" /></TableCell>
-                            <TableCell>S/N</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Program</TableCell>
-                            <TableCell>Application ID</TableCell>
-                            <TableCell>Email</TableCell>
-                            <TableCell>Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {dummyData.map((data, index) => (
-                            <TableRow key={data.id}>
-                                <TableCell><input type="checkbox" /></TableCell>
-                                <TableCell>{data.id}</TableCell>
-                                <TableCell>{data.name}</TableCell>
-                                <TableCell>{data.program}</TableCell>
-                                <TableCell>{data.applicationId}</TableCell>
-                                <TableCell>{data.email}</TableCell>
-                                <TableCell>
-                                    <ButtonGroup variant="outlined" color="primary" aria-label="outlined primary button group">
-                                        <Button onClick={() => handlePreview(data)}>Preview</Button>
-                                        <Button onClick={() => handleAccept(data)}>Accept</Button>
-                                        <Button onClick={() => handleDeny(data)}>Deny</Button>
-                                    </ButtonGroup>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+        <Box sx={{ marginTop: 4, paddingLeft: 0, paddingRight: 0 }}>
 
-                {/* Dialog for preview form */}
-                <Dialog open={open} onClose={() => setOpen(false)} >
-                    <DialogContent>
-                        <Box>
-                        <form onSubmit={handleSubmit}>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                <Avatar sx={{ width: 100, height: 100 }} />
-            </Box>
-                            <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                                    <TextField
-                                        label="Surname"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={surname}
-                                        onChange={(e) => setSurname(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        label="Other Name"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={otherName}
-                                        onChange={(e) => setOtherName(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        label="Sex"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={sex}
-                                        onChange={(e) => setSex(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        label="Marital Status"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={maritalStatus}
-                                        onChange={(e) => setMaritalStatus(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        label="Date of Birth"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={dateOfBirth}
-                                        onChange={(e) => setDateOfBirth(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        label="Place of Birth"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={placeOfBirth}
-                                        onChange={(e) => setPlaceOfBirth(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        label="Nationality"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={nationality}
-                                        onChange={(e) => setNationality(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        label="State of Origin"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={stateOfOrigin}
-                                        onChange={(e) => setStateOfOrigin(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        label="Mailing Address"
-                                        variant="outlined"
-                                        fullWidth
-                                        multiline // Allow multiline input
-                                        rows={4} // Set the number of rows
-                                        value={mailingAddress}
-                                        onChange={(e) => setMailingAddress(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        label="Telephone"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={telephone}
-                                        onChange={(e) => setTelephone(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        label="Email Address"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        label="Education"
-                                        variant="outlined"
-                                        fullWidth
-                                        multiline
-                                        rows={4}
-                                        value={education}
-                                        onChange={(e) => setEducation(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        label="Motivation"
-                                        variant="outlined"
-                                        fullWidth
-                                        multiline
-                                        rows={2}
-                                        value={motivation}
-                                        onChange={(e) => setMotivation(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        label="Referee"
-                                        variant="outlined"
-                                        fullWidth
-                                        multiline
-                                        rows={4}
-                                        value={referee}
-                                        onChange={(e) => setReferee(e.target.value)}
-                                        InputProps={{
-                                            readOnly: true,
-                                          }}
-                                        
-                                    />
-                                </Grid>
-                            </Grid>
-                                <Box sx={{ mt: 2 }}>
-                                    <Button variant="contained" onClick={handlePrint} sx={{ backgroundColor: '##4A0808', color: '#fff' }}>Print</Button>
-                                </Box>
-                            </form>
-                        </Box>
-                    </DialogContent>
-                </Dialog>
 
-                {/* Dialog for accept form */}
-                <Dialog open={acceptFormOpen} onClose={() => setAcceptFormOpen(false)} >
-                <DialogTitle>Accept Application</DialogTitle>
-<DialogContent>
-    <form onSubmit={handleSubmit} style={{ height: '400px' }}>
-        <Grid container spacing={2}>
-            <Grid item xs={6}>
-                <div style={{ height: '200px' }}> {/* Adjust the height here */}
-                    <DatePicker
-                        selected={interviewDate}
-                        onChange={date => setInterviewDate(date)}
-                        dateFormat="dd/MM/yyyy"
-                        className="form-control"
-                        placeholderText="Select Interview Date"
-                    />
-                </div>
-            </Grid>
-            <Grid item xs={6}>
-                <div style={{ height: '200px' }}> {/* Adjust the height here */}
-                    <DatePicker
-                        selected={interviewTime}
-                        onChange={time => setInterviewTime(time)}
-                        showTimeSelect
-                        showTimeSelectOnly
-                        timeIntervals={15}
-                        timeCaption="Time"
-                        dateFormat="h:mm aa"
-                        className="form-control"
-                        placeholderText="Select Interview Time"
-                    />
-                </div>
-            </Grid>
-            <Grid item xs={12}>
-                <TextField
-                    label="Interview Link"
-                    variant="outlined"
-                    fullWidth
-                    value={interviewLink}
-                    onChange={(e) => setInterviewLink(e.target.value)}
-                />
-            </Grid>
-        </Grid>
-        <Box sx={{ mt: 2 }}>
-            <Button variant="contained" type="submit">Submit</Button>
-        </Box>
-    </form>
-</DialogContent>
+   <Snackbar
+          open={isSuccessMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setSuccessMessageVisible(false)}
+        >
+          <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
+            User interview scheduled successfully! 
+          </Alert>
+            </Snackbar>
+            
+   <Snackbar
+          open={isDenyMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setDenyMessageVisible(false)}
+        >
+          <Alert onClose={() => setDenyMessageVisible(false)} severity="success">
+            User admission denied successfully! 
+          </Alert>
+        </Snackbar>
 
-                </Dialog>
-            </TableContainer>
-        </Box>
+
+    {isLoading ? (
+  <Box display="flex" justifyContent="center" marginTop="2rem">
+    <CircularProgress />
+  </Box>
+) : (
+  studentApplications.length > 0 ? (
+    <DataGrid
+      rows={studentApplications}
+      columns={columns}
+      pageSize={10}
+      style={{ cursor: 'pointer' }}
+      onRowClick={(params) => {
+        setSelectedStudent(params.row);
+        handleOpenDialog();
+      }}
+      components={{
+        Toolbar: GridToolbar,
+      }}
+      getRowId={getRowId}
+    />
+  ) : (
+    <Typography variant="body1">No data available</Typography>
+  )
+)}
+
+        
+
+{/* // Modify the layout of the form rendering section in your Dialog component */}
+<Dialog open={openPreviewModal} onClose={() => setOpenPreviewModal(false)} maxWidth="lg">
+  <Box p={2} style={{ minWidth: '800px' }}> {/* Adjust minWidth to accommodate both forms */}
+    <Typography style={{ fontWeight: 'bold', fontSize: '1.5rem', color: 'grey' }} variant="h6">Student Details</Typography>
+    {selectedStudent && (
+      <div style={{ display: 'flex', flexWrap: 'wrap' }}> {/* Use flex-wrap to wrap content */}
+        {renderFormFields(selectedStudent.student_application)}
+              </div>
+            )}
+            
+              {selectedStudent && selectedStudent.program && (
+      <div style={{ marginTop: '1rem' }}> {/* Separate div for the program section */}
+        <Typography style={{ fontWeight: 'bold', fontSize: '1.5rem', color: 'grey' }} variant="subtitle1">Chosen Program</Typography>
+        <TextField
+          label="Program"
+          value={selectedStudent.program.title}
+          margin="normal"
+        />
+      </div>
+        )}
+    <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between' }}>
+      <Button className='no-print' variant="contained" color="primary" onClick={handlePrint}>Print</Button>
+    </div>
+  </Box>
+  <style>
+    {
+      `@media print {
+        .no-print {
+          display: none;
+        }
+      }
+    `}
+  </style>
+</Dialog>
+
+            {/* Schedule Interview Modal */}
+
+      
+      <Dialog open={openScheduleModal} onClose={() => setOpenScheduleModal(false)}>
+        <DialogTitle>Schedule Interview</DialogTitle>
+        <DialogContent>
+          <form>
+            <TextField label="Email" value={scheduleData.email} fullWidth margin="normal"  />
+            <DatePicker
+              selected={datePickerValue}
+              onChange={handleDateChange}
+              dateFormat="MM/dd/yyyy"
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+              placeholderText="Select Date"
+              className="form-control"
+            />
+            <DatePicker
+              selected={timePickerValue}
+              onChange={handleTimeChange}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={15}
+              dateFormat="h:mm aa"
+              placeholderText="Select Time"
+              className="form-control"
+            />
+            {/* <TextField label="User ID" value={scheduleData.userid} fullWidth margin="normal"  /> */}
+            {/* <TextField label="Program" value={scheduleData.program} fullWidth margin="normal"  /> */}
+            <TextField label="program" value={scheduleData.programName} fullWidth margin="normal"  />
+            <TextField
+              label="Meeting Link"
+              value={scheduleData.meeting_link}
+              fullWidth
+              margin="normal"
+              onChange={(e) => setScheduleData({ ...scheduleData, meeting_link: e.target.value })}
+            />
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenScheduleModal(false)}>Cancel</Button>
+          <Button onClick={handleScheduleInterview} color="primary">
+                        <Box display='flex' justifyContent= 'center' alignItems= 'center'>
+                    {isLoading && <CircularProgress size={20} color="inherit" />}
+           
+                            Schedule Interview
+                             </Box>
+          </Button>
+        </DialogActions>
+            </Dialog>
+            
+            {/* Modal Prompt to deny an application */}
+
+           <DenyConfirmationDialog
+  open={openDenyDialog}
+  onClose={handleCloseDenyDialog}
+  onDeny={handleConfirmDeny}
+/>
+
+
+
+    </Box>
     );
 };
 

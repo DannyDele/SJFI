@@ -14,8 +14,8 @@ const FinancialSummary = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
           <div>
-            <p className="text-sm text-black font-light">Total Balance</p>
-            <p className="font-light text-base text-black">${totalBalance}</p>
+            <p className="text-sm text-black font-light">Total Income</p>
+            <p className="font-light text-base text-black">&#8358;{totalBalance}</p>
           </div>
         </div>
 
@@ -24,8 +24,8 @@ const FinancialSummary = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
           <div>
-            <p className="text-sm text-black font-light">Total Amount Spent</p>
-            <p className="font-light text-base text-black">${totalSpent}</p>
+            <p className="text-sm text-black font-light">Total Spent</p>
+            <p className="font-light text-base text-black">&#8358;{totalSpent}</p>
           </div>
         </div>
 
@@ -34,8 +34,8 @@ const FinancialSummary = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
           <div>
-            <p className="text-sm text-black font-light">Amount Not Spent</p>
-            <p className="font-light text-base text-black">${amountNotSpent}</p>
+            <p className="text-sm text-black font-light">Total Not Spent</p>
+            <p className="font-light text-base text-black">&#8358;{amountNotSpent}</p>
           </div>
         </div>
       </div>

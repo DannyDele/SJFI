@@ -32,8 +32,8 @@ const Admissions = () => {
     };
 
     return (
-        <Container maxWidth="md">
-            <Box mt={5} textAlign="left">
+        <Container>
+            <Box mt={5} textAlign="left" width="80vw" marginTop="1rem" padding="2rem">
                 <Typography variant="h4" gutterBottom>
                     Admissions
                 </Typography>

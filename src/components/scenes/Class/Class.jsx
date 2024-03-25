@@ -8,6 +8,9 @@ import Select from '@mui/material/Select';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import Cookies from 'js-cookie';
+
 
 
 
@@ -23,6 +26,7 @@ Alert.displayName = 'CustomAlert';
 
 const Class = () => {
  
+  const [token, setToken] = useState('');
 
   const [courses, setCourses] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -33,9 +37,11 @@ const [programOptions, setProgramOptions] = useState([]);
 const [teacherOptions, setTeacherOptions] = useState([]);
   
   const [isLoading, setIsLoading] = useState(false);
+  const [linkLoading, setlinkLoading] = useState(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
   const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
+  const [isMeetingLinkMessageVisible, setMeetingLinkMessageVisible] = useState(false);
   
   const [selectedProgramFilter, setSelectedProgramFilter] = useState('');
   const [selectedCourseFilter, setSelectedCourseFilter] = useState('');
@@ -46,18 +52,19 @@ const [teacherOptions, setTeacherOptions] = useState([]);
     program: '',
     lecturer: '',
     details: '',
-    dateFrom: new Date(),
-    dateTo: new Date(),
-    startTime: '00:00',
-    endTime: '01:00',
-    zoomMeetingLink: ''
+    date: new Date(),
+    start_time: '00:00',
+    end_time: '01:00',
+    url: ''
   });
   const [viewIndex, setViewIndex] = useState(null);
   const [zoomMeetingLinkIndex, setZoomMeetingLinkIndex] = useState(null);
+  const [messsageSuccessText, setSuccessMessageText] = useState('')
 
 
 
 
+  
 
 
 useEffect(() => {
@@ -120,6 +127,9 @@ const fetchCoursesForProgram = async () => {
       if (!newClass.course && courseNames.length > 0) {
         setNewClass((prevClass) => ({ ...prevClass, course: courseNames[0].id }));
       }
+
+      // Set the flag to indicate that course data is loaded
+      setIsCourseDataLoaded(true);
     }
   } catch (error) {
     console.error('Error fetching courses for the program:', error);
@@ -127,13 +137,14 @@ const fetchCoursesForProgram = async () => {
 };
 
 
+
   
   // Function to filter Program and Courses
 
-   useEffect(() => {
-    // Fetch classes based on filters when the component mounts or filters change
-    fetchFilteredClasses();
-  }, []);
+  useEffect(() => {
+  // Fetch classes based on filters when the component mounts or filters change
+  fetchFilteredClasses();
+}, [selectedProgramFilter, newClass.program, newClass.course]);
 
 
 
@@ -150,6 +161,7 @@ const fetchFilteredClasses = async () => {
 
     const response = await fetch(apiUrl);
     const data = await response.json();
+    console.log('All Clases:', data)
 
     // Update the courses state with the filtered data
     setCourses(data);
@@ -163,24 +175,30 @@ const fetchFilteredClasses = async () => {
 
 
 
-
 // Add a new useEffect hook to fetch teachers when the component mounts
-useEffect(() => {
-  fetchTeachers();
+  useEffect(() => {
+    const authToken = Cookies.get('authToken');
+
+  
+    if (authToken) {
+      setToken(authToken);
+      console.log('Token:', token)
+    }
+
+  fetchTeachers(authToken);
 }, []); // Empty dependency array ensures the effect runs only once when the component mounts
 
 
-const token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkRhbm55SXllIiwidXNlcklkIjoiNjVlODViNDUyNDU3N2JmZDMyMGNjMmVjIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzA5NzQwNTQ2fQ.i4K-14N5_X0dmj7GK6m8wNVJH5Fb3M14g5z20bAkDTQ";
 
   
 // Modify the fetchTeachers function
-const fetchTeachers = async () => {
+const fetchTeachers = async (authToken) => {
   try {
     const response = await fetch('https://fis.metaforeignoption.com/api/users?type=student',
        {
           method: "GET",
           headers: {
-            Authorization: `bearer ${token}`,
+            Authorization: `bearer ${authToken}`,
           },
         }
     );
@@ -226,8 +244,7 @@ const handleChange = (e) => {
 
 
 
-
-
+// Function to Add New Class
 const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -242,18 +259,28 @@ const handleSubmit = async (e) => {
       program: newClass.program,
       lecturer: newClass.lecturer,
       details: newClass.details,
-      dateFrom: newClass.dateFrom,
-      dateTo: newClass.dateTo,
-      startTime: newClass.startTime,
-      endTime: newClass.endTime,
-      zoomMeetingLink: newClass.zoomMeetingLink,
+      date: newClass.date,
+      start_time: newClass.start_time,
+      end_time: newClass.end_time,
+      url: newClass.url,
     };
 
-    console.log('Added Class Information:', classData)
+    // Determine whether to add or update the class based on viewIndex
+    let apiUrl = 'https://fis.metaforeignoption.com/api/classes';
+    let operationMessage = ''; // Variable to store the operation message
 
-    // API request to send the new class data to the server
-    const response = await fetch('https://fis.metaforeignoption.com/api/classes', {
-      method: 'POST',
+    if (viewIndex !== null) {
+      // If viewIndex is not null, it means we are updating an existing class
+      const classId = courses[viewIndex]._id;
+      apiUrl += `/${classId}`; // Append class ID to the URL for updating
+      operationMessage = 'updated'; // Set operation message to 'updated'
+    } else {
+      operationMessage = 'created'; // Set operation message to 'created'
+    }
+
+    // Make a POST request to the endpoint
+    const response = await fetch(apiUrl, {
+      method: viewIndex !== null ? 'PUT' : 'POST', // Use PUT for update, POST for add
       headers: {
         'Content-Type': 'application/json',
       },
@@ -268,10 +295,11 @@ const handleSubmit = async (e) => {
     // Parse the response data as JSON
     const responseData = await response.json();
     console.log('Response Data:', responseData);
+    setSuccessMessageVisible(true);
 
     // If successful, update the courses state and reset the newClass state
     const updatedCourses = [...courses];
-    console.log('Updated Course:', updatedCourses)
+    console.log('Updated Course:', updatedCourses);
 
     if (viewIndex !== null) {
       updatedCourses[viewIndex] = newClass;
@@ -286,17 +314,20 @@ const handleSubmit = async (e) => {
       program: '',
       lecturer: '',
       details: '',
-      dateFrom: new Date(),
-      dateTo: new Date(),
-      startTime: '00:00',
-      endTime: '01:00',
-      zoomMeetingLink: '',
+      date: new Date(),
+    start_time: '00:00',
+      end_time: '01:00',
+      url: '',
     });
 
     // Close the forms and reset the viewIndex
     setShowAddForm(false);
     setShowZoomMeetingLinkForm(false);
     setViewIndex(null);
+
+    // Show a dynamic success message based on whether the operation was an addition or update
+    setSuccessMessageText(`Class ${operationMessage} successfully!`);
+
   } catch (error) {
     console.error('Error:', error.message);
     // Handle errors if needed (e.g., show an error message)
@@ -309,11 +340,38 @@ const handleSubmit = async (e) => {
 
 
 
-  const handleView = (index) => {
-    setNewClass(courses[index]);
-    setViewIndex(index);
-    setShowAddForm(true);
+
+
+ const handleView = (index) => {
+  setNewClass(courses[index]);
+  setViewIndex(index);
+  setShowAddForm(true);
   };
+  
+
+
+
+const handleAddNewClass = () => {
+  // Set newClass to initial state for adding a new class
+  setNewClass({
+    title: '',
+    course: '',
+    program: '',
+    lecturer: '',
+    details: '',
+    date: new Date(),
+    start_time: '00:00',
+    end_time: '01:00',
+    url: ''
+  });
+
+  // Set viewIndex to null to indicate adding a new class
+  setViewIndex(null);
+  setShowAddForm(true);
+};
+
+
+
 
   const handleEdit = () => {
     // Check if there is a selected class for editing
@@ -323,6 +381,22 @@ const handleSubmit = async (e) => {
       setShowAddForm(false); // Add this line to prevent showing the form for a new class
     }
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -366,32 +440,86 @@ const handleSubmit = async (e) => {
 
 
   const handleDeleteZoomMeetingLink = () => {
-    setNewClass((prevClass) => ({ ...prevClass, zoomMeetingLink: '' }));
+    setNewClass((prevClass) => ({ ...prevClass, url: '' }));
     setShowZoomMeetingLinkForm(false);
   };
 
-  const handleSubmitZoomMeetingLink = () => {
-    setShowZoomMeetingLinkForm(false);
-  };
+
+
+  // FUNTION TO ADD ZOOM LINK FOR A CLASS
+ const handleSubmitZoomMeetingLink = async () => {
+   try {
+    setlinkLoading(true)
+    // Get the class ID from the courses array using the zoomMeetingLinkIndex
+    const classId = courses[zoomMeetingLinkIndex]._id;
+    console.log('Class Id:', classId)
+
+    // Create a new class object to send to the server with updated zoomMeetingLink
+    const classData = {
+      url: newClass.url,
+    };
+
+    // API request to update the zoom meeting link for the class
+    const response = await fetch(`https://fis.metaforeignoption.com/api/classes/${classId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(classData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to save zoom meeting link: ${response.statusText}`);
+    }
+
+    // Optionally, you can handle success scenarios here
+    // For example, show a success message or update the UI as needed
+    const meetingLinkRes = response.json()
+    console.log('Meeting Link Res:', meetingLinkRes)
+    // Close the zoom meeting link form
+     setShowZoomMeetingLinkForm(false);
+     setMeetingLinkMessageVisible(true)
+  } catch (error) {
+     console.error('Error:', error.message);
+          setIsLoading(false)
+
+    // Optionally, you can handle errors here
+    // For example, show an error message to the user
+   } finally {
+     setlinkLoading(false)
+  }
+};
+
 
   const CustomDatePickerInput = ({ value, onClick }) => (
     <TextField margin="dense" variant="outlined" value={value} onClick={onClick} fullWidth />
   );
 
+
+
+
+
+
+
+
+
   return (
-    <div className="container mx-auto p-6" style={{ marginLeft: '20px' }}>
+    <div className="container mx-auto p-6" style={{ marginLeft: '20px', width:"80vw" }}>
       <h1 className="text-3xl font-bold text-gray-500 mb-6">Classes</h1>
 
 
+      {/* Create Clas Message */}
          <Snackbar
           open={isSuccessMessageVisible}
           autoHideDuration={5000} // Hide the message after 5 seconds
           onClose={() => setSuccessMessageVisible(false)}
         >
           <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
-            Class Created successfully! 
+            {messsageSuccessText} 
           </Alert>
       </Snackbar>
+
+        {/* Delete Class Meesage */}
       
          <Snackbar
           open={isDeleteMessageVisible}
@@ -400,6 +528,18 @@ const handleSubmit = async (e) => {
         >
           <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
             Class Deleted successfully! 
+          </Alert>
+      </Snackbar>
+
+      {/* DAdd Zoom Link for Class Meesage */}
+      
+         <Snackbar
+          open={isMeetingLinkMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setMeetingLinkMessageVisible(false)}
+        >
+          <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
+            Meeting link added successfully! 
           </Alert>
         </Snackbar>
          
@@ -410,7 +550,7 @@ const handleSubmit = async (e) => {
           <Button
         variant="outlined"
         color="primary"
-        onClick={() => setShowAddForm(true)}
+    onClick={handleAddNewClass}
         className="mb-4"
       >
         Add New Class</Button>
@@ -472,35 +612,53 @@ const handleSubmit = async (e) => {
         </Box>
       </Box>
 
-      <table className="table-auto w-full">
-        <thead>
-          <tr>
-            <th className="border px-4 py-2 text-gray-800 font-semibold">Class Title</th>
-            <th className="border px-4 py-2 text-gray-800 font-semibold">Class Course</th>
-            <th className="border px-4 py-2 text-gray-800 font-semibold">Program</th>
-            <th className="border px-4 py-2 text-gray-800 font-semibold">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {courses.map((course, index) => (
-            <tr key={index}>
-              <td className="border px-4 py-2 font-extralight text-gray-600">{course.title}</td>
-      {/* Use find to get the corresponding course name based on the course ID */}
-      <td className="border px-4 py-2 font-extralight text-gray-600">
-        {courseOptions.find((c) => c.id === course.course)?.title || 'N/A'}
-      </td>
-      {/* Use find to get the corresponding program name based on the program ID */}
-      <td className="border px-4 py-2 font-extralight text-gray-600">
-        {programOptions.find((p) => p.id === course.program)?.title || 'N/A'}
-      </td>
-              <td className="border px-4 py-2  text-gray-800">
-                <Button variant="outlined" color="primary" onClick={() => handleView(index)}>View</Button>
-                <Button variant="outlined" color="primary" onClick={() => { setShowZoomMeetingLinkForm(true); setZoomMeetingLinkIndex(index); }}>Add/Edit Zoom</Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {isLoading ? (
+      <Box display="flex" justifyContent="center" alignItems="center" height={500}>
+            <CircularProgress />
+          </Box>
+      ) :
+        (
+    <DataGrid
+  columns={[
+    { field: 'title', headerName: 'Class Title', width: 200 },
+    { field: 'course', headerName: 'Class Course', width: 200 },
+    { field: 'program', headerName: 'Program', width: 200 },
+    { field: 'actions', headerName: 'Actions', width: 300, renderCell: (params) => (
+      <div>
+        <Button variant="outlined" color="primary" onClick={() => handleView(params.row.id)}>
+          View
+        </Button>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => {
+            setShowZoomMeetingLinkForm(true);
+            setZoomMeetingLinkIndex(params.row.id);
+          }}
+        >
+          Add/Edit Zoom
+        </Button>
+      </div>
+    )},
+  ]}
+rows={courses.map((course, index) => ({
+  id: index,
+  title: course.title,
+  course: course.course && courseOptions.some((c) => c.id === course.course) ? 
+          courseOptions.find((c) => c.id === course.course)?.title || 'N/A' : 'N/A',
+  program: programOptions.find((p) => p.id === course.program)?.title || 'N/A',
+}))}
+  pageSize={10}
+  rowsPerPageOptions={[10, 20, 50]}
+        pagination
+          components={{
+          Toolbar: GridToolbar,
+        }}
+/>
+       ) }
+
+  
+       
       <Dialog open={showAddForm} onClose={() => setShowAddForm(false)} minWidth="0" fullWidth>
         <DialogTitle>{viewIndex !== null ? 'Edit Class' : 'Add New Class'}</DialogTitle>
         <DialogContent>
@@ -587,24 +745,10 @@ const handleSubmit = async (e) => {
           </Box>
           <Box mt={2}>
             <DatePicker
-              selected={newClass.dateFrom}
-              onChange={(date) => setNewClass({ ...newClass, dateFrom: date })}
+              selected={newClass.date}
+              onChange={(date) => setNewClass({ ...newClass, date: date })}
               selectsStart
-              startDate={newClass.dateFrom}
-              endDate={newClass.dateTo}
-              dateFormat="MM/dd/yyyy"
-              className="form-control"
-              customInput={<CustomDatePickerInput />}
-            />
-          </Box>
-          <Box mt={2}>
-            <DatePicker
-              selected={newClass.dateTo}
-              onChange={(date) => setNewClass({ ...newClass, dateTo: date })}
-              selectsEnd
-              startDate={newClass.dateFrom}
-              endDate={newClass.dateTo}
-              minDate={newClass.dateFrom}
+              startDate={newClass.date}
               dateFormat="MM/dd/yyyy"
               className="form-control"
               customInput={<CustomDatePickerInput />}
@@ -613,12 +757,12 @@ const handleSubmit = async (e) => {
           <Box mt={2}>
             <TextField
               margin="dense"
-              id="startTime"
-              name="startTime"
+              id="start_time"
+              name="start_time"
               label="Start Time"
               type="time"
               fullWidth
-              value={newClass.startTime}
+              value={newClass.start_time}
               onChange={handleChange}
              
             />
@@ -626,12 +770,12 @@ const handleSubmit = async (e) => {
           <Box mt={2}>
             <TextField
               margin="dense"
-              id="endTime"
-              name="endTime"
+              id="end_time"
+              name="end_time"
               label="End Time"
               type="time"
               fullWidth
-              value={newClass.endTime}
+              value={newClass.end_time}
               onChange={handleChange}
               
             />
@@ -641,13 +785,13 @@ const handleSubmit = async (e) => {
           <Button onClick={() => setShowAddForm(false)}>Cancel</Button>
 <Button onClick={handleSubmit} color="primary" disabled={isLoading}>
   <div style={{ display: 'flex', alignItems: 'center', color: '#3B8AD8' }}>
-    {viewIndex !== null ? 'Save' : 'Add Class'}
+    {viewIndex !== null ? 'Update' : 'Add Class'}
     {isLoading && <CircularProgress size={20} style={{ marginLeft: '8px', color:'#3B8AD8' }} />}
   </div>
 </Button>
           {viewIndex !== null && (
             <>
-              <Button onClick={handleEdit} color="primary">Edit</Button>
+              {/* <Button onClick={handleEdit} color="primary">Edit</Button> */}
 <Button onClick={handleDelete} color="secondary" disabled={isLoadingDelete}>
         <div style={{ display: 'flex', alignItems: 'center', color: '#FF0000' }}>
           Delete
@@ -663,19 +807,26 @@ const handleSubmit = async (e) => {
           <TextField
             autoFocus
             margin="dense"
-            id="zoomMeetingLink"
-            name="zoomMeetingLink"
+            id="url"
+            name="url"
             label="Zoom Meeting Link"
             type="text"
             fullWidth
-            value={newClass.zoomMeetingLink}
+            value={newClass.url}
             onChange={handleChange}
            
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowZoomMeetingLinkForm(false)}>Cancel</Button>
-          <Button onClick={handleSubmitZoomMeetingLink} color="primary">Save</Button>
+          <Button onClick={handleSubmitZoomMeetingLink} color="primary">
+            
+            <Box style={{ display: 'flex', alignItems: 'center' }}>
+              {linkLoading && <CircularProgress size={20} style={{ marginLeft: '8px' }} />}
+              Add link
+              </Box>
+
+          </Button>
           {zoomMeetingLinkIndex !== null && (
             <Button onClick={handleDeleteZoomMeetingLink} color="secondary">Delete</Button>
           )}

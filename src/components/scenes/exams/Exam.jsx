@@ -46,26 +46,27 @@ function Exam() {
   const [isAddMoreQuestionsMode, setAddMoreQuestionsMode] = useState(false);
   const [examsList, setExamsList] = useState([]);
   const [isviewDialogOpen, setViewDialogOpen] = useState(false)
-  const [currentExam, setCurrentExam] = useState(null); // New state to track the current exam
-  const [filterProgram, setFilterProgram] = useState('');
-  const [filterCourse, setFilterCourse] = useState('');
-  const [filterClass, setFilterClass] = useState('');
   const [selectedExams, setSelectedExams] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
+  const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
   const [programOptions, setProgramOptions] = useState([]);
     const [courseOptions, setCourseOptions] = useState([]);
     const [classOptions, setClassOptions] = useState([]);
+  const [filteredExams, setFilteredExams] = useState([]);
+const [isTableCleared, setIsTableCleared] = useState(false);
+    
 
-
-
+  // Define state variables to hold the details of the selected filtered exam
+const [selectedFilteredExam, setSelectedFilteredExam] = useState(null);
+  const [isViewFilteredExamDialogOpen, setViewFilteredExamDialogOpen] = useState(false);
+  // Define a state variable to track whether the filter button has been clicked
+  const [filterButtonClicked, setFilterButtonClicked] = useState(false);
+    const [examQuestionsList, setExamQuestionsList] = useState([]);
 
   
-
-
-
-
  // Updated state for examQuestion
 const [examQuestion, setExamQuestion] = useState({
   question: '',
@@ -81,12 +82,18 @@ const [examQuestion, setExamQuestion] = useState({
 
 
 
-  const [examQuestionsList, setExamQuestionsList] = useState([]);
 
 
 
 
 
+  useEffect(() => {
+    // Load exams list from localStorage when component mounts
+    const storedExams = localStorage.getItem('exams');
+    if (storedExams) {
+      setExamsList(JSON.parse(storedExams));
+    }
+  }, []); // Empty dependency array to run only once when component mounts
 
 
 
@@ -148,6 +155,35 @@ const fetchCoursesForProgram = async () => {
 };
 
 
+
+  
+  
+// Fetch Classes for selected program
+const fetchClassesForProgram = async (programId) => {
+  try {
+    const response = await fetch(`https://fis.metaforeignoption.com/api/classes?program=${programId}`);
+    const data = await response.json();
+    const classNames = data.map(classItem => ({
+      id: classItem._id,
+      title: classItem.title
+    }));
+    console.log('Classes related to a program:', classNames);
+    setClassOptions(classNames);
+  } catch (error) {
+    console.error('Error fetching classes for the program:', error);
+  }
+};
+
+// ...
+
+useEffect(() => {
+  // Fetch classes when the program changes
+  console.log('Selected program:', selectedProgram);
+  if (selectedProgram) {
+    fetchCoursesForProgram();
+    fetchClassesForProgram(selectedProgram); // Fetch classes for the selected program
+  }
+}, [selectedProgram]);
 
 
 
@@ -220,7 +256,14 @@ const handleSave = () => {
 
   setExamsList(updatedExamsList);
 
+  
+  // Save the updated exams list to localStorage
+  localStorage.setItem('exams', JSON.stringify(updatedExamsList));
+
   setAddDialogOpen(false);
+
+    // Clear the form fields by resetting the state
+
   setExamQuestion({
     question: '',
     a: '',
@@ -232,11 +275,22 @@ const handleSave = () => {
     course: '',
     class: '',
   });
+
+  //  setSelectedProgram('');
+  // setSelectedCourse('');
+  // setSelectedClass('');
+
+  // Clear the filtered exam table
+  setFilteredExams([]);
+  
+  // Clear the table and set the state to show the message
+  setIsTableCleared(true);
 };
 
 
 
-  
+  // Function to Add  Exam
+
  const handleSubmit = async () => {
    try {
         setIsLoading(true);
@@ -272,6 +326,11 @@ const handleSave = () => {
       console.log('Exams submitted successfully!');
       // Clear the table by setting examsList to an empty array
       setExamsList([]);
+
+
+// Clear localStorage
+      localStorage.removeItem('exams');
+
       
     // Show the success message
       setSuccessMessageVisible(true);
@@ -295,9 +354,45 @@ const handleSave = () => {
 };
 
 
+  // Function to Delete Exam
+const handleDeleteExam = async (examId, index) => {
+  try {
+    setIsLoadingDelete(index);
 
+    const response = await fetch(`https://fis.metaforeignoption.com/api/tests/${examId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        // Add any other headers if needed
+      },
+      // Add any body if required
+    });
 
+    if (response.ok) {
+      // Remove the exam from the filtered exams state
+      const updatedFilteredExams = filteredExams.filter(exam => exam.id !== examId);
+      setFilteredExams(updatedFilteredExams);
 
+      // Handle success
+      console.log('Exam deleted successfully');
+      setDeleteMessageVisible(true)
+    } else {
+      // Handle error
+      console.error('Failed to delete exam:', response.status);
+    }
+  } catch (error) {
+    // Handle network error
+    console.error('Network error:', error);
+  } finally {
+    setIsLoadingDelete(false);
+  }
+};
+
+  
+  
+  
+
+// Function to view Exams
 
 const handleViewExam = (examIndex) => {
   setSelectedExamIndex(examIndex);
@@ -349,21 +444,92 @@ const isViewDialogClose = () => {
     const handleAddNewTable = () => {
     setExamsList([...examsList, { questions: [] }]);
   };
+  
+
+  // Funtion to Filter Exams
+
+const handleApplyFilters = async () => {
+  try {
+    setIsLoading(true);
+    // Build the API endpoint with selected filter values
+    const endpoint = `https://fis.metaforeignoption.com/api/tests?program=${selectedProgram}&course=${selectedCourse}&classes=${selectedClass}`;
+
+    // Make the API request to fetch exam questions based on filters
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      console.error('Failed to fetch exam questions. Status:', response.status);
+      return;
+    }
+
+    // Parse the response data
+    const responseData = await response.json();
+    console.log('Response Exam Data', responseData);
+
+     // Extract IDs from the responseData and store them in an array
+    const examsWithIds = responseData.map(exam => ({ ...exam, id: exam._id }));
+
+    // Save the filtered exam data and IDs in state variables
+    setFilteredExams(examsWithIds);
+
+    
+console.log('Exam Filtered Successfully!:', examsWithIds);
+    console.log(`Program =  ${selectedProgram}, Course = ${selectedCourse}, Class = ${selectedClass}`);
 
 
-  const handleApplyFilters = () => {
-  // Filter the exams based on selected filters
-  const filteredExams = examsList.filter((exam) => {
-    return (
-      (!filterProgram || exam.program === filterProgram) &&
-      (!filterCourse || exam.course === filterCourse) &&
-      (!filterClass || exam.class === filterClass)
-    );
-  });
+    // Set the filterButtonClicked state to true when the filter button is clicked
+    setFilterButtonClicked(true);
 
-  // Update the state variable holding the displayed exams
-  setExamsList(filteredExams);
+  } catch (error) {
+    console.error('Error applying filters:', error);
+    setIsLoading(false);
+
+    // Handle the error as needed
+  } finally {
+    setIsLoading(false);
+  }
 };
+
+
+// Function to handle viewing the details of the selected filtered exam
+const handleViewFilteredExam = (examId) => {
+  // Find the selected exam by its ID from the filtered exams array
+  const selectedExam = filteredExams.find(exam => exam._id === examId);
+
+  // Check if the selected exam is defined before setting the state
+  if (selectedExam) {
+    // Set the state variables for the selected exam and open the dialog
+    setSelectedFilteredExam(selectedExam);
+    setViewFilteredExamDialogOpen(true);
+  } else {
+    console.error('Selected exam not found.');
+  }
+};
+
+
+// Function to close the dialog/modal displaying the details of the selected filtered exam
+const handleCloseViewFilteredExamDialog = () => {
+  setViewFilteredExamDialogOpen(false);
+};
+  
+  
+  //  Function to clear Filterd Exam Table
+  const handleClearTable = () => {
+  setIsTableCleared(true);
+};
+
+  // Funtion to remove exam question from table after save
+  const handleRemoveExam = (examIndex) => {
+    // Filter out the exam at the specified index
+    const updatedExamsList = examsList.filter((exam, index) => index !== examIndex);
+  
+    // Update the state with the updated exams list
+    setExamsList(updatedExamsList);
+
+    // Update the local storage by removing the exam at the specified index
+  const updatedLocalStorageExams = JSON.parse(localStorage.getItem('exams')).filter((exam, index) => index !== examIndex);
+  localStorage.setItem('exams', JSON.stringify(updatedLocalStorageExams));
+  };
+  
 
   
   // Check box Function
@@ -399,7 +565,10 @@ const isViewDialogClose = () => {
 
   return (
     <div>
-      <Box>
+
+      <Box sx={{ width: "80vw" }}>
+        <Typography style={{marginLeft: '3rem',}} variant="h4" className="mb-4 font-bold text-gray-500">Exams</Typography>
+
         {/* Snackbar for Success Message */}
         <Snackbar
           open={isSuccessMessageVisible}
@@ -407,9 +576,23 @@ const isViewDialogClose = () => {
           onClose={() => setSuccessMessageVisible(false)}
         >
           <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
-            Exam Submission successful! 
+            Exam Submitted successfully! 
+          </Alert>
+
+        {/* Snackbar for Delete Message */}
+        </Snackbar>
+        {/* Snackbar for Success Message */}
+        <Snackbar
+          open={isDeleteMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setDeleteMessageVisible(false)}
+        >
+          <Alert onClose={() => setDeleteMessageVisible(false)} severity="success">
+            Exam Deleted successfully! 
           </Alert>
         </Snackbar>
+
+        
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box marginTop='1rem' padding='2rem' width='30%'>
       <Button onClick={handleAddExam} color="primary">
@@ -453,22 +636,29 @@ const isViewDialogClose = () => {
         </Select>
             </FormControl>
             
-      <FormControl fullWidth margin="normal" style={{ flex: 1, minWidth: '120px' }}>
-        <InputLabel id="filter-class-label">class</InputLabel>
-        <Select
-          labelId="filter-class-label"
-          id="filter-class"
-          value={filterClass}
-          onChange={(e) => setFilterClass(e.target.value)}
-        >
-          <MenuItem value="">All classs</MenuItem>
-          <MenuItem value="class1">class 1</MenuItem>
-          <MenuItem value="class2">class 2</MenuItem>
-        </Select>
-      </FormControl>
+    <FormControl fullWidth margin="normal" style={{ flex: 1, minWidth: '120px' }}>
+  <InputLabel id="filter-class-label">Class</InputLabel>
+  <Select
+    labelId="filter-class-label"
+    id="filter-class"
+    value={selectedClass}
+    onChange={(e) => setSelectedClass(e.target.value)}
+  >
+    {classOptions.map((classItem) => (
+      <MenuItem key={classItem.id} value={classItem.id}>
+        {classItem.title}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
 
       <Button onClick={handleApplyFilters} color="primary" variant="contained" style={{ marginLeft: '1rem' }}>
-        Apply Filters
+        
+              <Box display='flex' justifyContent='center' alignItems='center'>
+                {isLoading && <CircularProgress size={20} color="inherit"/>}
+                Apply Filters
+                </Box>
       </Button>
     </Box>
   </Box>
@@ -512,25 +702,30 @@ const isViewDialogClose = () => {
 </FormControl>
 
 
-      <FormControl fullWidth margin="normal">
-        <InputLabel id="class-label">Class</InputLabel>
-        <Select
-          labelId="class-label"
-          id="class"
-          value={selectedClass}
-          label="Class"
-          onChange={(e) => setSelectedClass(e.target.value)}
-        >
-          <MenuItem value="class1">Class 1</MenuItem>
-          <MenuItem value="class2">Class 2</MenuItem>
-        </Select>
-      </FormControl>
+    <FormControl fullWidth margin="normal">
+  <InputLabel id="class-label">Class</InputLabel>
+  <Select
+    labelId="class-label"
+    id="class"
+    value={selectedClass}
+    label="Class"
+    onChange={(e) => setSelectedClass(e.target.value)}
+  >
+    {classOptions.map((classItem) => (
+      <MenuItem key={classItem.id} value={classItem.id}>
+        {classItem.title}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
     </DialogContent>
     <DialogActions>
       <Button onClick={handleSelectDialogClose} color="primary">
         Cancel
       </Button>
-      <Button onClick={handleProceedToAddExam} color="primary">
+      <Button onClick={handleProceedToAddExam} color="primary"  disabled={!selectedProgram || !selectedCourse || !selectedClass}
+>
         Proceed to Add Exam
       </Button>
     </DialogActions>
@@ -624,7 +819,13 @@ const isViewDialogClose = () => {
 
   {/* Table to display saved exam questions */}
   {examsList.length > 0 && (
-  <Box marginTop="2rem">
+          <Box marginTop="2rem" style={{ marginLeft: '6rem' }}>
+              <Typography variant="h5" gutterBottom>
+      Exam Questions.
+    </Typography>
+    <Typography variant="h5" gutterBottom>
+      {getNamesByIds(selectedProgram, selectedCourse, selectedClass).program}, {getNamesByIds(selectedProgram, selectedCourse, selectedClass).course}, {getNamesByIds(selectedProgram, selectedCourse, selectedClass).class}
+    </Typography>
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
@@ -651,11 +852,20 @@ const isViewDialogClose = () => {
                   View
                 </Button>
               </TableCell>
+
+              
+              <TableCell>
+    <Button style={{color:'red'}}  onClick={() => handleRemoveExam(examIndex)}>
+      remove
+    </Button>
+  </TableCell>
+
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </TableContainer>
+    
 
     {/* Submit Button */}
     <Box marginTop="1rem" textAlign="right">
@@ -670,7 +880,80 @@ const isViewDialogClose = () => {
   </Button>
     </Box>
   </Box>
-)}
+        )}
+        
+
+
+{/* // Assuming filteredExamList holds the filtered exam data */}
+        {!isTableCleared && filteredExams.length > 0 ? (
+          
+          <Box marginTop="2rem" style={{ marginLeft: '6rem' }}>
+            <Box marginTop="2rem" style={{ marginLeft: '6rem' }}>
+  <Button onClick={handleClearTable} color="primary" variant="outlined">
+    Clear Table
+  </Button>
+</Box>
+    <Typography variant="h5" gutterBottom>
+      Filtered Exam Questions
+    </Typography>
+    <Typography variant="h5" gutterBottom>
+      {getNamesByIds(selectedProgram, selectedCourse, selectedClass).program}, {getNamesByIds(selectedProgram, selectedCourse, selectedClass).course}, {getNamesByIds(selectedProgram, selectedCourse, selectedClass).class}
+    </Typography>
+
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Number</TableCell>
+            <TableCell>Question</TableCell>
+            <TableCell>Action</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+  {filteredExams.map((exam, index) => (
+    <TableRow key={exam.id}>
+      <TableCell>{index + 1}</TableCell>
+      <TableCell>{exam.question}</TableCell>
+      <TableCell>
+        <Button color="primary" onClick={() => handleViewFilteredExam(exam.id)}> {/* Pass exam ID to handleViewFilteredExam */}
+          View
+        </Button>
+      </TableCell>
+
+      <TableCell>
+      <Button
+  style={{ color: 'red' }}
+  onClick={() => handleDeleteExam(exam.id, index)} // Pass index to handleDeleteExam
+>
+  {isLoadingDelete === index ? (
+    <CircularProgress color="inherit" size={16} style={{ marginRight: 8 }} />
+  ) : (
+    "Delete"
+  )}
+</Button>
+
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+      </Table>
+    </TableContainer>
+  </Box>
+) : (
+  filterButtonClicked && (
+    <Box marginTop="2rem" style={{ marginLeft: '6rem' }}>
+      <Typography variant="h5" gutterBottom>
+        No exam for this program: {getNamesByIds(selectedProgram, selectedCourse, selectedClass).program}
+      </Typography>
+    </Box>
+  )
+        )
+        
+        }
+
+
+
+
   <Dialog open={isviewDialogOpen} onClose={isViewDialogClose} fullWidth maxWidth="sm">
 <DialogTitle>{`View Exam Question - ${getNamesByIds(
     examsList[selectedExamIndex]?.exams[0]?.program,
@@ -752,6 +1035,97 @@ const isViewDialogClose = () => {
       {/* Add any actions or buttons you need */}
     </DialogActions>
         </Dialog>
+
+
+{/* Dialog For Filtered Exams */}
+
+<Dialog open={isViewFilteredExamDialogOpen} onClose={handleCloseViewFilteredExamDialog} fullWidth maxWidth="sm">
+  <DialogTitle>View Exam Details</DialogTitle>
+  <DialogContent>
+    {selectedFilteredExam && (
+      <form>
+        <TextField
+          label="Question"
+          fullWidth
+          margin="normal"
+          value={selectedFilteredExam.question}
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+
+        <TextField
+          label="Option A"
+          fullWidth
+          margin="normal"
+          value={selectedFilteredExam.a}
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+
+        <TextField
+          label="Option B"
+          fullWidth
+          margin="normal"
+          value={selectedFilteredExam.b}
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+
+        <TextField
+          label="Option C"
+          fullWidth
+          margin="normal"
+          value={selectedFilteredExam.c}
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+
+        <TextField
+          label="Option D"
+          fullWidth
+          margin="normal"
+          value={selectedFilteredExam.d}
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+
+        <TextField
+          label="Answer"
+          fullWidth
+          margin="normal"
+          value={selectedFilteredExam.answer && selectedFilteredExam.answer[0]?.option}
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+
+        <TextField
+          label="Answer Details"
+          fullWidth
+          margin="normal"
+          value={selectedFilteredExam.answer && selectedFilteredExam.answer[0]?.details}
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+      </form>
+    )}
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleCloseViewFilteredExamDialog} color="primary">
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
+
+
+
+
         
 
 </Box>

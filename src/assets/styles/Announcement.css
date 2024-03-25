@@ -1,0 +1,4 @@
+.custom-hover-rows .MuiDataGrid-row:hover {
+  cursor: pointer !important;
+  background-color: #f0f0f0 !important; /* Add any desired background color on hover */
+}

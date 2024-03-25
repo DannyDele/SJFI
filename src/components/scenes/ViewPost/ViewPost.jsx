@@ -1,26 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TextField, Button, TablePagination, Box } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+  import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import Cookies from 'js-cookie';
+
+
+
+
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
+Alert.displayName = 'CustomAlert';
+
+
 
 const ViewPost = () => {
+      const [token, setToken] = useState('');
+
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [posts, setPosts] = useState([
-    { "id": 1, "content": "The sky is blue.", "user": "User 1", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 2, "content": "Water boils at 100 degrees Celsius.", "user": "User 2", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 3, "content": "Plants need sunlight to grow.", "user": "User 3", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 4, "content": "Gravity pulls objects towards the Earth.", "user": "User 4", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 5, "content": "The Earth orbits around the Sun.", "user": "User 5", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 6, "content": "Oxygen is essential for human life.", "user": "User 6", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 7, "content": "Photosynthesis is the process by which plants make their own food.", "user": "User 7", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 8, "content": "The human body is made up of cells.", "user": "User 8", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 9, "content": "The Earth has four layers: crust, mantle, outer core, and inner core.", "user": "User 9", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 10, "content": "Light travels faster than sound.", "user": "User 10", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 11, "content": "The human brain is responsible for coordinating bodily functions.", "user": "User 11", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 12, "content": "Rocks are classified into three types: igneous, sedimentary, and metamorphic.", "user": "User 12", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 13, "content": "The water cycle involves evaporation, condensation, and precipitation.", "user": "User 13", "imageUrl": "https://via.placeholder.com/150" },
-    { "id": 14, "content": "The human skeleton provides structure and support for the body.", "user": "User 14", "imageUrl": "https://via.placeholder.com/150" }
-    ]);
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(false); // New state for loading detail
+    const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
+    const [loadingDeleteMap, setLoadingDeleteMap] = useState({}); // Use an object to track loading state for each row
+      const [loadingDelete, setLoadingDelete] = useState(false); // State to track delete loading
+
+
+
+
+  
+    
+    
+    
+  // useEffect to fetch data on component mount
+  useEffect(() => {
+
+    const authToken = Cookies.get('authToken');
+
+     if (authToken) {
+      setToken(authToken);
+      console.log('Post Token:', authToken)
+    }
+   
+
+// Before making the fetch call
+console.log('Using Auth Token:', authToken);
+
+
+    const fetchData = async (authToken) => {
+       
+// Inside the fetch call
+console.log('Request Headers:', {
+  "Authorization": `Bearer ${authToken}`,
+  "Content-Type": "application/json"
+});
+
+
+          setLoading(true);
+
+       try {
+
+        const response = await fetch('https://fis.metaforeignoption.com/api/posts', {
+          headers: {
+            "Authorization": `bearer ${authToken}`,
+              "Content-Type": "application/json"
+
+
+
+          }
+        });
+        const postData = await response.json();
+
+        const adminPost = postData.filter(post => post.userId?.role !== 'admin' ) 
+        console.log("All Post:", postData)
+
+        setPosts(adminPost);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+        setLoading(false)
+
+      } finally {
+        setLoading(false)
+      }
+    };
+
+
+
+
+
+
+    fetchData(authToken);
+  }, []); // Empty dependency array means it will run only once on component mount
+  
+    
+    
+
+
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -35,18 +112,78 @@ const ViewPost = () => {
         setPage(0);
     };
 
-    const handleDeletePost = (postId) => {
-        setPosts(posts.filter(post => post.id !== postId));
+  
+
+
+ 
+  // Function to handle deleting a post
+  const handleDeletePost = async (postId) => {
+    try {
+  // Set loading state for the clicked row to true
+      setLoadingDeleteMap((prevLoadingDeleteMap) => ({
+        ...prevLoadingDeleteMap,
+        [postId]: true,
+      }));
+      
+      
+      const response = await fetch(`https://fis.metaforeignoption.com/api/posts/${postId}`, {
+        method: 'DELETE',
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": `bearer ${token}`,
+
+        }
+      });
+
+      if (response.ok) {
+        setPosts(posts.filter(post => post._id !== postId));
+        // Optionally, you can show a success message using a Snackbar or similar component
+        // Example: showSnackbar('Post deleted successfully', 'success');
+        // fetchData()
+        console.log("Post Delete Successfully!");
+        setSuccessMessageVisible(true)
+
+      } else {
+        // Handle error case
+        // Optionally, you can show an error message using a Snackbar or similar component
+        // Example: showSnackbar('Error deleting post', 'error');
+                console.error("Failed to delete psot", response.status);
+
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      setLoadingDelete(false)
+
+    } finally {
+ setLoadingDeleteMap((prevLoadingDeleteMap) => ({
+        ...prevLoadingDeleteMap,
+        [postId]: false,
+      }));    }
     };
+    
+
 
     // Filter posts based on search term
     const filteredPosts = posts.filter(post =>
-        post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.user.toLowerCase().includes(searchTerm.toLowerCase())
+        post.userId?.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.userId?.username.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
-        <Box p={2}>
+        <Box p={2} padding="4rem" width='80vw'>
+            
+
+<Snackbar
+          open={isSuccessMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setSuccessMessageVisible(false)}
+        >
+          <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
+            Post Deleted successfully! 
+          </Alert>
+        </Snackbar>
+
+
             {/* <Typography variant="h4" gutterBottom>View Posts</Typography> Added header here */}
             <Typography variant="h5" gutterBottom className='text-gray-500'>All User Posts</Typography>
             <TextField
@@ -57,12 +194,25 @@ const ViewPost = () => {
                 onChange={handleSearch}
                 style={{ marginBottom: '1rem' }}
             />
+
+            {loading ?  (
+                   <CircularProgress
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: '25vh auto',
+          }}
+        />
+             ): (
+
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell>Content</TableCell>
                             <TableCell>User</TableCell>
+                            <TableCell>Role</TableCell>
                             <TableCell>Action</TableCell>
                         </TableRow>
                     </TableHead>
@@ -71,18 +221,22 @@ const ViewPost = () => {
                             <TableRow key={index}>
                                 <TableCell>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <img src={post.imageUrl} alt="Post" style={{ marginRight: '10px', width: '50px', height: '50px' }} />
-                                        <Typography>{post.content}</Typography>
+                                        <img src={post.userId?.profileimage} alt="Post" style={{ marginRight: '10px', width: '50px', height: '50px' }} />
+                                        <Typography>{post.post}</Typography>
                                     </div>
                                 </TableCell>
-                                <TableCell>{post.user}</TableCell>
+                                <TableCell>{post.userId?.username}</TableCell>
+                                <TableCell>{post.userId?.role}</TableCell>
                                 <TableCell>
                                     <Button
                                         variant="outlined"
                                         color="secondary"
-                                        onClick={() => handleDeletePost(post.id)}
+                                        onClick={() => handleDeletePost(post._id)}
                                     >
-                                        Delete
+                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                             {loadingDeleteMap[post._id] && <CircularProgress color="inherit" size={16} style={{ marginRight: 8 }} />}
+                                 Delete
+                                        </div>
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -98,7 +252,8 @@ const ViewPost = () => {
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-            </TableContainer>
+        </TableContainer>
+       ) }
         </Box>
     );
 };

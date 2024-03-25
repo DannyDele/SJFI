@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -18,26 +18,136 @@ import {
   DialogContent,
   TextField,
     IconButton,
-    DialogActions
+  DialogActions,
+    Typography
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CircularProgress from '@mui/material/CircularProgress';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import '../../assets/styles/Announcement.css'
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import Cookies from 'js-cookie';
+
+
+
+// Function to style the Snackbar Alert
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
+Alert.displayName = 'CustomAlert';
+
 
 
 function Announcement() {
+    const [token, setToken] = useState('');
+
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openViewModal, setOpenViewModal] = useState(false);
   const [trends, setTrends] = useState([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [loading, setLoading] = useState(true); // Added loading state
+      const [loadingDelete, setLoadingDelete] = useState(false); // State to track delete loading
+  const [loadingUpdate, setLoadingUpdate] = useState(false); // State to track delete loading
+    const [isSuccessMessageVisible, setSuccessMessageVisible] = useState(false);
+    const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
+    const [isUpdateMessageVisible, setUpdateMessageVisible] = useState(false);
+
+
   const [submitting, setSubmitting] = useState(false); // Added submitting state
-    const [selectedTrend, setSelectedTrend] = useState(null);
+  const [selectedTrend, setSelectedTrend] = useState(null);
+  // Add a state variable to store the fetched usernames
+  const [authorOptions, setAuthorOptions] = useState([]);
+    const [formData, setFormData] = useState({
+    title: '',
+    category: '',
+    // icon: null,
+    cover_image: '',
+    details: '',
+    author: '',
+  });
+  
+    const [formValid, setFormValid] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false); // Added formSubmitted state
+
+
+  
+useEffect(() => {
+  // Check form validity whenever programData changes
+  if(formSubmitted){
+  const isValid = Object.entries(formData).every(([key, value]) => {
+    // If value is a string, trim and check for empty string
+    if (typeof value === 'string') {
+      return value.trim() !== '';
+    }
+    // // If value is a number (like price), check for non-zero
+    // if (typeof value === 'number') {
+    //   return value !== 0;
+    // }
+    // For other types of values, consider them valid
+    return true;
+  });
+    setFormValid(isValid);
+    }
+  }, [formData, formSubmitted]);
 
 
 
+
+
+
+  
+
+// Add a new useEffect hook to fetch teachers when the component mounts
+  useEffect(() => {
+      const authToken = Cookies.get('authToken');
+
+   if (authToken) {
+      setToken(authToken);
+      console.log(' Author Token:', authToken)
+    }
+  fetchAuthors(authToken);
+}, []); // Empty dependency array ensures the effect runs only once when the component mounts
+
+
+
+  
+// Modify the fetchTeachers function
+  const fetchAuthors = async (authToken) => {
+  
+    console.log(
+      `
+      token: ${authToken}
+      `
+    )
+  try {
+    const response = await fetch('https://fis.metaforeignoption.com/api/users?type=student',
+       {
+          method: "GET",
+          headers: {
+            Authorization: `bearer ${authToken}`,
+          },
+        }
+    );
+    const data = await response.json();
+    console.log("Gotten Users:", data)
+
+    // Assuming data is an array of users
+    const authorUsernames = data.map(user => ({
+      id: user._id,
+      username: user.username
+    }));
+
+    // Update the state with the fetched usernames
+    setAuthorOptions(authorUsernames);
+  } catch (error) {
+    console.error('Error fetching teachers:', error);
+  }
+};
+  
     
 
     useEffect(() => {
@@ -50,7 +160,8 @@ function Announcement() {
                 }
             })
 
-            const trendData = await trend.json();
+          const trendData = await trend.json();
+          console.log('Trends Data:', trendData)
           setTrends(trendData)
                           setLoading(false); // Set loading to false once data is fetched
 
@@ -59,14 +170,7 @@ function Announcement() {
         sendTrend()
     }, [])
 
-  const [formData, setFormData] = useState({
-    title: '',
-    category: '',
-    icon: null,
-    cover_image: '',
-    details: '',
-    author: '',
-  });
+
 
   const handleAddModalOpen = () => {
     setOpenAddModal(true);
@@ -76,7 +180,7 @@ function Announcement() {
     setFormData({
       title: '',
       category: '',
-      icon: null,
+      // icon: null,
       cover_image: '',
       details: '',
       author: '',
@@ -94,11 +198,11 @@ function Announcement() {
   };
 
   const handleFormChange = (event) => {
-    if (event.target.name === 'icon') {
+    if (event.target.name === 'cover_image') {
       const file = event.target.files[0];
       setFormData({
         ...formData,
-        icon: file,
+        cover_image: file,
       });
     } else {
       setFormData({
@@ -111,9 +215,10 @@ function Announcement() {
 
 const handleFormSubmit = async () => {
   try {
+    setSubmitting(true)
     // Step 1: Upload Image
     const imageFormData = new FormData();
-    imageFormData.append('file', formData.icon);
+    imageFormData.append('file', formData.cover_image);
 
     const imageUploadResponse = await fetch('https://fis.metaforeignoption.com/upload', {
       method: 'POST',
@@ -126,6 +231,7 @@ const handleFormSubmit = async () => {
     }
 
     const imageData = await imageUploadResponse.json();
+    console.log('Cover Image:', imageData)
 
     // Step 2: Submit Trend Data
     const trendResponse = await fetch('https://fis.metaforeignoption.com/api/subjects', {
@@ -135,32 +241,35 @@ const handleFormSubmit = async () => {
       },
       body: JSON.stringify({
         ...formData,
-        icon: imageData.path,
+        cover_image: `https://fis.metaforeignoption.com/file/${imageData.path}`,
       }),
     });
 
     if (trendResponse.ok) {
       const trendData = await trendResponse.json();
 
-      // Step 3: Fetch the image separately and update the state
-      const imagePath = trendData.icon;
-      const imageUrl = `https://fis.metaforeignoption.com/file/${imagePath}`;
+      console.log('Cover Image Form Data:', trendData);
+      setSuccessMessageVisible(true)
 
-      const imageResponse = await fetch(imageUrl);
+      // Step 3: Fetch the image separately and update the state
+      const imagePath = trendData.cover_image;
+      // const imageUrl = `https://fis.metaforeignoption.com/file/${imagePath}`;
+
+      const imageResponse = await fetch(imagePath);
       if (imageResponse.ok) {
         // Assuming the response is an image, you may need to adjust the logic accordingly
         const blob = await imageResponse.blob();
         const imageUrlObject = URL.createObjectURL(blob);
 
         // Update state with the image URL
-        setTrends((prevTrends) => [...prevTrends, { ...trendData, icon: imageUrlObject }]);
+        setTrends((prevTrends) => [...prevTrends, { ...trendData, cover_image: imageUrlObject }]);
 
         // Close the modal and reset the form data
         setFormData({
           title: '',
           category: '',
-          icon: null,
-          coverImage: '',
+          // icon: null,
+          cover_image: '',
           details: '',
           author: '',
         });
@@ -175,8 +284,22 @@ const handleFormSubmit = async () => {
     }
   } catch (error) {
     console.error('Error submitting trend data:', error.message);
+  } finally {
+    setSubmitting(false)
   }
-};
+  };
+  
+
+  // Function call to submit form
+    const handleSubmit = () => {
+    // Set formSubmitted to true when attempting to submit the form
+    setFormSubmitted(true);
+    // If form is valid, proceed with adding new program
+    if (formValid) {
+      handleFormSubmit();
+    }
+  };
+
 
 
   // Function to delete Trend
@@ -186,10 +309,11 @@ const handleFormSubmit = async () => {
     setSelectedTrend(trend);
   };
 
+  // Funtion to delete Trend
   const handleDeleteTrend = async () => {
   try {
     // Set submitting to true when the form is being submitted
-    setSubmitting(true);
+    setLoadingDelete(true);
 
     if (!selectedTrend) {
       // If no trend is selected, do nothing
@@ -212,52 +336,89 @@ const handleFormSubmit = async () => {
 
     // Reset the form data or other state related to the deleted trend if needed
     setOpenViewModal(false)
+    setDeleteMessageVisible(true)
     console.log('Trend deleted successfully!');
   } catch (error) {
     console.error('Error deleting trend:', error);
     // Handle the error appropriately (e.g., show an error message to the user)
   } finally {
     // Set submitting back to false whether the submission was successful or not
-    setSubmitting(false);
+    setLoadingDelete (false);
   }
 };
 
 
 
-  const handleViewDetails = (index) => {
-    setFormData(trends[index]);
-    setOpenViewModal(true);
-    setIsEditMode(true);
-    setEditIndex(index);
-  };
+ const handleViewDetails = (data) => {
+  console.log('View details for row:', data);
+  setFormData(data);
+  setOpenViewModal(true);
+  setIsEditMode(true);
+  setEditIndex(trends.findIndex((trend) => trend._id === data._id));
+};
+
+
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setFormData({
       ...formData,
-      icon: file,
+      cover_image: file,
     });
   };
 
-  const handleEditFormSubmit = () => {
+
+  // Function to update Trend
+const handleEditFormSubmit = async () => {
+  try {
+    setLoadingUpdate(true)
+    // Your code for updating the data goes here
+    const apiUrl = `https://fis.metaforeignoption.com/api/subjects/${formData._id}`;
+
+    const response = await fetch(apiUrl, {
+      method: 'PUT', // Assuming you use the PUT method for updating data
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error updating trend data');
+    }
+
+    setUpdateMessageVisible(true)
+    console.log('Trend data updated successfully!');
+
+     // Update the local state with the modified data
     setTrends((prevTrends) => {
       const updatedTrends = [...prevTrends];
-      updatedTrends[editIndex] = formData;
+      const updatedIndex = updatedTrends.findIndex((trend) => trend._id === formData._id);
+      updatedTrends[updatedIndex] = formData;
       return updatedTrends;
     });
 
+    // Close the modal and reset the form data
     setOpenViewModal(false);
-
     setFormData({
       title: '',
       category: '',
-      icon: null,
+      // icon: null,
       cover_image: '',
       details: '',
       author: '',
     });
     setIsEditMode(false);
-    };
+  } catch (error) {
+    console.error('Error updating trend data:', error.message);
+    // Handle the error appropriately (e.g., show an error message to the user)
+        setLoadingUpdate(false)
+
+  } finally {
+    setLoadingUpdate(false)
+  }
+};
+
     
     
   const [expandedImage, setExpandedImage] = useState(null);
@@ -281,7 +442,7 @@ const handleFormSubmit = async () => {
     // Update trends state after deleting the image
     setTrends((prevTrends) => {
       const updatedTrends = [...prevTrends];
-      updatedTrends[editIndex].icon = null; // Set the icon to null to remove the image
+      updatedTrends[editIndex].cover_image = null; // Set the icon to null to remove the image
       return updatedTrends;
     });
     handleCloseExpandedImage();
@@ -296,8 +457,52 @@ const handleFormSubmit = async () => {
     handleCloseExpandedImage();
   };
 
+
+// Function to get Row ID
+const getRowId = (row) => row._id;
+
   return (
     <div>
+      <Typography style={{marginLeft:'2rem'}} variant="h4" className="mb-4 font-bold text-gray-500">Trends</Typography>
+
+
+
+   {/* Snackbar for Success Message */}
+        <Snackbar
+          open={isSuccessMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setSuccessMessageVisible(false)}
+        >
+          <Alert onClose={() => setSuccessMessageVisible(false)} severity="success">
+            Announcement post successful! 
+          </Alert>
+      </Snackbar>
+      
+   {/* Snackbar for Delete Message */}
+        <Snackbar
+          open={isDeleteMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setDeleteMessageVisible(false)}
+        >
+          <Alert onClose={() => setDeleteMessageVisible(false)} severity="success">
+            Announcement deleted successfully! 
+          </Alert>
+        </Snackbar>
+
+   {/* Snackbar for Update Message */}
+        <Snackbar
+          open={isUpdateMessageVisible}
+          autoHideDuration={5000} // Hide the message after 5 seconds
+          onClose={() => setUpdateMessageVisible(false)}
+        >
+          <Alert onClose={() => setUpdateMessageVisible(false)} severity="success">
+            Announcement Updated Successfully! 
+          </Alert>
+        </Snackbar>
+
+
+
+
       {loading ? (
         <Box
           display="flex"
@@ -309,45 +514,67 @@ const handleFormSubmit = async () => {
         </Box>
       ) : (<Box marginTop='1rem' padding='2rem' width='80vw' height='100vh'>
         <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleAddModalOpen}>
-          Add Announcement
+          Add Trend
         </Button>
 
        
         {trends.length > 0 && (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Image</TableCell> {/* Added Image header */}
+          <DataGrid
+  rows={trends}
+  columns={[
+    { field: 'title', headerName: 'Title', flex: 1 },
+    { field: 'category', headerName: 'Category', flex: 1 },
+    {
+      field: 'author',
+      headerName: 'Author',
+      flex: 1,
+    },
 
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {trends.map((trend, index) => (
-<TableRow key={index} onClick={() => { handleViewDetails(index); handleSelectTrend(trend); }} style={{ cursor: 'pointer' }}>
-                    <TableCell>{trend.title}</TableCell>
-                    <TableCell>{trend.category}</TableCell>
-                    <TableCell>
-                      {trend.icon && (
-                        <img
-                          src={trend.icon}
-                          alt="Trend Image"
-                          style={{ maxWidth: '50px', maxHeight: '50px', cursor: 'pointer' }}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleExpandImage(trend.icon)
-                          }}
-                        />
-                      )}
-                    </TableCell>
-                    
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+
+    {
+      field: 'cover_image',
+      headerName: 'Image',
+      flex: 1,
+      renderCell: (params) => (
+        params.row.cover_image && (
+          <img
+            src={params.row.cover_image}
+            alt="Trend Image"
+            style={{ maxWidth: '50px', maxHeight: '50px', cursor: 'pointer' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleExpandImage(params.row.cover_image);
+            }}
+          />
+        )
+      ),
+    },
+  ]}
+  pageSize={10} // Set the number of rows per page
+  onRowClick={(params) => {
+  const clickedRowId = params.row._id;
+  const clickedRowData = trends.find((row) => getRowId(row) === clickedRowId);
+
+  if (clickedRowData) {
+    console.log('Clicked row data:', clickedRowData);
+    handleViewDetails(clickedRowData);
+    handleSelectTrend(clickedRowData);
+  } else {
+    console.error('Row data not found for id:', clickedRowId);
+  }
+}}
+
+
+              getRowId={getRowId} // Add this line
+                       components={{
+          Toolbar: GridToolbar,
+        }}
+              className="custom-hover-rows"
+              style={{marginTop:'1rem'}}
+
+
+/>
+
         )}
 
         <Dialog open={openAddModal} onClose={handleAddModalClose}>
@@ -360,7 +587,9 @@ const handleFormSubmit = async () => {
                 value={formData.title}
                 onChange={handleFormChange}
                 fullWidth
-                margin="normal"
+                  margin="normal"
+                  error={formSubmitted && !formData.title.trim()}
+  helperText={formSubmitted && !formData.title.trim() && "Trends title cannot be empty"}
               />
               <FormControl fullWidth margin="normal">
                 <InputLabel>Select Category</InputLabel>
@@ -371,23 +600,25 @@ const handleFormSubmit = async () => {
                   value={formData.category}
                   onChange={handleFormChange}
                   fullWidth
-                  margin="normal"
+                    margin="normal"
+                    error={formSubmitted && !formData.category.trim()}
+  helperText={formSubmitted && !formData.category.trim() && "Trends category cannot be empty"}
                 >
                   <MenuItem value="All">All</MenuItem>
-                  <MenuItem value="Trending">Trending</MenuItem>
-                  <MenuItem value="Featured">Featured</MenuItem>
-                  <MenuItem value="Recommended">Recommended</MenuItem>
+                  <MenuItem value="trending">trending</MenuItem>
+                  <MenuItem value="featured">featured</MenuItem>
+                  <MenuItem value="recommended">recommended</MenuItem>
                   {/* Add more MenuItem components for additional categories */}
                 </Select>
               </FormControl>
-              <TextField
+              {/* <TextField
                 label="Cover Image"
                 name="cover_image"
                 value={formData.cover_image}
                 onChange={handleFormChange}
                 fullWidth
                 margin="normal"
-              />
+              /> */}
               <TextField
                 label="Details"
                 name="details"
@@ -396,27 +627,44 @@ const handleFormSubmit = async () => {
                 fullWidth
                 multiline
                 rows={4}
-                margin="normal"
+                  margin="normal"
+                  error={formSubmitted && !formData.details.trim()}
+  helperText={formSubmitted && !formData.details.trim() && "Trends details cannot be empty"}
               />
-              <TextField
-                label="Author"
+                
+      <FormControl fullWidth margin="normal">
+    <InputLabel>Select Author</InputLabel>
+    <Select
                 name="author"
                 value={formData.author}
-                onChange={handleFormChange}
-                fullWidth
-                margin="normal"
-              />
+                    onChange={handleFormChange}
+                    error={formSubmitted && !formData.author.trim()}
+  helperText={formSubmitted && !formData.author.trim() && "Trends author cannot be empty"}
+    >
+      {authorOptions.map((author, index) => (
+        <MenuItem key={index} value={author.username}>
+          {author.username}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+
+
+
               <label htmlFor="fileInput" style={{ display: 'flex', alignItems: 'center' }}>
                 <IconButton color="primary" component="span">
                   <CloudUploadIcon />
                 </IconButton>
                 <span style={{ marginLeft: '8px', fontSize: '14px', color: '#555555' }}>
-                  {formData.icon ? `Selected file: ${formData.icon.name}` : 'Choose an Icon'}
+                  {formData.cover_image ? `Selected file: ${formData.cover_image.name}` : 'Choose an Image'}
                 </span>
               </label>
               <input type="file" id="fileInput" style={{ display: 'none' }} onChange={handleFileChange} />
-              <Button variant="contained" color="primary" onClick={handleFormSubmit}>
-                Submit
+              <Button variant="contained" color="primary" onClick={handleSubmit}>
+                  <Box display='flex' justifyContent='center' alignItems='center'>
+                    {submitting && <CircularProgress size={20} color="inherit" />}
+                    Submit
+                    </Box>
               </Button>
             </form>
           </DialogContent>
@@ -446,28 +694,28 @@ const handleFormSubmit = async () => {
                   margin="normal"
                 >
                   <MenuItem value="All">All</MenuItem>
-                  <MenuItem value="Trending">Trending</MenuItem>
-                  <MenuItem value="Featured">Featured</MenuItem>
-                  <MenuItem value="Recommended">Recommended</MenuItem>
+                  <MenuItem value="trending">trending</MenuItem>
+                  <MenuItem value="featured">featured</MenuItem>
+                  <MenuItem value="recommended">recommended</MenuItem>
                   {/* Add more MenuItem components for additional categories */}
                 </Select>
               </FormControl>
-              <TextField
+              {/* <TextField
                 label="Icon"
                 name="icon"
                 value={formData.icon}
                 onChange={handleFormChange}
                 fullWidth
                 margin="normal"
-              />
-              <TextField
+              /> */}
+              {/* <TextField
                 label="Cover Image"
                 name="cover_image"
                 value={formData.cover_image}
                 onChange={handleFormChange}
                 fullWidth
                 margin="normal"
-              />
+              /> */}
               <TextField
                 label="Details"
                 name="details"
@@ -478,24 +726,38 @@ const handleFormSubmit = async () => {
                 rows={4}
                 margin="normal"
               />
-              <TextField
-                label="Author"
+             <FormControl fullWidth margin="normal">
+    <InputLabel>Select Author</InputLabel>
+    <Select
                 name="author"
                 value={formData.author}
                 onChange={handleFormChange}
-                fullWidth
-                margin="normal"
-              />
+    >
+      {authorOptions.map((author, index) => (
+        <MenuItem key={index} value={author.id}>
+          {author.username}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
 
               {/* Conditionally render the submit button based on the form mode */}
                 {isEditMode ? (
                   <Box>
                 <Button  color="primary"  onClick={handleEditFormSubmit}>
-                  Update
-                  </Button>
+<Box display="flex" alignItems="center">
+              {loadingUpdate && (
+                <CircularProgress size={24} color="secondary" style={{ marginRight: '8px' }} />
+              )}
+              Update
+            </Box>                      </Button>
                 <Button  color="secondary" onClick={handleDeleteTrend}>
-                    Delete
-                    </Button>
+ <Box display="flex" alignItems="center">
+              {loadingDelete && (
+                <CircularProgress size={24}  style={{ marginRight: '8px', color: 'red' }} />
+              )}
+              Delete
+            </Box>                    </Button>
                     </Box>
               ) : null}          </form>
           </DialogContent>

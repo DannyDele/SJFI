@@ -1,15 +1,14 @@
+import React, { useState, useEffect } from 'react';
 import './App.css';
-// import Login from './components/Login';
-import '../src/components/Fontawesome'
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import Login from './components/scenes/Login/Login';
 import Topbar from './components/scenes/global/Topbar';
-import { Routes, Route } from 'react-router-dom';
 import Sidebar from './components/scenes/global/Sidebar';
-import Dashboard from './components/scenes/dashboard/Dashboard';
 import Student from './components/scenes/students/Student';
 import Financial from './components/scenes/Financial/Financial';
 import Program from './components/scenes/Program/Program';
 import Course from './components/scenes/Courses/Courses';
-import Class from './components/scenes/Class/Classes';
+import Class from './components/scenes/Class/Class';
 import Ebook from './components/scenes/Ebook/Ebook';
 import AddPost from './components/scenes/AddPost/AddPost';
 import ViewPost from './components/scenes/ViewPost/ViewPost';
@@ -17,51 +16,63 @@ import Notification from './components/scenes/Notifications/Notifications';
 import WhatsNew from './components/scenes/whatsNew/WhatsNew';
 import Exam from './components/scenes/exams/Exam';
 import Announcement from './components/announcement/Announcement';
-import Admissions from './components/scenes/Admissions/Admisions';
+import Admissions from './components/scenes/Admissions/Admissions';
 import Applications from './components/scenes/Admissions/Applications';
 import Interview from './components/scenes/Admissions/Interview';
-
-
-
+import Calender from './components/scenes/calender/Calender';
+import ForgotPassword from './components/scenes/forgotPassword/forgotPassword';
+import Cookies from 'js-cookie';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if the user is logged in
+    const authToken = Cookies.get('authToken');
+    if (authToken) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+      navigate('/login');
+    }
+  }, [navigate]);
 
   return (
     <>
       <div className='app'>
-        <Sidebar/>
+        {isLoggedIn && <Sidebar />}
         <main className='content'>
-          <Topbar />
+          {isLoggedIn && <Topbar />}
           <Routes>
-            <Route path='/' element={<Dashboard/> } />
-            <Route path='/students' element={<Student/> } />
+            <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+             <Route path='/forgot-password' element={<ForgotPassword />} /> {/* Route for Forgot Password */}
 
-            {/* <Route path='/teachers' element={<Teacher/> } /> */}
-            <Route path='/financial' element={<Financial/> } />
-            <Route path='/program' element={<Program/> } />
-            <Route path='/course' element={<Course/> } />
-            <Route path='/class' element={<Class/> } />
-
-            <Route path='/ebook' element={<Ebook/> } />
-    
-            {/* <Route path='/calender' element={<Calender/> } /> */}
-            <Route path='/addpost' element={<AddPost/> } />
-            <Route path='/viewpost' element={<ViewPost/> } />
-            <Route path='/notifications' element={<Notification/> } />
-
-            <Route path='/whatsNew' element={<WhatsNew/> } />
-            <Route path='/announcements' element={<Announcement/> } />
-            <Route path='/exams' element={<Exam/> } />
-            <Route path ='/admissions' element={<Admissions/>}/>
-            <Route path='/applications' element={<Applications/>}/>
-            <Route path ='/interview' element={<Interview/>}/>
-            {/* <Route path='/' element={<Dashboard/> } /> */}
-
+            {isLoggedIn && (
+              <>
+                <Route path='/students' element={<Student setIsLoggedIn={setIsLoggedIn} />} />
+                <Route path='/financial' element={<Financial />} />
+                <Route path='/programs' element={<Program />} />
+                <Route path='/courses' element={<Course />} />
+                <Route path='/classes' element={<Class />} />
+                <Route path='/ebooks' element={<Ebook />} />
+                <Route path='/calender' element={<Calender />} />
+                <Route path='/addpost' element={<AddPost />} />
+                <Route path='/viewpost' element={<ViewPost />} />
+                <Route path='/notifications' element={<Notification />} />
+                <Route path='/whatsNew' element={<WhatsNew />} />
+                <Route path='/announcements' element={<Announcement />} />
+                <Route path='/exams' element={<Exam />} />
+                <Route path='/admissions' element={<Admissions />} />
+                <Route path='/applications' element={<Applications />} />
+                <Route path='/interview' element={<Interview />} />
+              </>
+            )}
           </Routes>
         </main>
-    </div>
+      </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

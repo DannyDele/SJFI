@@ -25,10 +25,13 @@ import ComputerOutlinedIcon from '@mui/icons-material/ComputerOutlined'; // Icon
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'; // Icon for Ebook
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined'; // Icon for Class
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined'; // Icon for Course
+import { useNavigate } from "react-router-dom";
+
 import '../../../assets/styles/Sidebar.css';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
     const theme = useTheme();
+
     return (
         <Link to={to} style={{ textDecoration: 'none' }}>
             <MenuItem
@@ -44,10 +47,35 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
     );
 };
 
+
+
 function Sidebar() {
     const [selected,  setSelected] = useState("Dashboard");
     const [openCourses, setOpenCourses] = useState(false);
     const [openCommunity, setOpenCommunity] = useState(false);
+    const navigate = useNavigate();
+
+
+        // Function to logout
+
+    const handleClick = () => {
+        if (title === 'Log Out') {
+            handleLogout();
+        } else {
+            setSelected(title);
+            navigate('/login')
+        }
+    };
+    
+
+ const handleLogout = () => {
+        // Remove token logic here
+        // For example, clear the token from local storage
+        localStorage.removeItem('authToken');
+        // Update the login state
+        setIsLoggedIn(false);
+    };
+  
 
     return (
         <Box>
@@ -101,8 +129,8 @@ function Sidebar() {
             />
           </SubMenu>
                               <SubMenu
-                                  label='Course Curriculum'
-            title="Course Curriculum"
+                                  label='Learning'
+            title="Learning"
             icon={<MenuBookOutlinedIcon />}
                                   className="submenu"
           >
@@ -133,7 +161,7 @@ function Sidebar() {
                   
                       />
                  <Item
-                          title='Ebook'
+                          title='Library'
                           to='/ebooks'
                           icon={<MenuBookOutlinedIcon />}
                           selected={selected}
@@ -189,18 +217,14 @@ function Sidebar() {
                                     setSelected={setSelected}
                                 />
                               
-                                <MenuItem
-                                    className="sidebar-item"
-                                    active={selected === "Community"}
-                                    style={{ color: '#FFF7F7' }}
-                                    onClick={() => setOpenCommunity(!openCommunity)}
-                                    icon={<GroupsOutlinedIcon />}
-                                    suffixIcon={<ExpandMoreIcon />}
-                                >
-                                    <Typography style={{ fontSize: '15px' }}>Community</Typography>
-                                </MenuItem>
-                                <div style={{ paddingLeft: '30px', display: openCommunity ? 'block' : 'none' }}>
-                                    <Item
+
+         <SubMenu
+                                  label='Community'
+            title="Community"
+            icon={<GroupsOutlinedIcon />}
+                                  className="submenu"
+          >
+            <Item
                                         title='Add Post'
                                         to='/addpost'
                                         selected={selected}
@@ -221,13 +245,26 @@ function Sidebar() {
                                         selected={selected}
                                         setSelected={setSelected}
                                     />
-                                </div>
+          </SubMenu>
+
+                                
                   </Box>
                       </Menu>
                   </Box>
                   
                   <Box>
-                    <Menu>
+                        <Menu>
+                            
+                      <Item
+                            title='Log Out'
+                            to='/logout'
+                            icon={<LogoutOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                            handleLogout={handleClick}
+                        />
+
+
                          <Item
                           title='Settings'
                           to='/settings'
@@ -236,13 +273,7 @@ function Sidebar() {
                       setSelected={setSelected}    
                   />
                   
-                      <Item
-                          title='Log Out'
-                          to='/logout'
-                          icon={<LogoutOutlinedIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                          />
+                    
                           </Menu>
 
                   </Box>
