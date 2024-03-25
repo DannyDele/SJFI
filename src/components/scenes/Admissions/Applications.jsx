@@ -48,7 +48,9 @@ const [selectedStudent, setSelectedStudent] = useState(null);
     const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
     const [isDenyMessageVisible, setDenyMessageVisible] = useState(false);
   const [openDenyDialog, setOpenDenyDialog] = useState(false);
-    const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState([]);
+    // const [rowCounter, setRowCounter] = useState(1); // Initialize rowCounter as a state variable
+
 
 
 
@@ -60,6 +62,7 @@ const [selectedStudent, setSelectedStudent] = useState(null);
     const [studentApplications, setStudentApplications] = useState([]);
 
 
+  
 
   // Fetch student applications when the component mounts
   useEffect(() => {
@@ -73,7 +76,7 @@ const [selectedStudent, setSelectedStudent] = useState(null);
         try {
             setIsLoading(true);
 
-            const response = await fetch('https://fis.metaforeignoption.com/api/enroll', {
+            const response = await fetch('https://api.stj-fertilityinstitute.com/api/enroll', {
                 headers: {
                     "Authorization": `bearer ${authToken}`
                 }
@@ -187,7 +190,7 @@ const handleScheduleInterview = async () => {
     }, {});
 
     // Function to schedule interview
-    const response = await fetch('https://fis.metaforeignoption.com/api/schedule-interview', {
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/schedule-interview', {
       method: 'POST',
       headers: {
         'Authorization': `bearer ${token}`,
@@ -255,7 +258,7 @@ const handleConfirmDeny = async () => {
   try {
     setIsLoadingDelete(true);
 
-    const response = await fetch(`https://fis.metaforeignoption.com/api/enroll/${selectedApplication._id}`, {
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/enroll/${selectedApplication._id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `${token}`,
@@ -321,20 +324,16 @@ const handleConfirmDeny = async () => {
     };
     
 
-// Counter variable for serial number
-  let serialNumberCounter = 1;
-
+  let rowCounter = 1; // Initialize rowCounter variable outside of state
 
 const columns = [
-  {
-    field: '1',
+    {
     headerName: 'S/N',
     flex: 0.5,
-     renderCell: (params) => (
-      <span>{params.rowIndex != null ? params.rowIndex + 1 : ''}</span>
-    ),
-   
-   
+    renderCell: (params) => {
+      const rowIndex = studentApplications.findIndex(row => row === params.row) + 1;
+      return <span>{rowIndex}</span>;
+    },
   },
     {
     field: 'student_application.name',

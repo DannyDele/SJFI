@@ -124,7 +124,7 @@ useEffect(() => {
       `
     )
   try {
-    const response = await fetch('https://fis.metaforeignoption.com/api/users?type=student',
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/users?type=student',
        {
           method: "GET",
           headers: {
@@ -153,7 +153,7 @@ useEffect(() => {
     useEffect(() => {
       
         const sendTrend = async () => {
-            const trend = await fetch('https://fis.metaforeignoption.com/api/subjects', {
+            const trend = await fetch('https://api.stj-fertilityinstitute.com/api/subjects', {
                 method: 'GET',
                 headers: {
                     "accept": "application/json"
@@ -220,7 +220,7 @@ const handleFormSubmit = async () => {
     const imageFormData = new FormData();
     imageFormData.append('file', formData.cover_image);
 
-    const imageUploadResponse = await fetch('https://fis.metaforeignoption.com/upload', {
+    const imageUploadResponse = await fetch('https://api.stj-fertilityinstitute.com/upload', {
       method: 'POST',
       body: imageFormData,
     });
@@ -234,14 +234,14 @@ const handleFormSubmit = async () => {
     console.log('Cover Image:', imageData)
 
     // Step 2: Submit Trend Data
-    const trendResponse = await fetch('https://fis.metaforeignoption.com/api/subjects', {
+    const trendResponse = await fetch('https://api.stj-fertilityinstitute.com/api/subjects', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         ...formData,
-        cover_image: `https://fis.metaforeignoption.com/file/${imageData.path}`,
+        cover_image: `https://api.stj-fertilityinstitute.com/file/${imageData.path}`,
       }),
     });
 
@@ -253,7 +253,7 @@ const handleFormSubmit = async () => {
 
       // Step 3: Fetch the image separately and update the state
       const imagePath = trendData.cover_image;
-      // const imageUrl = `https://fis.metaforeignoption.com/file/${imagePath}`;
+      // const imageUrl = `https://api.stj-fertilityinstitute.com/file/${imagePath}`;
 
       const imageResponse = await fetch(imagePath);
       if (imageResponse.ok) {
@@ -320,7 +320,7 @@ const handleFormSubmit = async () => {
       return;
     }
 
-    const apiUrl = `https://fis.metaforeignoption.com/api/subjects/${selectedTrend._id}`;
+    const apiUrl = `https://api.stj-fertilityinstitute.com/api/subjects/${selectedTrend._id}`;
 
     const response = await fetch(apiUrl, {
       method: 'DELETE',
@@ -373,7 +373,7 @@ const handleEditFormSubmit = async () => {
   try {
     setLoadingUpdate(true)
     // Your code for updating the data goes here
-    const apiUrl = `https://fis.metaforeignoption.com/api/subjects/${formData._id}`;
+    const apiUrl = `https://api.stj-fertilityinstitute.com/api/subjects/${formData._id}`;
 
     const response = await fetch(apiUrl, {
       method: 'PUT', // Assuming you use the PUT method for updating data

@@ -90,7 +90,7 @@ const Ebook = () => {
 
   const fetchProgramOptions = async () => {
     try {
-      const response = await fetch('https://fis.metaforeignoption.com/api/programs');
+      const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
       const data = await response.json();
       const programNames = data.map(program => ({
         id: program._id,
@@ -109,7 +109,7 @@ const Ebook = () => {
   const fetchCoursesForProgram = async () => {
     try {
       if (newEbook.program) {
-        const response = await fetch(`https://fis.metaforeignoption.com/api/courses?program=${newEbook.program}`);
+        const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses?program=${newEbook.program}`);
         const data = await response.json();
         const courseNames = data.map(course => ({
           id: course._id,
@@ -133,7 +133,7 @@ const Ebook = () => {
     const fetchEbooksAndObjectives = async (authToken) => {
       try {
       setIsLoading(true)
-      const response = await fetch('https://fis.metaforeignoption.com/api/ebook_and_objective', {
+      const response = await fetch('https://api.stj-fertilityinstitute.com/api/ebook_and_objective', {
         headers: {
           "Authorization": `bearer ${authToken}`
         }
@@ -175,7 +175,7 @@ const handleFormSubmit = async (e) => {
     // Step 2: Append the actual file to the FormData object
     fileData.append('file', ebookFile);
 
-    const fileUploadResponse = await fetch('https://fis.metaforeignoption.com/upload', {
+    const fileUploadResponse = await fetch('https://api.stj-fertilityinstitute.com/upload', {
       method: 'POST',
       body: fileData,
     });
@@ -193,7 +193,7 @@ const handleFormSubmit = async (e) => {
       url: path,
     };
 
-    const ebookPostResponse = await fetch('https://fis.metaforeignoption.com/api/ebook', {
+    const ebookPostResponse = await fetch('https://api.stj-fertilityinstitute.com/api/ebook', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -266,7 +266,7 @@ setEbooks((prevEbooks) => [...prevEbooks, { ...uploadedEbook, id: uploadedEbook.
 
  const handleViewEbook = () => {
   // Assuming the URL of the PDF is stored in selectedEbook.url
-  const pdfViewerUrl = `https://fis.metaforeignoption.com/file/${selectedEbook.url}`;
+  const pdfViewerUrl = `https://api.stj-fertilityinstitute.com/file/${selectedEbook.url}`;
   window.open(pdfViewerUrl, '_blank'); // Open the PDF in a new tab
 };
 
@@ -277,7 +277,7 @@ const handleDeleteEbook = async () => {
   try {
     setIsLoadingDelete(true); // Set loading state to true
 
-    const response = await fetch(`https://fis.metaforeignoption.com/api/ebook/${selectedEbook._id}`, {
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/ebook/${selectedEbook._id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -289,6 +289,7 @@ const handleDeleteEbook = async () => {
     if (response.ok) {
       // If deletion is successful, remove the ebook from the state
       setEbooks(ebooks.filter(ebook => ebook.id !== selectedEbook.id));
+      // setSelectedEbook(null); // Reset selected ebook state
       console.log('Ebook deleted successfully');
       setSelectedEbook(null);
       

@@ -50,7 +50,7 @@ const Admitted = () => {
             try {
                                   setIsLoading(true)
 
-                const response = await fetch('https://fis.metaforeignoption.com/api/enroll', {
+                const response = await fetch('https://api.stj-fertilityinstitute.com/api/enroll', {
                     headers: {
                         "Authorization": `bearer ${authToken}`
                     }
@@ -113,13 +113,14 @@ const Admitted = () => {
   let counter = 1;
 
 const columns = [
- {
-    field: '1',
+  {
     headerName: 'S/N',
     flex: 0.5,
-    valueGetter: () => counter++,
+    renderCell: (params) => {
+      const rowIndex = data.findIndex(row => row === params.row) + 1;
+      return <span>{rowIndex}</span>;
     },
-    
+  },
     {
     field: 'student_application.name',
     headerName: 'Name',

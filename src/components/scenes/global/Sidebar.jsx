@@ -30,8 +30,6 @@ import { useNavigate } from "react-router-dom";
 import '../../../assets/styles/Sidebar.css';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
-    const theme = useTheme();
-
     return (
         <Link to={to} style={{ textDecoration: 'none' }}>
             <MenuItem
@@ -47,35 +45,18 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
     );
 };
 
-
-
 function Sidebar() {
-    const [selected,  setSelected] = useState("Dashboard");
-    const [openCourses, setOpenCourses] = useState(false);
-    const [openCommunity, setOpenCommunity] = useState(false);
+    const [selected, setSelected] = useState("Dashboard");
     const navigate = useNavigate();
 
-
-        // Function to logout
-
-    const handleClick = () => {
-        if (title === 'Log Out') {
-            handleLogout();
-        } else {
-            setSelected(title);
-            navigate('/login')
-        }
-    };
-    
-
- const handleLogout = () => {
-        // Remove token logic here
-        // For example, clear the token from local storage
+    // Function to handle logout
+    const handleLogout = () => {
+        // Clear the token
         localStorage.removeItem('authToken');
-        // Update the login state
-        setIsLoggedIn(false);
+        console.log('Token removed!!')
+        // Redirect to login page
+        navigate('/login');
     };
-  
 
     return (
         <Box>
@@ -100,113 +81,105 @@ function Sidebar() {
                         display='flex'
                         justifyContent='center'> <h4>ST JUDE FERTILITY INSTITUTE</h4></Box>
 
+                    <Box>
+                        <Menu>
+                            <Box >
+                                <Item
+                                    title='Dashboard'
+                                    to='/'
+                                    icon={<DashboardOutlinedIcon />}
+                                    selected={selected}
+                                    setSelected={setSelected}
+                                />
 
-                  <Box>
-              <Menu>
-                  <Box >
-                      <Item 
-                          title='Dashboard'
-                          to='/'
-                          icon={<DashboardOutlinedIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                              />
-                              
-                              <SubMenu
-                                  label='User Management'
-            title="User Management"
-            icon={<PermIdentityOutlinedIcon />}
-                                  className="submenu"
-          >
-            <Item
-              title="Student Information"
-              to="/students"
-              icon={<SchoolOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              className="student-item"
-              
-            />
-          </SubMenu>
-                              <SubMenu
-                                  label='Learning'
-            title="Learning"
-            icon={<MenuBookOutlinedIcon />}
-                                  className="submenu"
-          >
+                                <SubMenu
+                                    label='User Management'
+                                    title="User Management"
+                                    icon={<PermIdentityOutlinedIcon />}
+                                    className="submenu"
+                                >
+                                    <Item
+                                        title="Student Information"
+                                        to="/students"
+                                        icon={<SchoolOutlinedIcon />}
+                                        selected={selected}
+                                        setSelected={setSelected}
+                                        className="student-item"
+                                    />
+                                </SubMenu>
 
-                 <Item
-                          title='Program'
-                          to='/programs'
-                          icon={<MenuBookOutlinedIcon />}
-                          selected={selected}
-                          setSelected={setSelected} 
-                          className="student-item"
-                  
-                      />
-                 <Item
-                          title='Courses'
-                          to='/courses'
-                          icon={<MenuBookOutlinedIcon />}
-                          selected={selected}
-                          setSelected={setSelected} 
-                  
-                      />
-                 <Item
-                          title='Classes'
-                          to='/classes'
-                          icon={<MenuBookOutlinedIcon />}
-                          selected={selected}
-                          setSelected={setSelected} 
-                  
-                      />
-                 <Item
-                          title='Library'
-                          to='/ebooks'
-                          icon={<MenuBookOutlinedIcon />}
-                          selected={selected}
-                          setSelected={setSelected} 
-                  
-                      />
+                                <SubMenu
+                                    label='Learning'
+                                    title="Learning"
+                                    icon={<MenuBookOutlinedIcon />}
+                                    className="submenu"
+                                >
+                                    <Item
+                                        title='Program'
+                                        to='/programs'
+                                        icon={<MenuBookOutlinedIcon />}
+                                        selected={selected}
+                                        setSelected={setSelected}
+                                        className="student-item"
+                                    />
+                                    <Item
+                                        title='Courses'
+                                        to='/courses'
+                                        icon={<MenuBookOutlinedIcon />}
+                                        selected={selected}
+                                        setSelected={setSelected}
+                                    />
+                                    <Item
+                                        title='Classes'
+                                        to='/classes'
+                                        icon={<MenuBookOutlinedIcon />}
+                                        selected={selected}
+                                        setSelected={setSelected}
+                                    />
+                                    <Item
+                                        title='Library'
+                                        to='/ebooks'
+                                        icon={<MenuBookOutlinedIcon />}
+                                        selected={selected}
+                                        setSelected={setSelected}
+                                    />
+                                </SubMenu>
 
-          </SubMenu>
-
-                      <Item
-                          title='Financial Overview'
-                          to='/financial'
-                          icon={<PaymentOutlinedIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                      />
-                      <Item
-                          title='Calender & Events'
-                          to='/calender'
-                          icon={<EditCalendarOutlinedIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                              />
-                    <Item
-                          title='Admission Updates'
-                          to='/whatsNew'
-                          icon={<NotificationsActiveIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                      />
-                    <Item
-                          title='Announcement'
-                          to='/announcements'
-                          icon={<CampaignIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                      />
-                    <Item
-                          title='Exams'
-                          to='/exams'
-                          icon={<QuizIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                      />
-                              
+                                <Item
+                                    title='Financial Overview'
+                                    to='/financial'
+                                    icon={<PaymentOutlinedIcon />}
+                                    selected={selected}
+                                    setSelected={setSelected}
+                                />
+                                <Item
+                                    title='Calender & Events'
+                                    to='/calender'
+                                    icon={<EditCalendarOutlinedIcon />}
+                                    selected={selected}
+                                    setSelected={setSelected}
+                                />
+                                <Item
+                                    title='Admission Updates'
+                                    to='/whatsNew'
+                                    icon={<NotificationsActiveIcon />}
+                                    selected={selected}
+                                    setSelected={setSelected}
+                                />
+                                <Item
+                                    title='Announcement'
+                                    to='/announcements'
+                                    icon={<CampaignIcon />}
+                                    selected={selected}
+                                    setSelected={setSelected}
+                                />
+                                <Item
+                                    title='Exams'
+                                    to='/exams'
+                                    icon={<QuizIcon />}
+                                    selected={selected}
+                                    setSelected={setSelected}
+                                />
 
                                 {/* Admissions Component Moved After Teacher Information */}
                                 <Item
@@ -216,27 +189,24 @@ function Sidebar() {
                                     selected={selected}
                                     setSelected={setSelected}
                                 />
-                              
 
-         <SubMenu
-                                  label='Community'
-            title="Community"
-            icon={<GroupsOutlinedIcon />}
-                                  className="submenu"
-          >
-            <Item
+                                <SubMenu
+                                    label='Community'
+                                    title="Community"
+                                    icon={<GroupsOutlinedIcon />}
+                                    className="submenu"
+                                >
+                                    <Item
                                         title='Add Post'
                                         to='/addpost'
                                         selected={selected}
                                         setSelected={setSelected}
-                                        icon={<PostAddIcon />}
                                     />
                                     <Item
                                         title='Notifications'
                                         to='/notifications'
                                         selected={selected}
                                         setSelected={setSelected}
-                                        icon={<NotificationsIcon />}
                                     />
                                     <Item
                                         title='View Post'
@@ -245,47 +215,45 @@ function Sidebar() {
                                         selected={selected}
                                         setSelected={setSelected}
                                     />
-          </SubMenu>
+                                </SubMenu>
 
-                                
-                  </Box>
-                      </Menu>
-                  </Box>
-                  
-                  <Box>
+                            </Box>
+                        </Menu>
+                    </Box>
+
+                    <Box>
                         <Menu>
-                            
-                      <Item
-                            title='Log Out'
-                            to='/logout'
-                            icon={<LogoutOutlinedIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                            handleLogout={handleClick}
-                        />
 
+                            <Item
+                                title='Log Out'
+                                to='/login'
+                                icon={<LogoutOutlinedIcon />}
+                                selected={selected}
+                                setSelected={setSelected}
+                                handleClick={handleLogout} // Pass handleLogout function
+                            />
 
-                         <Item
-                          title='Settings'
-                          to='/settings'
-                          icon={<SettingsOutlinedIcon />}
-                          selected={selected}
-                      setSelected={setSelected}    
-                  />
-                  
-                    
-                          </Menu>
+                            <Item
+                                title='Settings'
+                                to='/settings'
+                                icon={<SettingsOutlinedIcon />}
+                                selected={selected}
+                                setSelected={setSelected}
+                            />
 
-                  </Box>
-                  </Box>
-        </ProSidebar>
-          
-    </Box>
+                        </Menu>
+
+                    </Box>
+                </Box>
+            </ProSidebar>
+
+        </Box>
 
 
     )
 }
 
-export default Sidebar
+export default Sidebar;
+
 
 

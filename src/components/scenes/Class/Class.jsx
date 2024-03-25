@@ -88,7 +88,7 @@ useEffect(() => {
 
   const fetchProgramOptions = async () => {
     try {
-      const response = await fetch('https://fis.metaforeignoption.com/api/programs');
+      const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
       const data = await response.json();
        // Assuming data is an array of courses
       const programNames = data.map(program => ({
@@ -113,7 +113,7 @@ useEffect(() => {
 const fetchCoursesForProgram = async () => {
   try {
     if (newClass.program) {
-      const response = await fetch(`https://fis.metaforeignoption.com/api/courses?program=${newClass.program}`);
+      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses?program=${newClass.program}`);
       const data = await response.json();
       const courseNames = data.map(course => ({
         id: course._id,
@@ -153,7 +153,7 @@ const fetchFilteredClasses = async () => {
   try {
     setIsLoading(true);
 
-    let apiUrl = 'https://fis.metaforeignoption.com/api/classes?';
+    let apiUrl = 'https://api.stj-fertilityinstitute.com/api/classes?';
 
     if (selectedProgramFilter) {
       apiUrl += `program=${selectedProgramFilter}`;
@@ -194,7 +194,7 @@ const fetchFilteredClasses = async () => {
 // Modify the fetchTeachers function
 const fetchTeachers = async (authToken) => {
   try {
-    const response = await fetch('https://fis.metaforeignoption.com/api/users?type=student',
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/users?type=student',
        {
           method: "GET",
           headers: {
@@ -266,7 +266,7 @@ const handleSubmit = async (e) => {
     };
 
     // Determine whether to add or update the class based on viewIndex
-    let apiUrl = 'https://fis.metaforeignoption.com/api/classes';
+    let apiUrl = 'https://api.stj-fertilityinstitute.com/api/classes';
     let operationMessage = ''; // Variable to store the operation message
 
     if (viewIndex !== null) {
@@ -409,7 +409,7 @@ const handleAddNewClass = () => {
     try {
       setIsLoadingDelete(true);
 
-      const response = await fetch(`https://fis.metaforeignoption.com/api/classes/${classIdToDelete}`, {
+      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/classes/${classIdToDelete}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -460,7 +460,7 @@ const handleAddNewClass = () => {
     };
 
     // API request to update the zoom meeting link for the class
-    const response = await fetch(`https://fis.metaforeignoption.com/api/classes/${classId}`, {
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/classes/${classId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

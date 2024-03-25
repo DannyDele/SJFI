@@ -25,7 +25,7 @@ const TransactionSummary = () => {
     const fetchTransactions = async () => {
       try {
         setLoading(true)
-        const response = await fetch('https://fis.metaforeignoption.com/api/trx', {
+        const response = await fetch('https://api.stj-fertilityinstitute.com/api/trx', {
             headers: {
                     "Authorization": `bearer ${token}`
                 }

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; // Import Link
+
 import Carousel from "react-elastic-carousel";
 import womanPic from '../../../assets/sjfi 1.png';
 import manPic from '../../../assets/sjfi 2.png';
@@ -10,8 +12,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie'; // Import js-cookie library
-import ForgotPassword from "../forgotPassword/forgotPassword";
-
 
 
 
@@ -55,7 +55,7 @@ const [isLoading, setIsLoading] = useState(false);
       console.log(email, password)
       try {
         setIsLoading(true)
-      const response = await fetch("https://fis.metaforeignoption.com/api/login", {
+      const response = await fetch("https://api.stj-fertilityinstitute.com/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -105,6 +105,14 @@ const [isLoading, setIsLoading] = useState(false);
   const imageSize = { width: "500px", height: "500px" };
 
   const currentYear = new Date().getFullYear();
+
+
+  
+    const handleClick = (event) => {
+      // event.preventDefault(); // Prevent default behavior of the link
+      // Any additional logic you want to execute on click
+    };
+  
 
   return (
     <div className="Flex">
@@ -182,11 +190,11 @@ const [isLoading, setIsLoading] = useState(false);
                 className="mt-1 p-2 w-full border-gray-600 border rounded-md bg-white"
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <p className="text-left text-[#4A0808] text-sm mt-1"><br/>
-                <a href="" className="text-[#4A0808]">
-                  Forgot Password?
-                </a>
-              </p>
+             <p className="text-left text-[#4A0808] text-sm mt-1"><br/>
+  <Link to="/forgot-password" className="text-[#4A0808]" onClick={handleClick} > {/* Use Link instead of anchor tag */}
+    Forgot Password?
+  </Link>
+</p>
             </div>
             <button
               type="button"

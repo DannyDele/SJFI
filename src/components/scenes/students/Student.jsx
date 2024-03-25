@@ -138,7 +138,7 @@ const [selectedRole, setSelectedRole] = useState('student');
 // Fetch All Programs
 const fetchProgramOptions = async () => {
   try {
-    const response = await fetch('https://fis.metaforeignoption.com/api/programs');
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
     const data = await response.json();
     const programNames = data.map(program => ({
       id: program._id,
@@ -335,7 +335,7 @@ const handleSubmit = async () => {
       setLoadingDelete(true); // Set loading state to true when starting deletion
 
       const response = await fetch(
-        `https://fis.metaforeignoption.com/api/users?email=${selectedStudent.email}`,
+        `https://api.stj-fertilityinstitute.com/api/users?email=${selectedStudent.email}`,
         {
           method: "DELETE",
           headers: {

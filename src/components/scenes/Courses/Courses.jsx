@@ -118,7 +118,7 @@ useEffect(() => {
 
   const fetchProgramOptions = async () => {
     try {
-      const response = await fetch('https://fis.metaforeignoption.com/api/programs');
+      const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
       const data = await response.json();
 
       // Assuming data is an array of programs with 'id' and 'title' properties
@@ -139,7 +139,7 @@ useEffect(() => {
 
   const fetchCategoryOptions = async () => {
     try {
-      const response = await fetch('https://fis.metaforeignoption.com/api/category');
+      const response = await fetch('https://api.stj-fertilityinstitute.com/api/category');
       const data = await response.json();
 
       // Assuming data is an array of programs with 'id' and 'title' properties
@@ -164,7 +164,7 @@ useEffect(() => {
     try {
       setIsLoading(true);
 
-      const response = await fetch('https://fis.metaforeignoption.com/api/courses');
+      const response = await fetch('https://api.stj-fertilityinstitute.com/api/courses');
       const data = await response.json();
 
       setCourses(data);
@@ -182,7 +182,7 @@ useEffect(() => {
     try {
       setIsLoading(true);
 
-      const response = await fetch(`https://fis.metaforeignoption.com/api/courses?program=${programId}`);
+      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses?program=${programId}`);
       const data = await response.json();
 
       setCourses(data);
@@ -249,7 +249,7 @@ const handleAddCourse = async () => {
             setIsLoading(true);
 
     // Make a POST request to the courses API endpoint
-    const response = await fetch('https://fis.metaforeignoption.com/api/courses', {
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/courses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -321,7 +321,7 @@ const handleAddCourse = async () => {
     const courseIdToUpdate = courses[selectedCourseIndex]._id;
 
     // Make a PUT request to update the course data
-    const response = await fetch(`https://fis.metaforeignoption.com/api/courses/${courseIdToUpdate}`, {
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses/${courseIdToUpdate}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -371,7 +371,7 @@ const handleAddCourse = async () => {
     const courseIdToDelete = courses[selectedCourseIndex]._id;
 
     // Make a DELETE request to the courses API endpoint
-    const response = await fetch(`https://fis.metaforeignoption.com/api/courses/${courseIdToDelete}`, {
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses/${courseIdToDelete}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -435,7 +435,7 @@ const getProgramNameById = (programId) => {
     try {
       setIsLoading(true);
 
-      const response = await fetch('https://fis.metaforeignoption.com/api/category', {
+      const response = await fetch('https://api.stj-fertilityinstitute.com/api/category', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -488,7 +488,7 @@ const getProgramNameById = (programId) => {
   const handleDeleteCategory = async (e, categoryId) => {
     e.stopPropagation();
     try {
-      const response = await fetch(`https://fis.metaforeignoption.com/api/category/${categoryId}`, {
+      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/category/${categoryId}`, {
         method: 'DELETE',
       });
 

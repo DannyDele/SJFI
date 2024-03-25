@@ -118,7 +118,7 @@ useEffect(() => {
 // Fetch All Programs
 const fetchProgramOptions = async () => {
   try {
-    const response = await fetch('https://fis.metaforeignoption.com/api/programs');
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
     const data = await response.json();
     const programNames = data.map(program => ({
       id: program._id,
@@ -141,7 +141,7 @@ const fetchProgramOptions = async () => {
 const fetchCoursesForProgram = async () => {
   console.log('Fetching courses for the program...');
   try {
-    const response = await fetch(`https://fis.metaforeignoption.com/api/courses?program=${selectedProgram}`);
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses?program=${selectedProgram}`);
     const data = await response.json();
     const courseNames = data.map(course => ({
       id: course._id,
@@ -161,7 +161,7 @@ const fetchCoursesForProgram = async () => {
 // Fetch Classes for selected program
 const fetchClassesForProgram = async (programId) => {
   try {
-    const response = await fetch(`https://fis.metaforeignoption.com/api/classes?program=${programId}`);
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/classes?program=${programId}`);
     const data = await response.json();
     const classNames = data.map(classItem => ({
       id: classItem._id,
@@ -312,7 +312,7 @@ const handleSave = () => {
     };
 
     // Making the API request
-    const response = await fetch('https://fis.metaforeignoption.com/api/tests', {
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/tests', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -359,7 +359,7 @@ const handleDeleteExam = async (examId, index) => {
   try {
     setIsLoadingDelete(index);
 
-    const response = await fetch(`https://fis.metaforeignoption.com/api/tests/${examId}`, {
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/tests/${examId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -452,7 +452,7 @@ const handleApplyFilters = async () => {
   try {
     setIsLoading(true);
     // Build the API endpoint with selected filter values
-    const endpoint = `https://fis.metaforeignoption.com/api/tests?program=${selectedProgram}&course=${selectedCourse}&classes=${selectedClass}`;
+    const endpoint = `https://api.stj-fertilityinstitute.com/api/tests?program=${selectedProgram}&course=${selectedCourse}&classes=${selectedClass}`;
 
     // Make the API request to fetch exam questions based on filters
     const response = await fetch(endpoint);

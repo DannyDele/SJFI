@@ -11,8 +11,6 @@ import CircularProgress from '@mui/material/CircularProgress';
   import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import TextareaAutosize from '@mui/material/TextareaAutosize';
-
 import Cookies from 'js-cookie';
 
 
@@ -49,6 +47,7 @@ const useStyles = makeStyles({
 const ManagePosts = () => {
 
     const [token, setToken] = useState('');
+    
 
   const classes = useStyles(); // Make sure to initialize useStyles and get the classes object
 
@@ -90,7 +89,7 @@ const [editedPostContent, setEditedPostContent] = useState('');
           setLoading(true);
 
   try {
-    const response = await fetch('https://fis.metaforeignoption.com/api/posts', {
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/posts', {
       method: 'GET',
       headers: {
         "Content-type": "application/json",
@@ -140,7 +139,7 @@ const [editedPostContent, setEditedPostContent] = useState('');
       setLoading(true);
 
       // Make an API request to fetch the detailed information of the selected post
-      const response = await fetch(`https://fis.metaforeignoption.com/api/posts/${postId}`);
+      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/posts/${postId}`);
       const postData = await response.json();
       
         // Update the editedPostContent state with the post content
@@ -167,7 +166,7 @@ const [editedPostContent, setEditedPostContent] = useState('');
       }));
       
       
-      const response = await fetch(`https://fis.metaforeignoption.com/api/posts/${postId}`, {
+      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/posts/${postId}`, {
         method: 'DELETE',
         headers: {
           "Content-type": "application/json",
@@ -251,7 +250,7 @@ const handlePostInputChange = (e) => {
     setLoadingUpdate(true); // Set loading state to true while the update is in progress
     console.log('Selected post:', selectedPost._id)
 
-    const response = await fetch(`https://fis.metaforeignoption.com/api/posts/${selectedPost._id}`, {
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/posts/${selectedPost._id}`, {
       method: 'PUT', // Assuming you want to perform a PUT request to update the post
       headers: {
         'Content-Type': 'application/json',
@@ -451,7 +450,6 @@ const formatDate = (dateTimeString) => {
   fullWidth
   margin="normal"
   onChange={handlePostInputChange}
-  
 />
         <TextField
           label="Comments"

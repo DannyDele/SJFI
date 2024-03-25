@@ -62,7 +62,7 @@ console.log('Request Headers:', {
 
        try {
 
-        const response = await fetch('https://fis.metaforeignoption.com/api/posts', {
+        const response = await fetch('https://api.stj-fertilityinstitute.com/api/posts', {
           headers: {
             "Authorization": `bearer ${authToken}`,
               "Content-Type": "application/json"
@@ -126,7 +126,7 @@ console.log('Request Headers:', {
       }));
       
       
-      const response = await fetch(`https://fis.metaforeignoption.com/api/posts/${postId}`, {
+      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/posts/${postId}`, {
         method: 'DELETE',
         headers: {
           "Content-type": "application/json",

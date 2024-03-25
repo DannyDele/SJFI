@@ -95,7 +95,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const response = await fetch('https://fis.metaforeignoption.com/api/announcements');
+        const response = await fetch('https://api.stj-fertilityinstitute.com/api/announcements');
         if (!response.ok) {
           throw new Error('Error fetching announcements');
         }
@@ -159,7 +159,7 @@ async function handleFormSubmit() {
     // Set submitting to true when the form is being submitted
     setSubmitting(true);
 
-    let apiUrl = 'https://fis.metaforeignoption.com/api/announcements';
+    let apiUrl = 'https://api.stj-fertilityinstitute.com/api/announcements';
 
     // Determine whether to send a POST or PUT request based on whether selectedAnnouncement is present
     let method = 'POST';
@@ -244,7 +244,7 @@ async function handleFormSubmit() {
       return;
     }
 
-    const apiUrl = `https://fis.metaforeignoption.com/api/announcements/${selectedAnnouncement._id}`;
+    const apiUrl = `https://api.stj-fertilityinstitute.com/api/announcements/${selectedAnnouncement._id}`;
 
     const response = await fetch(apiUrl, {
       method: 'DELETE',

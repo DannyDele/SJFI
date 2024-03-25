@@ -60,7 +60,7 @@ const [denyConfirmationDialogOpen, setDenyConfirmationDialogOpen] = useState(fal
     const fetchData = async (authToken) => {
       try {
         setIsLoading(true)
-        const response = await fetch('https://fis.metaforeignoption.com/api/enroll', {
+        const response = await fetch('https://api.stj-fertilityinstitute.com/api/enroll', {
           headers: {
               "Authorization": `bearer ${authToken}`
           }
@@ -126,7 +126,7 @@ const handleAdmit = async () => {
     };
 
     console.log('Body Data:', bodyData)
-    const response = await fetch('https://fis.metaforeignoption.com/api/admission-accepted', {
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/admission-accepted', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -166,7 +166,7 @@ const handleDenyConfirmation = (interviewId) => {
 const handleDeny = async () => {
   try {
     setIsLoading(true);
-    const response = await fetch(`https://fis.metaforeignoption.com/api/enroll/${denyingInterviewId}`, {
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/enroll/${denyingInterviewId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -193,11 +193,13 @@ const handleDeny = async () => {
 
 
 const columns = [
- {
-    field: '1',
+  {
     headerName: 'S/N',
     flex: 0.5,
-    valueGetter: () => counter++,
+    renderCell: (params) => {
+      const rowIndex = interviews.findIndex(row => row === params.row) + 1;
+      return <span>{rowIndex}</span>;
+    },
   },
   {
     field: 'studentName', headerName: 'Name', flex: 1,

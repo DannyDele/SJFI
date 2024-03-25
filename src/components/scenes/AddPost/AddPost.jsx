@@ -3,7 +3,12 @@ import { Grid, Box } from '@mui/material';
 import Add from './Add';
 import ManagePost from './ManagePost';
 
+
 const AddPost = () => {
+
+
+
+  
   return (
     <Box width="80vw">
     <div className="min-h-2/4  max-w-5xl flex items-center justify-center">

@@ -92,7 +92,7 @@ const AddPost = () => {
     formData.append('file', image); // Use 'file' as the property name
 
         // Upload image directly using the image state
-        const uploadResponse = await fetch('https://fis.metaforeignoption.com/upload', {
+        const uploadResponse = await fetch('https://api.stj-fertilityinstitute.com/upload', {
           method: 'POST',
           body: formData,
         });
@@ -109,7 +109,7 @@ const AddPost = () => {
       setPostData((prevData) => ({ ...prevData, media: [imageLink] }));
 
       // Make the POST request
-      const response = await fetch('https://fis.metaforeignoption.com/api/posts', {
+      const response = await fetch('https://api.stj-fertilityinstitute.com/api/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +119,8 @@ const AddPost = () => {
       });
 
       // Check if the request was successful
-      if (response.ok) {
+        if (response.ok) {
+        
     // Show the success message
       setSuccessMessageVisible(true);
        // Optionally, hide the success message after a certain duration

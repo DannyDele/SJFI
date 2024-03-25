@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Login from './components/scenes/Login/Login';
 import Topbar from './components/scenes/global/Topbar';
 import Sidebar from './components/scenes/global/Sidebar';
@@ -20,12 +20,13 @@ import Admissions from './components/scenes/Admissions/Admissions';
 import Applications from './components/scenes/Admissions/Applications';
 import Interview from './components/scenes/Admissions/Interview';
 import Calender from './components/scenes/calender/Calender';
-import ForgotPassword from './components/scenes/forgotPassword/forgotPassword';
 import Cookies from 'js-cookie';
+import ForgotPasswordRouter from './components/scenes/global/ForgotPasswordRouter';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Check if the user is logged in
@@ -34,21 +35,25 @@ function App() {
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
-      navigate('/login');
+      if (location.pathname !== '/forgot-password') {
+        navigate('/login');
+      }
     }
-  }, [navigate]);
+  }, [navigate, location.pathname]);
+
+  const showSidebarAndTopbar = isLoggedIn && location.pathname !== '/forgot-password' && location.pathname !== '/login';
+  const showDashboard = isLoggedIn && !['/login', '/forgot-password'].includes(location.pathname);
 
   return (
     <>
       <div className='app'>
-        {isLoggedIn && <Sidebar />}
+        {showSidebarAndTopbar && <Sidebar />}
         <main className='content'>
-          {isLoggedIn && <Topbar />}
+          {showSidebarAndTopbar && <Topbar />}
           <Routes>
             <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-             <Route path='/forgot-password' element={<ForgotPassword />} /> {/* Route for Forgot Password */}
-
-            {isLoggedIn && (
+            <Route path='/forgot-password' element={<ForgotPasswordRouter />} />
+            {showDashboard && (
               <>
                 <Route path='/students' element={<Student setIsLoggedIn={setIsLoggedIn} />} />
                 <Route path='/financial' element={<Financial />} />

@@ -75,7 +75,7 @@ useEffect(() => {
   const fetchPrograms = async () => {
     try {
       setLoading(true)
-      const response = await fetch('https://fis.metaforeignoption.com/api/programs');
+      const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
 
       if (!response.ok) {
         throw new Error(`Failed to fetch programs. Status: ${response.status}`);
@@ -139,7 +139,7 @@ useEffect(() => {
    setLoadingDelete(true)
   try {
     // Assuming editProgram is defined and has an "id" property
-    const response = await fetch(`https://fis.metaforeignoption.com/api/programs/${editProgram._id}`, {
+    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/programs/${editProgram._id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ useEffect(() => {
 
 
     // Assuming the API supports adding a new program
-    const response = await fetch('https://fis.metaforeignoption.com/api/programs', {
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -244,7 +244,7 @@ useEffect(() => {
   const handleUpdateProgram = async () => {
     setLoadingUpdate(true);
     try {
-      const response = await fetch(`https://fis.metaforeignoption.com/api/programs/${editProgram._id}`, {
+      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/programs/${editProgram._id}`, {
         method: 'PUT', // Assuming you need to use PUT method to update
         headers: {
           'Content-Type': 'application/json',
