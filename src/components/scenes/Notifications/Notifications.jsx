@@ -539,8 +539,8 @@ const adminNotifications = data.filter(notification => notification.receiver && 
   
 
   return (
-    <div className="container mx-auto p-6" style={{ marginLeft: '20px', width: "80vw" }}>
-            <Typography variant="h4" className="mb-4 font-bold text-gray-500">Notifications</Typography>
+    <div className="container mx-auto p-6" style={{ width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
+            <h1 className="text-3xl font-bold text-gray-500 mb-6">Notifications</h1>
 
 
 {notifications.slice().reverse().map(notification => (
@@ -605,7 +605,13 @@ const adminNotifications = data.filter(notification => notification.receiver && 
 
 
   {/* Loading indicator */}
-      {loading && <CircularProgress />}
+      {loading && <CircularProgress style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: '35vw',
+        marginTop:'25vh'
+      }} />}
 
 
 
