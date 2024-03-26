@@ -8,11 +8,15 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import CircularProgress from '@mui/material/CircularProgress';
-
-
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 
+
+
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
 
 
 // Function to style the Snackbar Alert
@@ -52,7 +56,10 @@ function Topbar() {
         if (usernameFromCookie) setUsername(usernameFromCookie);
         if (profileImageFromCookie) setProfileImage(profileImageFromCookie);
         if (roleFromCookie) setRole(roleFromCookie);
-    }, []);
+  }, []);
+    
+
+    
 
 // Funtion to upload Profile Picture
 
@@ -72,7 +79,7 @@ function Topbar() {
                 formData.append('file', file);
 
                 // Send POST request to the endpoint
-                const response = await fetch('https://api.stj-fertilityinstitute.com/upload', {
+                const response = await fetch(`${API_ENDPOINT}/upload`, {
                     method: 'POST',
                     body: formData
                 });
@@ -88,13 +95,14 @@ const profileData = JSON.parse(responseData);
                     console.log('Profile Data:', profileData)
                     const filePath = profileData.path
                     console.log('File Path:', filePath)
-                    const updatePath = `https://api.stj-fertilityinstitute.com/file/${filePath}`
+                    const updatePath = `${API_ENDPOINT}/file/${filePath}`
+                    console.log('Updated Profile Path:', updatePath)
                 //       const formDataProfile = new FormData();
                 // formDataProfile.append('profileimage', updatePath);
                     
 
   //  // Send PUT request to update the profile picture URL
-                const updateResponse = await fetch(`https://api.stj-fertilityinstitute.com/api/profile`, {
+                const updateResponse = await fetch(`${API_ENDPOINT}/api/profile`, {
                     method: 'PUT',
                     headers: {
                         "Authorization": `bearer ${token}`
@@ -105,6 +113,7 @@ const profileData = JSON.parse(responseData);
                 if (updateResponse.ok) {
                     const updateRes = await updateResponse.json();
                     console.log('Profile picture updated successfully:', updateRes);
+
 
                     // Update profileImage state
                     setProfileImage(updatePath);

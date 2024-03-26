@@ -1,20 +1,21 @@
-// PostContext.js
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 const PostContext = createContext();
+
+export const usePostContext = () => useContext(PostContext);
 
 export const PostProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
 
-  const addPost = (newPost) => {
-    setPosts([...posts, newPost]);
+  const updatePosts = (newPosts) => {
+    setPosts(newPosts);
   };
 
   return (
-    <PostContext.Provider value={{ posts, addPost }}>
+    <PostContext.Provider value={{ posts, updatePosts }}>
       {children}
     </PostContext.Provider>
   );
 };
 
-export const usePostContext = () => useContext(PostContext);
+export default PostContext;

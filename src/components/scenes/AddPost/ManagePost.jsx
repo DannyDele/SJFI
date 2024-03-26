@@ -16,6 +16,11 @@ import Cookies from 'js-cookie';
 
 
 
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
+
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 ));
@@ -70,6 +75,7 @@ const ManagePosts = () => {
   const [isUpdateMessageVisible, setUpdateMessageVisible] = useState(false);
   const [loadingDeleteMap, setLoadingDeleteMap] = useState({}); // Use an object to track loading state for each row
   
+  
   // Define state variable to store the edited post content
 const [editedPostContent, setEditedPostContent] = useState('');
 
@@ -89,7 +95,7 @@ const [editedPostContent, setEditedPostContent] = useState('');
           setLoading(true);
 
   try {
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/posts', {
+    const response = await fetch(`${API_ENDPOINT}/api/posts`, {
       method: 'GET',
       headers: {
         "Content-type": "application/json",
@@ -139,7 +145,7 @@ const [editedPostContent, setEditedPostContent] = useState('');
       setLoading(true);
 
       // Make an API request to fetch the detailed information of the selected post
-      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/posts/${postId}`);
+      const response = await fetch(`${API_ENDPOINT}/api/posts/${postId}`);
       const postData = await response.json();
       
         // Update the editedPostContent state with the post content
@@ -166,7 +172,7 @@ const [editedPostContent, setEditedPostContent] = useState('');
       }));
       
       
-      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/posts/${postId}`, {
+      const response = await fetch(`${API_ENDPOINT}/api/posts/${postId}`, {
         method: 'DELETE',
         headers: {
           "Content-type": "application/json",
@@ -250,7 +256,7 @@ const handlePostInputChange = (e) => {
     setLoadingUpdate(true); // Set loading state to true while the update is in progress
     console.log('Selected post:', selectedPost._id)
 
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/posts/${selectedPost._id}`, {
+    const response = await fetch(`${API_ENDPOINT}/api/posts/${selectedPost._id}`, {
       method: 'PUT', // Assuming you want to perform a PUT request to update the post
       headers: {
         'Content-Type': 'application/json',
@@ -374,7 +380,7 @@ const formatDate = (dateTimeString) => {
 
 
   return (
-    <div className="ml-10 w-full">
+    <div >
 
       
       {/* Delete Success Message */}
@@ -402,7 +408,7 @@ const formatDate = (dateTimeString) => {
 
 
 
-      <Typography variant="h6" className="mb-4 font-bold text-gray-500">Manage Posts</Typography>
+      <h2 variant="h6" className="mb-4 font-bold text-gray-500">Manage Posts</h2>
       <TextField
         label="Search posts"
         variant="outlined"
@@ -410,6 +416,7 @@ const formatDate = (dateTimeString) => {
         value={searchTerm}
         onChange={handleSearch}
         className="mb-4"
+        style={{marginBottom:'1rem'}}
       />
 
 
@@ -457,18 +464,8 @@ const formatDate = (dateTimeString) => {
           fullWidth
           margin="normal"
         />
-        <TextField
-          label="Likes"
-          value={selectedPost.likes}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Media"
-          value={selectedPost.media}
-          fullWidth
-          margin="normal"
-        />
+      
+      
               <Box mt={2} display="flex" justifyContent="space-between">
                 <Button variant="outlined" color="primary" onClick={handleSaveEdit}>
                 {loadingUpdate && <CircularProgress color="inherit" size={16} style={{ marginRight: 8 }} />}

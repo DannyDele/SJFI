@@ -64,7 +64,7 @@ function CalendarWithDialog() {
 
   return (
     <div>
-      <Box marginTop="1rem" padding="2rem" width="80vw" height="100vh">
+      <Box className="container mx-auto p-6" style={{ width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
         <Calendar
           localizer={localizer}
           events={events}
@@ -90,8 +90,12 @@ function CalendarWithDialog() {
             <Button onClick={handleAddEvent}>Add Event</Button>
           </DialogActions>
         </Dialog>
-      </Box>
-      <Typography variant="h6">Events</Typography>
+
+
+   
+         <Box marginTop='1rem'>
+
+           <h2 className="text-2xl font-bold text-gray-500 mb-6">Events</h2>
       <Box>
         {events.map((event, index) => (
           <Box key={index} display="flex" alignItems="center" marginBottom="0.5rem">
@@ -101,7 +105,10 @@ function CalendarWithDialog() {
             </IconButton>
           </Box>
         ))}
+            </Box>
       </Box>
+      </Box>
+   
     </div>
   );
 }

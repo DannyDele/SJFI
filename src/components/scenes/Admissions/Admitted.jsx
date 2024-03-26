@@ -13,6 +13,8 @@ import Cookies from 'js-cookie';
 
 
 
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
 
 // Function to style the Snackbar Alert
 const Alert = React.forwardRef((props, ref) => (
@@ -50,7 +52,7 @@ const Admitted = () => {
             try {
                                   setIsLoading(true)
 
-                const response = await fetch('https://api.stj-fertilityinstitute.com/api/enroll', {
+                const response = await fetch(`${API_ENDPOINT}/api/enroll`, {
                     headers: {
                         "Authorization": `bearer ${authToken}`
                     }
@@ -189,7 +191,6 @@ const renderFormFields = (data, parentKey = '') => {
     return (
         <Box sx={{ marginTop: 4, paddingLeft: 0, paddingRight: 0 }}>
           <div style={{ height: 400, width: '100%' }}>
-                <Typography variant="h5" gutterBottom>ADMITTED</Typography>
                 
                 
                 {isLoading ? (

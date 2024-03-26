@@ -33,10 +33,10 @@ const Admissions = () => {
 
     return (
         <Container>
-            <Box mt={5} textAlign="left" width="80vw" marginTop="1rem" padding="2rem">
-                <Typography variant="h4" gutterBottom>
+            <Box  className="container mx-auto p-6" style={{ width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
+                <h1 className="text-3xl font-bold text-gray-500 mb-6">
                     Admissions
-                </Typography>
+                </h1>
                 <Button
                     variant="outlined"
                     startIcon={<PersonIcon />}

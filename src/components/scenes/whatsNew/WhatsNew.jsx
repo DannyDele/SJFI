@@ -24,6 +24,12 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 
 
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
+
 // Function to style the Snackbar Alert
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -95,7 +101,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const response = await fetch('https://api.stj-fertilityinstitute.com/api/announcements');
+        const response = await fetch(`${API_ENDPOINT}/api/announcements`);
         if (!response.ok) {
           throw new Error('Error fetching announcements');
         }
@@ -159,7 +165,7 @@ async function handleFormSubmit() {
     // Set submitting to true when the form is being submitted
     setSubmitting(true);
 
-    let apiUrl = 'https://api.stj-fertilityinstitute.com/api/announcements';
+    let apiUrl = `${API_ENDPOINT}/api/announcements`;
 
     // Determine whether to send a POST or PUT request based on whether selectedAnnouncement is present
     let method = 'POST';
@@ -244,7 +250,7 @@ async function handleFormSubmit() {
       return;
     }
 
-    const apiUrl = `https://api.stj-fertilityinstitute.com/api/announcements/${selectedAnnouncement._id}`;
+    const apiUrl = `${API_ENDPOINT}/api/announcements/${selectedAnnouncement._id}`;
 
     const response = await fetch(apiUrl, {
       method: 'DELETE',
@@ -282,9 +288,9 @@ const getRowId = (row) => row._id;
 
 
   return (
-    <div>
+    <div className="container mx-auto p-6" style={{ marginLeft: '20px', width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
 
-      <Typography style={{marginLeft:'2rem'}} variant="h4" className="mb-4 font-bold text-gray-500">Announcement</Typography>
+      <h1 className="text-3xl font-bold text-gray-500 mb-6" >Announcement</h1>
 
       
 
@@ -333,9 +339,8 @@ const getRowId = (row) => row._id;
       ) : (
 
         <Box>
-          <Box marginTop='1rem' padding='2rem' width='80vw' height='100vh'>
-            <Button variant="contained"
-              color="primary"
+          <Box>
+            <Button variant="contained" className='All-buttons'
               style={{ marginBottom: '10px', display: 'flex', justifyContent: 'end' }} onClick={() => handleClickOpen()}>
                 What&apos;s New
               </Button>

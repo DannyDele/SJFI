@@ -11,6 +11,8 @@ import Cookies from 'js-cookie';
 
 
 
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
 
 
 // Function to style the Snackbar Alert
@@ -70,13 +72,13 @@ const [selectedStudent, setSelectedStudent] = useState(null);
 
      if (authToken) {
       setToken(authToken);
-      console.log('Token:', token)
+      console.log('Token:', authToken)
     }
     const fetchData = async (authToken) => {
         try {
             setIsLoading(true);
 
-            const response = await fetch('https://api.stj-fertilityinstitute.com/api/enroll', {
+            const response = await fetch(`${API_ENDPOINT}/api/enroll`, {
                 headers: {
                     "Authorization": `bearer ${authToken}`
                 }
@@ -190,7 +192,7 @@ const handleScheduleInterview = async () => {
     }, {});
 
     // Function to schedule interview
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/schedule-interview', {
+    const response = await fetch(`${API_ENDPOINT}/api/schedule-interview`, {
       method: 'POST',
       headers: {
         'Authorization': `bearer ${token}`,
@@ -258,7 +260,7 @@ const handleConfirmDeny = async () => {
   try {
     setIsLoadingDelete(true);
 
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/enroll/${selectedApplication._id}`, {
+    const response = await fetch(`${API_ENDPOINT}/api/enroll/${selectedApplication._id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `${token}`,

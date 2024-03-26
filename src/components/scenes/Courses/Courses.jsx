@@ -27,6 +27,11 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 
 
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
 // Function to style the Snackbar Alert
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -118,7 +123,7 @@ useEffect(() => {
 
   const fetchProgramOptions = async () => {
     try {
-      const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
+      const response = await fetch(`${API_ENDPOINT}/api/programs`);
       const data = await response.json();
 
       // Assuming data is an array of programs with 'id' and 'title' properties
@@ -139,7 +144,7 @@ useEffect(() => {
 
   const fetchCategoryOptions = async () => {
     try {
-      const response = await fetch('https://api.stj-fertilityinstitute.com/api/category');
+      const response = await fetch(`${API_ENDPOINT}/api/category`);
       const data = await response.json();
 
       // Assuming data is an array of programs with 'id' and 'title' properties
@@ -164,7 +169,7 @@ useEffect(() => {
     try {
       setIsLoading(true);
 
-      const response = await fetch('https://api.stj-fertilityinstitute.com/api/courses');
+      const response = await fetch(`${API_ENDPOINT}/api/courses`);
       const data = await response.json();
 
       setCourses(data);
@@ -182,7 +187,7 @@ useEffect(() => {
     try {
       setIsLoading(true);
 
-      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses?program=${programId}`);
+      const response = await fetch(`${API_ENDPOINT}/api/courses?program=${programId}`);
       const data = await response.json();
 
       setCourses(data);
@@ -249,7 +254,7 @@ const handleAddCourse = async () => {
             setIsLoading(true);
 
     // Make a POST request to the courses API endpoint
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/courses', {
+    const response = await fetch(`${API_ENDPOINT}/api/courses`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -321,7 +326,7 @@ const handleAddCourse = async () => {
     const courseIdToUpdate = courses[selectedCourseIndex]._id;
 
     // Make a PUT request to update the course data
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses/${courseIdToUpdate}`, {
+    const response = await fetch(`${API_ENDPOINT}/api/courses/${courseIdToUpdate}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -371,7 +376,7 @@ const handleAddCourse = async () => {
     const courseIdToDelete = courses[selectedCourseIndex]._id;
 
     // Make a DELETE request to the courses API endpoint
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses/${courseIdToDelete}`, {
+    const response = await fetch(`${API_ENDPOINT}/api/courses/${courseIdToDelete}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -435,7 +440,7 @@ const getProgramNameById = (programId) => {
     try {
       setIsLoading(true);
 
-      const response = await fetch('https://api.stj-fertilityinstitute.com/api/category', {
+      const response = await fetch('${API_ENDPOINT}/api/category', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -488,7 +493,7 @@ const getProgramNameById = (programId) => {
   const handleDeleteCategory = async (e, categoryId) => {
     e.stopPropagation();
     try {
-      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/category/${categoryId}`, {
+      const response = await fetch(`${API_ENDPOINT}/api/category/${categoryId}`, {
         method: 'DELETE',
       });
 
@@ -509,8 +514,8 @@ const getProgramNameById = (programId) => {
 
   return (
     <div>
-      <Box marginTop='1rem' padding='2rem' width='80vw' height='100vh'>
-            <Typography variant="h4" className="mb-4 font-bold text-gray-500">Courses</Typography>
+      <Box padding="2rem 4rem 4rem 4rem" width='80vw' height='100vh'>
+            <h1  className="text-3xl font-bold text-gray-500 mb-6">Courses</h1>
 
         
         {/* Create Class Message */}
@@ -562,13 +567,13 @@ const getProgramNameById = (programId) => {
         <Box display='flex' justifyContent='space-between' alignItems='center'>
 
   <Box flex="1">
-    <Button variant="outlined" color="primary" onClick={() => openModal(null)}>
+    <Button variant="contained" className='All-buttons' onClick={() => openModal(null)}>
       Add New Course
     </Button>
   </Box>
 
           <Box marginRight='1rem'>
-        <Button variant="outlined" color="primary" onClick={openCategoryModal}>
+        <Button variant="contained" className='All-buttons' onClick={openCategoryModal}>
             Add Category
           </Button>
           </Box>
@@ -595,8 +600,8 @@ const getProgramNameById = (programId) => {
 
   <Box flex="1">
     <Button
-      variant="outlined"
-      color="primary"
+              variant="contained"
+              className='All-buttons'
       onClick={() => {
         setIsFilterApplied(true);
         // Trigger a function to filter courses based on the selected program
@@ -719,10 +724,10 @@ onClick={handleDelete}
               </Button>
             ) : (
               <Button
-    color="primary"
-          onClick={handleSubmit}
+                  variant="contained"
+                  className='All-buttons'
+                  onClick={handleSubmit}
             disabled={isLoading}
-    style={{ backgroundColor: '#1976D2', color: '#ffffff' }}
     startIcon={isLoading && <CircularProgress size={20} color="inherit" />} >
                     Add Course </Button>
             )}
@@ -756,6 +761,7 @@ onClick={handleDelete}
 
 
         
+        <div style={{ height: 400 }}>
 
       {isLoading ? (
         // Show loading spinner while data is being fetched
@@ -787,7 +793,7 @@ onClick={handleDelete}
               lesson: course.lesson,
               days: course.days,
             }))}
-                        style={{ marginTop: '2rem', marginLeft: '2rem' }}
+                        style={{ marginTop: '2rem', }}
 
             pageSize={10}
             rowsPerPageOptions={[10, 25, 50, 100]}
@@ -797,7 +803,8 @@ onClick={handleDelete}
         }}
           />
         )
-      )}
+          )}
+          </div>
 
       </Box>
     </div>

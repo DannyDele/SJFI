@@ -17,6 +17,9 @@ import Cookies from 'js-cookie'; // Import js-cookie library
 
 
 
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
 
 
 
@@ -55,7 +58,7 @@ const [isLoading, setIsLoading] = useState(false);
       console.log(email, password)
       try {
         setIsLoading(true)
-      const response = await fetch("https://api.stj-fertilityinstitute.com/api/login", {
+      const response = await fetch(`${API_ENDPOINT}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -70,13 +73,14 @@ const [isLoading, setIsLoading] = useState(false);
           console.log('Login Token:', token)
         
         // Extract username and profileimage from user object
-        const { username, profileimage, role } = user;
+        const { username, profileimage, role, _id } = user;
         
         // Save token, username, and profile image in cookies
         Cookies.set('authToken', token);
         Cookies.set('username', username);
         Cookies.set('profileImage', profileimage);
         Cookies.set('role', role);
+        Cookies.set('id', _id);
           console.log('Login Data:', loginData)
 
         // Save login state in local storage

@@ -8,6 +8,10 @@ import Cookies from 'js-cookie';
 
 
 
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
+
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 ));
@@ -62,7 +66,7 @@ console.log('Request Headers:', {
 
        try {
 
-        const response = await fetch('https://api.stj-fertilityinstitute.com/api/posts', {
+        const response = await fetch(`${API_ENDPOINT}/api/posts`, {
           headers: {
             "Authorization": `bearer ${authToken}`,
               "Content-Type": "application/json"
@@ -126,7 +130,7 @@ console.log('Request Headers:', {
       }));
       
       
-      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/posts/${postId}`, {
+      const response = await fetch(`${API_ENDPOINT}/api/posts/${postId}`, {
         method: 'DELETE',
         headers: {
           "Content-type": "application/json",
@@ -170,7 +174,7 @@ console.log('Request Headers:', {
     );
 
     return (
-        <Box p={2} padding="4rem" width='80vw'>
+        <Box className="container mx-auto p-6" style={{ width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
             
 
 <Snackbar
@@ -185,7 +189,7 @@ console.log('Request Headers:', {
 
 
             {/* <Typography variant="h4" gutterBottom>View Posts</Typography> Added header here */}
-            <Typography variant="h5" gutterBottom className='text-gray-500'>All User Posts</Typography>
+            <h1 className="text-3xl font-bold text-gray-500 mb-6">All User Posts</h1>
             <TextField
                 label="Search posts"
                 variant="outlined"

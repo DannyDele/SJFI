@@ -1,5 +1,7 @@
+// App.jsx
+
 import React, { useState, useEffect } from 'react';
-import './App.css';
+import { ThemeProvider } from '@mui/material/styles';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Login from './components/scenes/Login/Login';
 import Topbar from './components/scenes/global/Topbar';
@@ -22,6 +24,7 @@ import Interview from './components/scenes/Admissions/Interview';
 import Calender from './components/scenes/calender/Calender';
 import Cookies from 'js-cookie';
 import ForgotPasswordRouter from './components/scenes/global/ForgotPasswordRouter';
+import theme from './assets/muiTheme/theme'; // Import the created theme
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -45,7 +48,7 @@ function App() {
   const showDashboard = isLoggedIn && !['/login', '/forgot-password'].includes(location.pathname);
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <div className='app'>
         {showSidebarAndTopbar && <Sidebar />}
         <main className='content'>
@@ -76,7 +79,7 @@ function App() {
           </Routes>
         </main>
       </div>
-    </>
+    </ThemeProvider>
   );
 }
 

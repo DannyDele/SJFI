@@ -13,6 +13,9 @@ import MuiAlert from '@mui/material/Alert';
 
 
 
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
 // Function to style the Snackbar Alert
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -75,7 +78,7 @@ useEffect(() => {
   const fetchPrograms = async () => {
     try {
       setLoading(true)
-      const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
+      const response = await fetch(`${API_ENDPOINT}/api/programs`);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch programs. Status: ${response.status}`);
@@ -139,7 +142,7 @@ useEffect(() => {
    setLoadingDelete(true)
   try {
     // Assuming editProgram is defined and has an "id" property
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/programs/${editProgram._id}`, {
+    const response = await fetch(`${API_ENDPOINT}/api/programs/${editProgram._id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -184,7 +187,7 @@ useEffect(() => {
 
 
     // Assuming the API supports adding a new program
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs', {
+    const response = await fetch(`${API_ENDPOINT}/api/programs`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -244,7 +247,7 @@ useEffect(() => {
   const handleUpdateProgram = async () => {
     setLoadingUpdate(true);
     try {
-      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/programs/${editProgram._id}`, {
+      const response = await fetch(`${API_ENDPOINT}/api/programs/${editProgram._id}`, {
         method: 'PUT', // Assuming you need to use PUT method to update
         headers: {
           'Content-Type': 'application/json',
@@ -285,7 +288,7 @@ useEffect(() => {
 
 
   return (
-    <div className="container mx-auto p-4" style={{ marginLeft: '20px', width:"80vw" }}>
+    <div className="container mx-auto p-4" style={{ width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
 
        {/* Add Program Message */}
          <Snackbar
@@ -321,7 +324,7 @@ useEffect(() => {
         </Snackbar>
       
       <h1 className="text-3xl font-bold text-gray-500 mb-6">Programs</h1>
-      <Button onClick={handleAddProgram} variant="outlined" color="primary" className="mb-4">
+      <Button onClick={handleAddProgram} variant="contained" className='All-buttons mb-4'>
         Add New Program
       </Button>
       {loading ? (
@@ -410,7 +413,8 @@ useEffect(() => {
             </Button>
           </DialogActions>
           </Dialog>
-          
+                  <div style={{ height: 400 }}>
+
           {loading ? (
             <Box display="flex" justifyContent="center" alignItems="center" height={500}>
               <CircularProgress />
@@ -439,12 +443,12 @@ useEffect(() => {
                   Toolbar: GridToolbar,
                 }}
                 getRowId={(row) => row._id} // Specify the unique identifier for each row
-                style={{ height: '500', width: '90%', margin: '1rem 0 0 4rem' }} // Set a height and width for the DataGrid
+                style={{ height: '500', width: '100%', margin: '2rem 0 0 0' }} // Set a height and width for the DataGrid
 
               />
             )}
 
-          
+          </div>
       </Box>
       )}
     </div>

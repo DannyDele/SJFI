@@ -4,9 +4,13 @@ import CircularProgress from '@mui/material/CircularProgress';
   import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Cookies from 'js-cookie';
+import { usePostContext } from './PostContext';
 
 
 
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
 
 
 
@@ -19,7 +23,8 @@ Alert.displayName = 'CustomAlert';
 
 
 const AddPost = () => {
-    const [token, setToken] = useState('');
+  const [token, setToken] = useState('');
+  
 
   
    const [postContent, setPostContent] = useState('');
@@ -92,7 +97,7 @@ const AddPost = () => {
     formData.append('file', image); // Use 'file' as the property name
 
         // Upload image directly using the image state
-        const uploadResponse = await fetch('https://api.stj-fertilityinstitute.com/upload', {
+        const uploadResponse = await fetch(`${API_ENDPOINT}/upload`, {
           method: 'POST',
           body: formData,
         });
@@ -109,7 +114,7 @@ const AddPost = () => {
       setPostData((prevData) => ({ ...prevData, media: [imageLink] }));
 
       // Make the POST request
-      const response = await fetch('https://api.stj-fertilityinstitute.com/api/posts', {
+      const response = await fetch(`${API_ENDPOINT}/api/posts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +155,7 @@ const AddPost = () => {
   };
 
   return (
-    <div style={{ marginLeft: '50px' }}> {/* Adjust the left margin according to your requirement */}
+    <div> {/* Adjust the left margin according to your requirement */}
       
    {/* Add Program Message */}
          <Snackbar

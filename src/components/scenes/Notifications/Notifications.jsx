@@ -433,6 +433,12 @@ import '../../../assets/styles/Notification.css'
 
 
 
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
+
 const NotificationPage = () => {
     const [token, setToken] = useState('');
 
@@ -455,7 +461,7 @@ const authToken = Cookies.get('authToken');
     const fetchNotifications = async (authToken) => {
       setLoading(true);
       try {
-        const response = await fetch('https://api.stj-fertilityinstitute.com/api/notification', {
+        const response = await fetch(`${API_ENDPOINT}/api/notification`, {
           headers: {
             "Authorization": `bearer ${authToken}`
           }
