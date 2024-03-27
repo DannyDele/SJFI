@@ -131,7 +131,7 @@ useEffect(() => {
       `
     )
   try {
-    const response = await fetch(`${API_ENDPOINT}/api/users?type=student`,
+    const response = await fetch(`${API_ENDPOINT}/api/users?type=admin`,
        {
           method: "GET",
           headers: {
@@ -394,8 +394,8 @@ const handleEditFormSubmit = async () => {
       throw new Error('Error updating trend data');
     }
 
-    setUpdateMessageVisible(true)
     console.log('Trend data updated successfully!');
+
 
      // Update the local state with the modified data
     setTrends((prevTrends) => {
@@ -404,6 +404,7 @@ const handleEditFormSubmit = async () => {
       updatedTrends[updatedIndex] = formData;
       return updatedTrends;
     });
+    setUpdateMessageVisible(true)
 
     // Close the modal and reset the form data
     setOpenViewModal(false);
@@ -611,7 +612,6 @@ const getRowId = (row) => row._id;
                     error={formSubmitted && !formData.category.trim()}
   helperText={formSubmitted && !formData.category.trim() && "Trends category cannot be empty"}
                 >
-                  <MenuItem value="All">All</MenuItem>
                   <MenuItem value="trending">trending</MenuItem>
                   <MenuItem value="featured">featured</MenuItem>
                   <MenuItem value="recommended">recommended</MenuItem>
@@ -758,10 +758,10 @@ const getRowId = (row) => row._id;
               )}
               Update
             </Box>                      </Button>
-                <Button  color="secondary" onClick={handleDeleteTrend}>
+                <Button  style={{color: 'red'}} onClick={handleDeleteTrend}>
  <Box display="flex" alignItems="center">
               {loadingDelete && (
-                <CircularProgress size={24}  style={{ marginRight: '8px', color: 'red' }} />
+                <CircularProgress size={24}  style={{ marginRight: '8px', color: 'inherit' }} />
               )}
               Delete
             </Box>                    </Button>

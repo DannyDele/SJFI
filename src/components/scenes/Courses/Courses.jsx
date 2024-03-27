@@ -226,24 +226,32 @@ useEffect(() => {
     });
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
 
-    // Check if the input is the 'program' field
-    if (name === 'program') {
-      // Update the course data with the selected program ID
-      setCourseData({
-        ...courseData,
-        [name]: value,
-      });
-    } else {
-      // For other fields, update the course data as before
-      setCourseData({
-        ...courseData,
-        [name]: value,
-      });
-    }
-  };
+  
+ const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  // Check if the input is the 'program' field
+  if (name === 'program') {
+    // Update the course data with the selected program ID
+    setCourseData({
+      ...courseData,
+      [name]: value,
+    });
+  } else if (name === 'category') {
+    // Update the course data with the selected category name
+    setCourseData({
+      ...courseData,
+      [name]: value,
+    });
+  } else {
+    // For other fields, update the course data as before
+    setCourseData({
+      ...courseData,
+      [name]: value,
+    });
+  }
+};
 
 
 
@@ -370,7 +378,7 @@ const handleAddCourse = async () => {
   // Funtion to delete a Course
  const handleDelete = async () => {
    try {
-                setIsLoadingDelete(true);
+        setIsLoadingDelete(true);
 
     // Retrieve the courseId of the course to be deleted
     const courseIdToDelete = courses[selectedCourseIndex]._id;
@@ -427,10 +435,17 @@ const handleAddCourse = async () => {
 };
 ;
 
-  // Add this function to your component
+  // Fuctinon to get Programe name
 const getProgramNameById = (programId) => {
   const program = programOptions.find(option => option.id === programId);
   return program ? program.title : '';
+};
+
+    // Fuctinon to get Course name
+
+  const getCategoryNameById = (categoryId) => {
+  const category = categoryOptions.find(option => option.id === categoryId);
+  return category ? category.title : '';
 };
 
   
@@ -440,7 +455,7 @@ const getProgramNameById = (programId) => {
     try {
       setIsLoading(true);
 
-      const response = await fetch('${API_ENDPOINT}/api/category', {
+      const response = await fetch(`${API_ENDPOINT}/api/category`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -616,6 +631,9 @@ const getProgramNameById = (programId) => {
 </Box>
 
 
+        
+        {/* Modal to view course */}
+
         <Dialog open={isModalOpen} onClose={closeModal}>
           <DialogTitle>{selectedCourseIndex !== null ? 'View Course' : 'Add Course'}</DialogTitle>
           <DialogContent>
@@ -788,7 +806,7 @@ onClick={handleDelete}
             rows={courses.map((course, index) => ({
               id: index,
               title: course.title,
-              category: course.category,
+              category: getCategoryNameById(course.category),
               program: getProgramNameById(course.program),
               lesson: course.lesson,
               days: course.days,
