@@ -430,7 +430,7 @@ const handleSubmit = async () => {
 
       
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Box display="flex" alignItems="center" marginBottom="1rem">
+        <Box display="flex" alignItems="center">
           <TextField
             placeholder="Search..."
             value={searchText}
@@ -478,7 +478,7 @@ const handleSubmit = async () => {
             <CircularProgress />
           </Box>
         ) : (
-          <div style={{ height: 500, width: "100%" }}>
+            <div style={{ height: 500, width: "100%", marginTop: '2rem' }}>
             <DataGrid
               rows={data.filter(
                 (row) =>

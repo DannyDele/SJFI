@@ -144,7 +144,7 @@ const profileData = JSON.parse(responseData);
 
     return (
         <>
-      <Box display='flex' justifyContent='space-between' p={4} mt={4}>
+      <Box display='flex' justifyContent='space-between' padding="2rem 4rem 0 4rem" width="80vw">
             {/* SEARCH BAR */}
                   <p style={{fontSize:'24px', color: '#4A0808', marginTop: '0.3rem'}}>Dashboard</p>
 
@@ -163,7 +163,7 @@ const profileData = JSON.parse(responseData);
               
 
           {/* ICONS */}
-          <Box display='flex'>
+          {/* <Box display='flex'>
               <IconButton>
                   <EmailOutlinedIcon/>
               </IconButton>
@@ -171,12 +171,12 @@ const profileData = JSON.parse(responseData);
                   <NotificationsOutlinedIcon/>
               </IconButton>
               
-          </Box>
+          </Box> */}
 
                 <Box>
                     
                     <Box display='flex' justifyContent='center' alignItems='center' >
-                        <Box  width='80px' height='80px' borderRadius='50px' position='relative'>
+                        <Box  width='60px' height='60px' borderRadius='50px' position='relative'>
                             <img src={profileImage} alt="" style={{
                                 position: 'absolute',
                                 width:'60px',
@@ -186,22 +186,22 @@ const profileData = JSON.parse(responseData);
                             >
                      <CircularProgress size={50} thickness={2} style={{ position: 'absolute', top: '.5rem', left: '.5rem', visibility: loadingUpdate ? 'visible' : 'hidden' }} />
 
-                          <input type="file" id="fileInput" style={{display: 'none'}} onChange={handleFileChange} />
+                          {/* <input type="file" id="fileInput" style={{display: 'none'}} onChange={handleFileChange} />
                             <IconButton>
                                 <PhotoCameraIcon style={{position:'absolute', top:'2rem', left: '3rem',zIndex:'999'}}  onClick={handleProfileImageChange} />
-                            </IconButton>
+                            </IconButton> */}
 
                         </Box>
                         
                         <Box>
-                            <Typography sx={{fontSize:'16px', fontWeight: 'bold', color: '#4A0808'}}>{username}</Typography>
-                            <Typography sx={{fontSize:'14px', fontWeight: 'bold', color: '#4A08084D' }}>{role}</Typography>
+                            <Typography sx={{fontSize:'16px', fontWeight: 'bold', color: '#4A0808', marginLeft: '.5rem'}}>{username}</Typography>
+                            {/* <Typography sx={{fontSize:'14px', fontWeight: 'bold', color: '#4A08084D' }}>{role}</Typography> */}
                         </Box>
                         </Box>
             </Box>
  
         </Box>
-            <hr />
+            <hr style={{marginTop: '1rem'}} />
             </>
         
   )
