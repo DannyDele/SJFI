@@ -26,6 +26,13 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 
 
+
+
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
 // Function to style the Snackbar Alert
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -118,7 +125,7 @@ useEffect(() => {
 // Fetch All Programs
 const fetchProgramOptions = async () => {
   try {
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
+    const response = await fetch(`${API_ENDPOINT}/api/programs`);
     const data = await response.json();
     const programNames = data.map(program => ({
       id: program._id,
@@ -141,7 +148,7 @@ const fetchProgramOptions = async () => {
 const fetchCoursesForProgram = async () => {
   console.log('Fetching courses for the program...');
   try {
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses?program=${selectedProgram}`);
+    const response = await fetch(`${API_ENDPOINT}/api/courses?program=${selectedProgram}`);
     const data = await response.json();
     const courseNames = data.map(course => ({
       id: course._id,
@@ -161,7 +168,7 @@ const fetchCoursesForProgram = async () => {
 // Fetch Classes for selected program
 const fetchClassesForProgram = async (programId) => {
   try {
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/classes?program=${programId}`);
+    const response = await fetch(`${API_ENDPOINT}/api/classes?program=${programId}`);
     const data = await response.json();
     const classNames = data.map(classItem => ({
       id: classItem._id,
@@ -312,7 +319,7 @@ const handleSave = () => {
     };
 
     // Making the API request
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/tests', {
+    const response = await fetch(`${API_ENDPOINT}/api/tests`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -359,7 +366,7 @@ const handleDeleteExam = async (examId, index) => {
   try {
     setIsLoadingDelete(index);
 
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/tests/${examId}`, {
+    const response = await fetch(`${API_ENDPOINT}/api/tests/${examId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -452,7 +459,7 @@ const handleApplyFilters = async () => {
   try {
     setIsLoading(true);
     // Build the API endpoint with selected filter values
-    const endpoint = `https://api.stj-fertilityinstitute.com/api/tests?program=${selectedProgram}&course=${selectedCourse}&classes=${selectedClass}`;
+    const endpoint = `${API_ENDPOINT}/api/tests?program=${selectedProgram}&course=${selectedCourse}&classes=${selectedClass}`;
 
     // Make the API request to fetch exam questions based on filters
     const response = await fetch(endpoint);
@@ -566,8 +573,8 @@ const handleCloseViewFilteredExamDialog = () => {
   return (
     <div>
 
-      <Box sx={{ width: "80vw" }}>
-        <Typography style={{marginLeft: '3rem',}} variant="h4" className="mb-4 font-bold text-gray-500">Exams</Typography>
+      <Box sx={{ width: "80vw", padding:"2rem 4rem 4rem 4rem" }}>
+        <h1  className="text-3xl font-bold text-gray-500 mb-6">Exams</h1>
 
         {/* Snackbar for Success Message */}
         <Snackbar
@@ -594,8 +601,8 @@ const handleCloseViewFilteredExamDialog = () => {
 
         
   <Box display="flex" alignItems="center" justifyContent="space-between">
-    <Box marginTop='1rem' padding='2rem' width='30%'>
-      <Button onClick={handleAddExam} color="primary">
+    <Box marginTop='1rem'>
+      <Button variant="contained" className='All-buttons' onClick={handleAddExam}>
         Add Exam Question
       </Button>
     </Box>
@@ -653,7 +660,7 @@ const handleCloseViewFilteredExamDialog = () => {
 </FormControl>
 
 
-      <Button onClick={handleApplyFilters} color="primary" variant="contained" style={{ marginLeft: '1rem' }}>
+      <Button onClick={handleApplyFilters} variant="contained" className='All-buttons' style={{ marginLeft: '1rem' }}>
         
               <Box display='flex' justifyContent='center' alignItems='center'>
                 {isLoading && <CircularProgress size={20} color="inherit"/>}
@@ -819,7 +826,7 @@ const handleCloseViewFilteredExamDialog = () => {
 
   {/* Table to display saved exam questions */}
   {examsList.length > 0 && (
-          <Box marginTop="2rem" style={{ marginLeft: '6rem' }}>
+          <Box marginTop="2rem"> 
               <Typography variant="h5" gutterBottom>
       Exam Questions.
     </Typography>
@@ -887,9 +894,9 @@ const handleCloseViewFilteredExamDialog = () => {
 {/* // Assuming filteredExamList holds the filtered exam data */}
         {!isTableCleared && filteredExams.length > 0 ? (
           
-          <Box marginTop="2rem" style={{ marginLeft: '6rem' }}>
-            <Box marginTop="2rem" style={{ marginLeft: '6rem' }}>
-  <Button onClick={handleClearTable} color="primary" variant="outlined">
+          <Box >
+            <Box marginTop="2rem" >
+  <Button onClick={handleClearTable} style={{marginBottom: '2rem'}} variant="contained" className='All-buttons mb-4'>
     Clear Table
   </Button>
 </Box>

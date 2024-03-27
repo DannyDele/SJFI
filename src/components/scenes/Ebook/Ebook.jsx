@@ -27,6 +27,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 
 
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
 
 
 // Function to style the Snackbar Alert
@@ -90,7 +93,7 @@ const Ebook = () => {
 
   const fetchProgramOptions = async () => {
     try {
-      const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
+      const response = await fetch(`${API_ENDPOINT}/api/programs`);
       const data = await response.json();
       const programNames = data.map(program => ({
         id: program._id,
@@ -109,7 +112,7 @@ const Ebook = () => {
   const fetchCoursesForProgram = async () => {
     try {
       if (newEbook.program) {
-        const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses?program=${newEbook.program}`);
+        const response = await fetch(`${API_ENDPOINT}/api/courses?program=${newEbook.program}`);
         const data = await response.json();
         const courseNames = data.map(course => ({
           id: course._id,
@@ -133,7 +136,7 @@ const Ebook = () => {
     const fetchEbooksAndObjectives = async (authToken) => {
       try {
       setIsLoading(true)
-      const response = await fetch('https://api.stj-fertilityinstitute.com/api/ebook_and_objective', {
+      const response = await fetch(`${API_ENDPOINT}/api/ebook_and_objective`, {
         headers: {
           "Authorization": `bearer ${authToken}`
         }
@@ -175,7 +178,7 @@ const handleFormSubmit = async (e) => {
     // Step 2: Append the actual file to the FormData object
     fileData.append('file', ebookFile);
 
-    const fileUploadResponse = await fetch('https://api.stj-fertilityinstitute.com/upload', {
+    const fileUploadResponse = await fetch(`${API_ENDPOINT}/upload`, {
       method: 'POST',
       body: fileData,
     });
@@ -193,7 +196,7 @@ const handleFormSubmit = async (e) => {
       url: path,
     };
 
-    const ebookPostResponse = await fetch('https://api.stj-fertilityinstitute.com/api/ebook', {
+    const ebookPostResponse = await fetch(`${API_ENDPOINT}/api/ebook`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -266,7 +269,7 @@ setEbooks((prevEbooks) => [...prevEbooks, { ...uploadedEbook, id: uploadedEbook.
 
  const handleViewEbook = () => {
   // Assuming the URL of the PDF is stored in selectedEbook.url
-  const pdfViewerUrl = `https://api.stj-fertilityinstitute.com/file/${selectedEbook.url}`;
+  const pdfViewerUrl = `${API_ENDPOINT}/file/${selectedEbook.url}`;
   window.open(pdfViewerUrl, '_blank'); // Open the PDF in a new tab
 };
 
@@ -277,7 +280,7 @@ const handleDeleteEbook = async () => {
   try {
     setIsLoadingDelete(true); // Set loading state to true
 
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/ebook/${selectedEbook._id}`, {
+    const response = await fetch(`${API_ENDPOINT}/api/ebook/${selectedEbook._id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -314,7 +317,7 @@ const handleDeleteEbook = async () => {
       // Specify a custom getRowId function
     const getRowId = (row) => row._id;
 return (
-  <div className="container mx-auto p-4" style={{ marginLeft: '20px', width:"80vw" }}>
+  <div className="container mx-auto p-4" style={{ padding:"2rem 4rem 4rem 4rem", width:"80vw" }}>
     
  <Snackbar
           open={isSuccessMessageVisible}
@@ -339,9 +342,9 @@ return (
       <h1 className="text-3xl text-gray-500 mb-6">Ebooks</h1>
       <Button
         onClick={handleAddClick}
-        variant="outlined"
-        color="primary"
-        className="mb-4"
+      variant="contained"
+      className='All-buttons mb-4'
+      
       >
         Add New Ebook
       </Button>
@@ -503,7 +506,7 @@ return (
 
 
 
-    <div style={{ height: 500, width: "90%", }}>
+    <div style={{ height: 400}}>
       
       {isLoading ? ( <Box display="flex" justifyContent="center" alignItems="center" height={500}>
             <CircularProgress />
@@ -512,7 +515,7 @@ return (
     <DataGrid
           rows={ebooks} // Use the ebooks state for the rows
         id="ebooks-table"
-        style={{ marginTop: '2rem', marginLeft: '2rem' }}
+        style={{ marginTop: '2rem' }}
         autoHeight
         columns={[
           { field: 'title', headerName: 'Ebook Title', flex: 1 },

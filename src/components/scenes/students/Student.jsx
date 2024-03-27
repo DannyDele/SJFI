@@ -26,6 +26,10 @@ import Cookies from 'js-cookie';
 
 
 
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://api.stj-fertilityinstitute.com";
+
+
 // Function to style the Snackbar Alert
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -138,7 +142,7 @@ const [selectedRole, setSelectedRole] = useState('student');
 // Fetch All Programs
 const fetchProgramOptions = async () => {
   try {
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
+    const response = await fetch(`${API_ENDPOINT}/api/programs`);
     const data = await response.json();
     const programNames = data.map(program => ({
       id: program._id,
@@ -193,7 +197,7 @@ const handleRoleChange = (event) => {
       try {
         setLoading(true)
         const response = await fetch(
-      `https://api.stj-fertilityinstitute.com/api/users?type=${selectedRole}`,
+      `${API_ENDPOINT}/api/users?type=${selectedRole}`,
           {
             method: "GET",
             headers: {
@@ -292,7 +296,7 @@ const handleSubmit = async () => {
     };
 
     // Make a POST request to the endpoint
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/enroll', {
+    const response = await fetch(`${API_ENDPOINT}/api/enroll`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -335,7 +339,7 @@ const handleSubmit = async () => {
       setLoadingDelete(true); // Set loading state to true when starting deletion
 
       const response = await fetch(
-        `https://api.stj-fertilityinstitute.com/api/users?email=${selectedStudent.email}`,
+        `${API_ENDPOINT}/api/users?email=${selectedStudent.email}`,
         {
           method: "DELETE",
           headers: {
@@ -397,8 +401,8 @@ const handleSubmit = async () => {
     const getRowId = (row) => row._id;
     
     return (
-      <Box marginTop="1rem" padding="2rem" width="80vw" height="100vh">
-                    <Typography variant="h4" className="mb-4 font-bold text-gray-500">Students</Typography>
+      <Box  padding="2rem 4rem 4rem 4rem" width="80vw" height="100vh">
+                    <h1  className="text-3xl font-bold text-gray-500 mb-6">Students</h1>
 
 
       <Snackbar
@@ -426,7 +430,7 @@ const handleSubmit = async () => {
 
       
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Box display="flex" alignItems="center" marginBottom="1rem">
+        <Box display="flex" alignItems="center">
           <TextField
             placeholder="Search..."
             value={searchText}
@@ -463,8 +467,8 @@ const handleSubmit = async () => {
           </Box>
 
           <Box>
-      <Button variant="contained" color="primary" onClick={handleOpenAddStudentDialog}>
-              + Add Student
+      <Button variant="contained" className='All-buttons'  onClick={handleOpenAddStudentDialog}>
+              Add Student
             </Button>
      </Box>
 
@@ -474,7 +478,7 @@ const handleSubmit = async () => {
             <CircularProgress />
           </Box>
         ) : (
-          <div style={{ height: 500, width: "100%" }}>
+            <div style={{ height: 500, width: "100%", marginTop: '2rem' }}>
             <DataGrid
               rows={data.filter(
                 (row) =>

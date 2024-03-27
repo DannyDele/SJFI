@@ -9,14 +9,14 @@ import TransactionSummary from './TransactionSummary';
 function Financial() {
   return (
  
-    <Box padding="2rem" width="80vw" height="100vh">
-        <Typography variant="h4" className="mb-4 font-bold text-gray-500">Financial</Typography>
+    <Box className="container mx-auto p-6" style={{ width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
+        <h1 className="text-3xl font-bold text-gray-500 mb-6">Financial</h1>
 
     <div className="flex flex-col items-start font-light w-full h-auto max-h-screen bg-FFF7F7"> 
-      <div className="w-full max-w-screen-lg ml-8 mt-8"> {/* Added ml-8 and mt-8 */}
+      <div className="w-full max-w-screen-lg  mt-8"> {/* Added ml-8 and mt-8 */}
         <FinancialSummary />
       </div>
-      <div className="mt-4 ml-8"> 
+      <div > 
         <TransactionSummary />
       </div>
       </div>

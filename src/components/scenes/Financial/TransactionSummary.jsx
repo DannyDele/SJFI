@@ -5,6 +5,13 @@ import { Box } from '@mui/material';
 import Cookies from 'js-cookie';
 
 
+
+
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
 const TransactionSummary = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +32,7 @@ const TransactionSummary = () => {
     const fetchTransactions = async () => {
       try {
         setLoading(true)
-        const response = await fetch('https://api.stj-fertilityinstitute.com/api/trx', {
+        const response = await fetch(`${API_ENDPOINT}/api/trx`, {
             headers: {
                     "Authorization": `bearer ${token}`
                 }
@@ -68,7 +75,7 @@ const TransactionSummary = () => {
   return (
     <div className="mt-8 bg-white shadow-lg rounded-lg overflow-hidden">
       <div className="px-4 py-4">
-        <h2 className="text-lg font-normal mb-4">Transaction Summary</h2>
+        <h2 className="text-2xl font-bold text-gray-500 mb-6">Transaction Summary</h2>
         <div style={{ height: 400 }}>
           {loading ? (
             <Box display="flex" justifyContent="center" marginTop="2rem">

@@ -15,6 +15,11 @@ import Cookies from 'js-cookie';
 
 
 
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
+
 // Function to style the Snackbar Alert
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -88,7 +93,7 @@ useEffect(() => {
 
   const fetchProgramOptions = async () => {
     try {
-      const response = await fetch('https://api.stj-fertilityinstitute.com/api/programs');
+      const response = await fetch(`${API_ENDPOINT}/api/programs`);
       const data = await response.json();
        // Assuming data is an array of courses
       const programNames = data.map(program => ({
@@ -113,7 +118,7 @@ useEffect(() => {
 const fetchCoursesForProgram = async () => {
   try {
     if (newClass.program) {
-      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/courses?program=${newClass.program}`);
+      const response = await fetch(`${API_ENDPOINT}/api/courses?program=${newClass.program}`);
       const data = await response.json();
       const courseNames = data.map(course => ({
         id: course._id,
@@ -153,7 +158,7 @@ const fetchFilteredClasses = async () => {
   try {
     setIsLoading(true);
 
-    let apiUrl = 'https://api.stj-fertilityinstitute.com/api/classes?';
+    let apiUrl = `${API_ENDPOINT}/api/classes?`;
 
     if (selectedProgramFilter) {
       apiUrl += `program=${selectedProgramFilter}`;
@@ -194,7 +199,7 @@ const fetchFilteredClasses = async () => {
 // Modify the fetchTeachers function
 const fetchTeachers = async (authToken) => {
   try {
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/users?type=student',
+    const response = await fetch(`${API_ENDPOINT}/api/users?type=student`,
        {
           method: "GET",
           headers: {
@@ -266,7 +271,7 @@ const handleSubmit = async (e) => {
     };
 
     // Determine whether to add or update the class based on viewIndex
-    let apiUrl = 'https://api.stj-fertilityinstitute.com/api/classes';
+    let apiUrl = `${API_ENDPOINT}/api/classes`;
     let operationMessage = ''; // Variable to store the operation message
 
     if (viewIndex !== null) {
@@ -409,7 +414,7 @@ const handleAddNewClass = () => {
     try {
       setIsLoadingDelete(true);
 
-      const response = await fetch(`https://api.stj-fertilityinstitute.com/api/classes/${classIdToDelete}`, {
+      const response = await fetch(`${API_ENDPOINT}/api/classes/${classIdToDelete}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -460,7 +465,7 @@ const handleAddNewClass = () => {
     };
 
     // API request to update the zoom meeting link for the class
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/classes/${classId}`, {
+    const response = await fetch(`${API_ENDPOINT}/api/classes/${classId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -504,7 +509,7 @@ const handleAddNewClass = () => {
 
 
   return (
-    <div className="container mx-auto p-6" style={{ marginLeft: '20px', width:"80vw" }}>
+    <div className="container mx-auto p-6" style={{ width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
       <h1 className="text-3xl font-bold text-gray-500 mb-6">Classes</h1>
 
 
@@ -548,10 +553,9 @@ const handleAddNewClass = () => {
 
         <Box>
           <Button
-        variant="outlined"
-        color="primary"
+       variant="contained" className='All-buttons mb-4'
     onClick={handleAddNewClass}
-        className="mb-4"
+        
       >
         Add New Class</Button>
 </Box>
@@ -600,8 +604,8 @@ const handleAddNewClass = () => {
 
         <Box ml={2}>
           <Button
-            variant="outlined"
-            color="primary"
+            variant="contained"
+            className='All-buttons'
             onClick={() => {
               // Trigger a function to filter classes based on the selected filters
               fetchFilteredClasses();
@@ -611,6 +615,7 @@ const handleAddNewClass = () => {
           </Button>
         </Box>
       </Box>
+           <div style={{ height: 400 }}>
 
       {isLoading ? (
       <Box display="flex" justifyContent="center" alignItems="center" height={500}>
@@ -655,7 +660,8 @@ rows={courses.map((course, index) => ({
           Toolbar: GridToolbar,
         }}
 />
-       ) }
+          )}
+        </div>
 
   
        

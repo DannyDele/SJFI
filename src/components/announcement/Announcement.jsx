@@ -33,6 +33,13 @@ import Cookies from 'js-cookie';
 
 
 
+
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
+
 // Function to style the Snackbar Alert
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -124,7 +131,7 @@ useEffect(() => {
       `
     )
   try {
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/users?type=student',
+    const response = await fetch(`${API_ENDPOINT}/api/users?type=student`,
        {
           method: "GET",
           headers: {
@@ -153,7 +160,7 @@ useEffect(() => {
     useEffect(() => {
       
         const sendTrend = async () => {
-            const trend = await fetch('https://api.stj-fertilityinstitute.com/api/subjects', {
+            const trend = await fetch(`${API_ENDPOINT}/api/subjects`, {
                 method: 'GET',
                 headers: {
                     "accept": "application/json"
@@ -220,7 +227,7 @@ const handleFormSubmit = async () => {
     const imageFormData = new FormData();
     imageFormData.append('file', formData.cover_image);
 
-    const imageUploadResponse = await fetch('https://api.stj-fertilityinstitute.com/upload', {
+    const imageUploadResponse = await fetch(`${API_ENDPOINT}/upload`, {
       method: 'POST',
       body: imageFormData,
     });
@@ -234,14 +241,14 @@ const handleFormSubmit = async () => {
     console.log('Cover Image:', imageData)
 
     // Step 2: Submit Trend Data
-    const trendResponse = await fetch('https://api.stj-fertilityinstitute.com/api/subjects', {
+    const trendResponse = await fetch(`${API_ENDPOINT}/api/subjects`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         ...formData,
-        cover_image: `https://api.stj-fertilityinstitute.com/file/${imageData.path}`,
+        cover_image: `${API_ENDPOINT}/file/${imageData.path}`,
       }),
     });
 
@@ -253,7 +260,7 @@ const handleFormSubmit = async () => {
 
       // Step 3: Fetch the image separately and update the state
       const imagePath = trendData.cover_image;
-      // const imageUrl = `https://api.stj-fertilityinstitute.com/file/${imagePath}`;
+      // const imageUrl = `${API_ENDPOINT}/file/${imagePath}`;
 
       const imageResponse = await fetch(imagePath);
       if (imageResponse.ok) {
@@ -320,7 +327,7 @@ const handleFormSubmit = async () => {
       return;
     }
 
-    const apiUrl = `https://api.stj-fertilityinstitute.com/api/subjects/${selectedTrend._id}`;
+    const apiUrl = `${API_ENDPOINT}/api/subjects/${selectedTrend._id}`;
 
     const response = await fetch(apiUrl, {
       method: 'DELETE',
@@ -373,7 +380,7 @@ const handleEditFormSubmit = async () => {
   try {
     setLoadingUpdate(true)
     // Your code for updating the data goes here
-    const apiUrl = `https://api.stj-fertilityinstitute.com/api/subjects/${formData._id}`;
+    const apiUrl = `${API_ENDPOINT}/api/subjects/${formData._id}`;
 
     const response = await fetch(apiUrl, {
       method: 'PUT', // Assuming you use the PUT method for updating data
@@ -462,8 +469,8 @@ const handleEditFormSubmit = async () => {
 const getRowId = (row) => row._id;
 
   return (
-    <div>
-      <Typography style={{marginLeft:'2rem'}} variant="h4" className="mb-4 font-bold text-gray-500">Trends</Typography>
+    <div className="container mx-auto p-6" style={{ marginLeft: '20px', width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
+      <h1 className="text-3xl font-bold text-gray-500 mb-6" >Trends</h1>
 
 
 
@@ -512,8 +519,8 @@ const getRowId = (row) => row._id;
         >
           <CircularProgress color="primary" />
         </Box>
-      ) : (<Box marginTop='1rem' padding='2rem' width='80vw' height='100vh'>
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleAddModalOpen}>
+      ) : (<Box >
+        <Button style={{marginBottom: '10px'}} variant="contained" className='All-buttons' onClick={handleAddModalOpen}>
           Add Trend
         </Button>
 
@@ -570,7 +577,7 @@ const getRowId = (row) => row._id;
           Toolbar: GridToolbar,
         }}
               className="custom-hover-rows"
-              style={{marginTop:'1rem'}}
+              
 
 
 />

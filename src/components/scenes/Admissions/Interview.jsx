@@ -12,6 +12,9 @@ import Cookies from 'js-cookie';
 
 
 
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
 
 // Function to style the Snackbar Alert
 const Alert = React.forwardRef((props, ref) => (
@@ -60,7 +63,7 @@ const [denyConfirmationDialogOpen, setDenyConfirmationDialogOpen] = useState(fal
     const fetchData = async (authToken) => {
       try {
         setIsLoading(true)
-        const response = await fetch('https://api.stj-fertilityinstitute.com/api/enroll', {
+        const response = await fetch( `${API_ENDPOINT}/api/enroll`, {
           headers: {
               "Authorization": `bearer ${authToken}`
           }
@@ -126,7 +129,7 @@ const handleAdmit = async () => {
     };
 
     console.log('Body Data:', bodyData)
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/admission-accepted', {
+    const response = await fetch(`${API_ENDPOINT}/api/admission-accepted`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -166,7 +169,7 @@ const handleDenyConfirmation = (interviewId) => {
 const handleDeny = async () => {
   try {
     setIsLoading(true);
-    const response = await fetch(`https://api.stj-fertilityinstitute.com/api/enroll/${denyingInterviewId}`, {
+    const response = await fetch(`${API_ENDPOINT}/api/enroll/${denyingInterviewId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -251,8 +254,7 @@ const columns = [
 
 
   return (
-    <Container>
-      <Box mt={5} textAlign="left">
+        <Box sx={{ marginTop: 4, paddingLeft: 0, paddingRight: 0 }}>
 
          <Snackbar
           open={isSuccessMessageVisible}
@@ -265,7 +267,7 @@ const columns = [
         </Snackbar>
         
 
-
+{/* 
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Typography variant="h5" gutterBottom>
             INTERVIEWS
@@ -282,7 +284,6 @@ const columns = [
             >
               <MenuItem onClick={() => {}}>Action 1</MenuItem>
               <MenuItem onClick={() => {}}>Action 2</MenuItem>
-              {/* Add more menu items as needed */}
             </Menu>
             <Button
               id="bulk-action-button"
@@ -294,8 +295,8 @@ const columns = [
             </Button>
             <Button variant="contained" onClick={() => console.log("Apply clicked")}>Apply</Button>
           </Box>
-        </Box>
-        <div style={{ height: 400, width: '100%' }}>
+        </Box> */}
+       
 
           {isLoading ? (
                         <Box display="flex" justifyContent="center" marginTop="2rem">
@@ -316,8 +317,7 @@ const columns = [
               )
    }
 
-        </div>
-      </Box>
+     
       {/* Accept Form Dialog */}
       <Dialog open={acceptFormOpen} onClose={handleCloseAcceptForm}>
         <DialogTitle>Accept Application</DialogTitle>
@@ -387,9 +387,9 @@ const columns = [
     </Button>
   </DialogActions>
 </Dialog>
-
-    </Container>
+ </Box>
   );
 };
+      
 
 export default Interviews;

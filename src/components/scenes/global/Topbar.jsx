@@ -8,11 +8,15 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import CircularProgress from '@mui/material/CircularProgress';
-
-
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 
+
+
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
 
 
 // Function to style the Snackbar Alert
@@ -52,7 +56,10 @@ function Topbar() {
         if (usernameFromCookie) setUsername(usernameFromCookie);
         if (profileImageFromCookie) setProfileImage(profileImageFromCookie);
         if (roleFromCookie) setRole(roleFromCookie);
-    }, []);
+  }, []);
+    
+
+    
 
 // Funtion to upload Profile Picture
 
@@ -72,7 +79,7 @@ function Topbar() {
                 formData.append('file', file);
 
                 // Send POST request to the endpoint
-                const response = await fetch('https://api.stj-fertilityinstitute.com/upload', {
+                const response = await fetch(`${API_ENDPOINT}/upload`, {
                     method: 'POST',
                     body: formData
                 });
@@ -88,13 +95,14 @@ const profileData = JSON.parse(responseData);
                     console.log('Profile Data:', profileData)
                     const filePath = profileData.path
                     console.log('File Path:', filePath)
-                    const updatePath = `https://api.stj-fertilityinstitute.com/file/${filePath}`
+                    const updatePath = `${API_ENDPOINT}/file/${filePath}`
+                    console.log('Updated Profile Path:', updatePath)
                 //       const formDataProfile = new FormData();
                 // formDataProfile.append('profileimage', updatePath);
                     
 
   //  // Send PUT request to update the profile picture URL
-                const updateResponse = await fetch(`https://api.stj-fertilityinstitute.com/api/profile`, {
+                const updateResponse = await fetch(`${API_ENDPOINT}/api/profile`, {
                     method: 'PUT',
                     headers: {
                         "Authorization": `bearer ${token}`
@@ -105,6 +113,7 @@ const profileData = JSON.parse(responseData);
                 if (updateResponse.ok) {
                     const updateRes = await updateResponse.json();
                     console.log('Profile picture updated successfully:', updateRes);
+
 
                     // Update profileImage state
                     setProfileImage(updatePath);
@@ -135,7 +144,7 @@ const profileData = JSON.parse(responseData);
 
     return (
         <>
-      <Box display='flex' justifyContent='space-between' p={4} mt={4}>
+      <Box display='flex' justifyContent='space-between' padding="2rem 4rem 0 4rem" width="80vw">
             {/* SEARCH BAR */}
                   <p style={{fontSize:'24px', color: '#4A0808', marginTop: '0.3rem'}}>Dashboard</p>
 
@@ -154,7 +163,7 @@ const profileData = JSON.parse(responseData);
               
 
           {/* ICONS */}
-          <Box display='flex'>
+          {/* <Box display='flex'>
               <IconButton>
                   <EmailOutlinedIcon/>
               </IconButton>
@@ -162,12 +171,12 @@ const profileData = JSON.parse(responseData);
                   <NotificationsOutlinedIcon/>
               </IconButton>
               
-          </Box>
+          </Box> */}
 
                 <Box>
                     
                     <Box display='flex' justifyContent='center' alignItems='center' >
-                        <Box  width='80px' height='80px' borderRadius='50px' position='relative'>
+                        <Box  width='60px' height='60px' borderRadius='50px' position='relative'>
                             <img src={profileImage} alt="" style={{
                                 position: 'absolute',
                                 width:'60px',
@@ -177,22 +186,22 @@ const profileData = JSON.parse(responseData);
                             >
                      <CircularProgress size={50} thickness={2} style={{ position: 'absolute', top: '.5rem', left: '.5rem', visibility: loadingUpdate ? 'visible' : 'hidden' }} />
 
-                          <input type="file" id="fileInput" style={{display: 'none'}} onChange={handleFileChange} />
+                          {/* <input type="file" id="fileInput" style={{display: 'none'}} onChange={handleFileChange} />
                             <IconButton>
                                 <PhotoCameraIcon style={{position:'absolute', top:'2rem', left: '3rem',zIndex:'999'}}  onClick={handleProfileImageChange} />
-                            </IconButton>
+                            </IconButton> */}
 
                         </Box>
                         
                         <Box>
-                            <Typography sx={{fontSize:'16px', fontWeight: 'bold', color: '#4A0808'}}>{username}</Typography>
-                            <Typography sx={{fontSize:'14px', fontWeight: 'bold', color: '#4A08084D' }}>{role}</Typography>
+                            <Typography sx={{fontSize:'16px', fontWeight: 'bold', color: '#4A0808', marginLeft: '.5rem'}}>{username}</Typography>
+                            {/* <Typography sx={{fontSize:'14px', fontWeight: 'bold', color: '#4A08084D' }}>{role}</Typography> */}
                         </Box>
                         </Box>
             </Box>
  
         </Box>
-            <hr />
+            <hr style={{marginTop: '1rem'}} />
             </>
         
   )
