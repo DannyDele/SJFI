@@ -193,7 +193,7 @@ const handleRoleChange = (event) => {
       try {
         setLoading(true)
         const response = await fetch(
-      `https://fis.metaforeignoption.com/api/users?type=${selectedRole}`,
+      `https://api.stj-fertilityinstitute.com/api/users?type=${selectedRole}`,
           {
             method: "GET",
             headers: {
@@ -292,7 +292,7 @@ const handleSubmit = async () => {
     };
 
     // Make a POST request to the endpoint
-    const response = await fetch('https://fis.metaforeignoption.com/api/enroll', {
+    const response = await fetch('https://api.stj-fertilityinstitute.com/api/enroll', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
