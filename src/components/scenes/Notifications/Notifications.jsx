@@ -27,7 +27,7 @@
 //   useEffect(() => {
 //     const authToken = Cookies.get('authToken');
 //     if (authToken) {
-// const ws = new WebSocket('wss://fis.metaforeignoption.com/api/notification');
+// const ws = new WebSocket('wss://api.stj-fertilityinstitute.com/api/notification');
 
 //       ws.onmessage = (event) => {
 //         const newNotification = JSON.parse(event.data);
@@ -441,7 +441,7 @@ import { Modal, TextField } from '@mui/material';
 
 
 // Store the endpoint in a variable
-const API_ENDPOINT = "https://fis.metaforeignoption.com";
+const API_ENDPOINT = "https://api.stj-fertilityinstitute.com";
 
 
 const NotificationPage = () => {
