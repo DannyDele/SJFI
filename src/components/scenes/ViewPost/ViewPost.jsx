@@ -9,7 +9,7 @@ import Cookies from 'js-cookie';
 
 
 // Store the endpoint in a variable
-const API_ENDPOINT = "https://fis.metaforeignoption.com";
+const API_ENDPOINT = "https://api.stj-fertilityinstitute.com";
 
 
 const Alert = React.forwardRef((props, ref) => (
