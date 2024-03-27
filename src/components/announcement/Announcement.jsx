@@ -256,7 +256,8 @@ const handleFormSubmit = async () => {
       const trendData = await trendResponse.json();
 
       console.log('Cover Image Form Data:', trendData);
-      setSuccessMessageVisible(true)
+            setSuccessMessageVisible(true)
+
 
       // Step 3: Fetch the image separately and update the state
       const imagePath = trendData.cover_image;
@@ -470,7 +471,7 @@ const handleEditFormSubmit = async () => {
 const getRowId = (row) => row._id;
 
   return (
-    <div className="container mx-auto p-6" style={{ marginLeft: '20px', width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
+    <div className="container mx-auto p-6" style={{width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
       <h1 className="text-3xl font-bold text-gray-500 mb-6" >Trends</h1>
 
 
@@ -754,7 +755,7 @@ const getRowId = (row) => row._id;
                 <Button  color="primary"  onClick={handleEditFormSubmit}>
 <Box display="flex" alignItems="center">
               {loadingUpdate && (
-                <CircularProgress size={24} color="secondary" style={{ marginRight: '8px' }} />
+                <CircularProgress size={24} color="inherit" style={{ marginRight: '8px' }} />
               )}
               Update
             </Box>                      </Button>

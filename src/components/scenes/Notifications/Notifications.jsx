@@ -545,42 +545,33 @@ const adminNotifications = data.filter(notification => notification.receiver && 
 
   return (
 
-
-
-
     
-        <div className=" min-h-screen py-8">
-            <div className="max-w-3xl mx-auto">
-                <h1 className="text-3xl font-semibold text-gray-700 mb-6">Notifications</h1>
+        <div style={{padding:"2rem 4rem 4rem 4rem", width:"80vw", height:"100vh"}}>
+            <div>
+                <h1 className="text-3xl font-bold text-gray-500 mb-6">Notifications</h1>
                 <div className="grid gap-4">
           {notifications.slice().reverse().map(notification => (
                         <div key={notification._id} className="bg-white rounded-lg shadow-md p-4">
-                            <div className="flex items-center mb-2">
-               <div className="h-10  rounded-full  mr-3" style={{
-  position: 'relative', 
-  width: '50px', 
-  height: '50px', 
-}}>
-  <img 
-    src={notification.sender?.profileimage} 
-    alt="" 
-    style={{ 
-      borderRadius: '50%', 
-      width: '100%', 
-      height: '100%', 
-      position: 'absolute', 
-    }}
-  />
+  <div className="flex items-center mb-2">
+    <div className="h-10 rounded-full mr-3" style={{ position: 'relative', width: '50px', height: '50px' }}>
+      <img src={notification.sender?.profileimage} alt="" style={{ borderRadius: '50%', width: '100%', height: '100%', position: 'absolute' }} />
+    </div>
+    <div>
+                  {notification.action === 'Commented' ? (
+                    <div style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
+                      <p className="text-gray-800 font-normal">{notification.sender?.username} commented on your post:
+                      </p> <span style={{fontSize:'13px', color:'#4A0808', margin:'.2rem 0 0 .5rem'}}>{notification?.message}</span>
+                    </div>
+
+      ) : (
+        <p className="text-gray-800 font-normal">{notification.sender?.username} liked your post</p>
+      )}
+      <p className="text-gray-600 text-sm">{formatCommentTime(notification?.createdAt)}</p>
+    </div>
+  </div>
+  <p style={{ display: 'flex', alignItems: 'end', marginLeft: '3.8rem', color: 'grey', fontWeight: '100', fontSize:'13px'}} >{notification?.post?.post}</p>
 </div>
 
-                                <div>
-                                    <p className="text-gray-800 font-normal">{notification.sender?.username} commented on your post</p>
-                                    {/* <p className="text-gray-800 font-normal">{notification?.message}</p> */}
-                                    <p className="text-gray-600 text-sm"> {formatCommentTime(notification?.createdAt)}</p>
-                                </div>
-                            </div>
-              <p style={{ display: 'flex', alignItems: 'end', marginLeft: '3.8rem', color: 'grey', fontWeight: '100', fontSize:'13px'}} >{notification?.post?.post}</p>
-                        </div>
                     ))}
                 </div>
       </div>

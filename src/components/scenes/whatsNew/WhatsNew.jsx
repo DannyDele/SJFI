@@ -288,7 +288,7 @@ const getRowId = (row) => row._id;
 
 
   return (
-    <div className="container mx-auto p-6" style={{ marginLeft: '20px', width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
+    <div className="container mx-auto p-6" style={{ width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
 
       <h1 className="text-3xl font-bold text-gray-500 mb-6" >Announcement</h1>
 

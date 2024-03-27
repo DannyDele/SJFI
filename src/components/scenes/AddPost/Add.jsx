@@ -4,13 +4,12 @@ import CircularProgress from '@mui/material/CircularProgress';
   import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Cookies from 'js-cookie';
-import { usePostContext } from './PostContext';
 
 
 
 
 // Store the endpoint in a variable
-const API_ENDPOINT = "https://api.stj-fertilityinstitute.com";
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
 
 
 
@@ -22,12 +21,9 @@ Alert.displayName = 'CustomAlert';
 
 
 
-const AddPost = () => {
+const AddPost = ({ updatePosts, posts }) => {
   const [token, setToken] = useState('');
-  
-
-  
-   const [postContent, setPostContent] = useState('');
+    const [postContent, setPostContent] = useState(''); // Added missing state variable
   const [image, setImage] = useState(null);
   const [tags, setTags] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -45,111 +41,88 @@ const AddPost = () => {
     media: [],
   });
 
-  const handlePostContentChange = (event) => {
+ 
+const handlePostContentChange = (event) => {
     setPostContent(event.target.value);
-    // Update post data state
-    setPostData((prevData) => ({ ...prevData, post: event.target.value }));
+  };
+  
+
+    const handleImageChange = (event) => {
+    setImage(event.target.files[0]);
   };
 
-  const handleImageChange = (event) => {
-    const selectedImage = event.target.files[0];
-    setImage(selectedImage);
-  };
-
-  // const handleTagsChange = (event) => {
-  //   setTags(event.target.value);
-  // };
 
 
+  // Function to submit post
+const handleSubmit = async (event) => {
+    event.preventDefault();
+    const authToken = Cookies.get('authToken');
 
-
-  const handleSubmit = async (event) => {
-  const authToken = Cookies.get('authToken');
-
-     if (authToken) {
-      setToken(authToken);
-      console.log('Token:', authToken)
+    if (!authToken) {
+      console.error('Authentication token not found');
+      return;
     }
 
-    event.preventDefault();
-
-    // Custom form validation
     if (postContent.length < 10) {
       setErrorMessage('Post content must be at least 10 characters.');
       return;
     }
 
-    // if (!tags.trim()) {
-    //   setErrorMessage('Please enter at least one tag.');
-    //   return;
-    // }
-
-   
-
-    try {
-       // Set loading to true to indicate that the request is in progress
     setLoading(true);
 
-       // Check if an image is selected
+    try {
       if (image) {
+        const formData = new FormData();
+        formData.append('file', image);
 
- const formData = new FormData();
-    formData.append('file', image); // Use 'file' as the property name
-
-        // Upload image directly using the image state
         const uploadResponse = await fetch(`${API_ENDPOINT}/upload`, {
           method: 'POST',
           body: formData,
         });
-      
 
-      if (!uploadResponse.ok) {
-        throw new Error('Image upload failed');
-      }
+        if (!uploadResponse.ok) {
+          throw new Error('Image upload failed');
+        }
 
-      const uploadData = await uploadResponse.json();
-      const imageLink = uploadData.path; // Assuming the response structure is similar
+        const uploadData = await uploadResponse.json();
+        const imageLink = uploadData.path;
 
-      // Update post data state with the image link
-      setPostData((prevData) => ({ ...prevData, media: [imageLink] }));
+        const postData = {
+          post: postContent,
+          media: [imageLink],
+        };
 
-      // Make the POST request
-      const response = await fetch(`${API_ENDPOINT}/api/posts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
-        },
-        body: JSON.stringify(postData),
-      });
+        console.log('Post Data Content:', postData)
 
-      // Check if the request was successful
+        const response = await fetch(`${API_ENDPOINT}/api/posts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(postData),
+        });
+
         if (response.ok) {
-        
-    // Show the success message
-      setSuccessMessageVisible(true);
-       // Optionally, hide the success message after a certain duration
-    setTimeout(() => {
-      setSuccessMessageVisible(false);
-    }, 5000); // Hide the message after 5 seconds (adjust the duration as needed)
+          const newPost = await response.json();
+          updatePosts(prevPosts => [newPost, ...prevPosts]);
+          console.log('Post made Successfuly Res Post!!:', newPost)
 
+          setSuccessMessageVisible(true);
+          setTimeout(() => {
+            setSuccessMessageVisible(false);
+          }, 5000);
 
-        console.log('Post submitted successfully!');
-        // Reset form fields after successful submission
-        setPostContent('');
-        setImage(null);
-        setTags('');
-        setErrorMessage('');
-      } else {
-        // Handle errors here (e.g., display an error message)
-        console.error('Error submitting post:', response.status);
-      }
+          setPostContent('');
+          setImage(null);
+          setErrorMessage('');
+        } else {
+          console.error('Error submitting post:', response.status);
+        }
       }
     } catch (error) {
       console.error('Error submitting post:', error.message);
-      setLoading(false);
     } finally {
-      // Set loading back to false, regardless of success or failure
       setLoading(false);
     }
   };
@@ -175,13 +148,12 @@ const AddPost = () => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
-              id="postContent"
+              id=""
               label="What's on your mind"
               variant="outlined"
               fullWidth
               multiline
-              rows={4}
-              value={postContent}
+             value={postContent}
               onChange={handlePostContentChange}
               margin="normal"
               error={errorMessage && postContent.length < 10}

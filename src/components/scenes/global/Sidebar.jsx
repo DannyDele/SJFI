@@ -66,7 +66,7 @@ function Sidebar() {
                 rootStyles={{
                     [`.${sidebarClasses.container}`]: {
                         backgroundColor: '#4A0808',
-                        height: '110vh',
+                        height: '100vh',
                         display: 'flex',
                         position: 'fixed',
                         padding: '1rem'
@@ -84,13 +84,6 @@ function Sidebar() {
                     <Box>
                         <Menu>
                             <Box >
-                                <Item
-                                    title='Dashboard'
-                                    to='/'
-                                    icon={<DashboardOutlinedIcon />}
-                                    selected={selected}
-                                    setSelected={setSelected}
-                                />
 
                                 <SubMenu
                                     label='User Management'
@@ -199,12 +192,14 @@ function Sidebar() {
                                     <Item
                                         title='Add Post'
                                         to='/addpost'
+                                        icon={<PostAddIcon />} // You can change the icon as needed
                                         selected={selected}
                                         setSelected={setSelected}
                                     />
                                     <Item
                                         title='Notifications'
                                         to='/notifications'
+                                        icon={<PostAddIcon />} // You can change the icon as needed
                                         selected={selected}
                                         setSelected={setSelected}
                                     />
@@ -231,14 +226,6 @@ function Sidebar() {
                                 selected={selected}
                                 setSelected={setSelected}
                                 handleClick={handleLogout} // Pass handleLogout function
-                            />
-
-                            <Item
-                                title='Settings'
-                                to='/settings'
-                                icon={<SettingsOutlinedIcon />}
-                                selected={selected}
-                                setSelected={setSelected}
                             />
 
                         </Menu>

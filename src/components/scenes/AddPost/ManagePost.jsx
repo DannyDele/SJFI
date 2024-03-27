@@ -18,7 +18,7 @@ import Cookies from 'js-cookie';
 
 
 // Store the endpoint in a variable
-const API_ENDPOINT = "https://api.stj-fertilityinstitute.com";
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
 
 
 const Alert = React.forwardRef((props, ref) => (
@@ -49,7 +49,7 @@ const useStyles = makeStyles({
   },
 });
 
-const ManagePosts = () => {
+const ManagePosts = ({ posts, updatePosts }) => { // Accept updatePosts prop
 
     const [token, setToken] = useState('');
     
@@ -59,7 +59,7 @@ const ManagePosts = () => {
 
   // State to store the list of posts
  // State to store the list of posts
-  const [posts, setPosts] = useState([]);
+  // const [posts, setPosts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -110,7 +110,7 @@ const [editedPostContent, setEditedPostContent] = useState('');
         console.log("Admin Posts:", adminPost);
 
 
-    setPosts(adminPost);
+    updatePosts(adminPost); // Update posts using updatePosts prop
   } catch (error) {
     console.error('Error fetching posts:', error);
   } finally {
@@ -165,47 +165,34 @@ const [editedPostContent, setEditedPostContent] = useState('');
   // Function to handle deleting a post
   const handleDeletePost = async (postId) => {
     try {
-  // Set loading state for the clicked row to true
-      setLoadingDeleteMap((prevLoadingDeleteMap) => ({
-        ...prevLoadingDeleteMap,
-        [postId]: true,
-      }));
-      
-      
-      const response = await fetch(`${API_ENDPOINT}/api/posts/${postId}`, {
-        method: 'DELETE',
-        headers: {
-          "Content-type": "application/json",
-          "Authorization": `bearer ${token}`,
+        setLoadingDeleteMap((prevLoadingDeleteMap) => ({
+            ...prevLoadingDeleteMap,
+            [postId]: true,
+        }));
 
+        const response = await fetch(`${API_ENDPOINT}/api/posts/${postId}`, {
+            method: 'DELETE',
+            headers: {
+                "Content-type": "application/json",
+                "Authorization": `bearer ${token}`,
+            }
+        });
+
+        if (response.ok) {
+            updatePosts(posts.filter(post => post._id !== postId)); // Update posts using updatePosts prop
+            setSuccessMessageVisible(true);
+        } else {
+            console.error("Failed to delete post", response.status);
         }
-      });
-
-      if (response.ok) {
-        setPosts(posts.filter(post => post._id !== postId));
-        // Optionally, you can show a success message using a Snackbar or similar component
-        // Example: showSnackbar('Post deleted successfully', 'success');
-        // fetchData()
-        console.log("Post Delete Successfully!");
-        setSuccessMessageVisible(true)
-
-      } else {
-        // Handle error case
-        // Optionally, you can show an error message using a Snackbar or similar component
-        // Example: showSnackbar('Error deleting post', 'error');
-                console.error("Failed to delete psot", response.status);
-
-      }
     } catch (error) {
-      console.error('Error deleting post:', error.message);
-      setLoadingDelete(false)
-
+        console.error('Error deleting post:', error.message);
     } finally {
- setLoadingDeleteMap((prevLoadingDeleteMap) => ({
-        ...prevLoadingDeleteMap,
-        [postId]: false,
-      }));    }
-  };
+        setLoadingDeleteMap((prevLoadingDeleteMap) => ({
+            ...prevLoadingDeleteMap,
+            [postId]: false,
+        }));
+    }
+};
 
 
 
