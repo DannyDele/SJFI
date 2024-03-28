@@ -345,7 +345,7 @@ const columns = [
     headerName: 'Name',
     flex: 1,
     renderCell: (params) => (
-      <span>{`${params.row.student_application.frist_name} ${params.row.student_application.sur_name}`}</span>
+      <span>{`${params.row.student_application.first_name} ${params.row.student_application.sur_name}`}</span>
     ),
   },
   {

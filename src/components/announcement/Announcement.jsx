@@ -708,22 +708,7 @@ const getRowId = (row) => row._id;
                   {/* Add more MenuItem components for additional categories */}
                 </Select>
               </FormControl>
-              {/* <TextField
-                label="Icon"
-                name="icon"
-                value={formData.icon}
-                onChange={handleFormChange}
-                fullWidth
-                margin="normal"
-              /> */}
-              {/* <TextField
-                label="Cover Image"
-                name="cover_image"
-                value={formData.cover_image}
-                onChange={handleFormChange}
-                fullWidth
-                margin="normal"
-              /> */}
+             
               <TextField
                 label="Details"
                 name="details"
@@ -742,7 +727,7 @@ const getRowId = (row) => row._id;
                 onChange={handleFormChange}
     >
       {authorOptions.map((author, index) => (
-        <MenuItem key={index} value={author.id}>
+        <MenuItem key={index} value={author.username}>
           {author.username}
         </MenuItem>
       ))}
