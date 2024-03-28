@@ -22,6 +22,8 @@ import {
   Checkbox
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Cookies from 'js-cookie';
@@ -35,7 +37,6 @@ import Cookies from 'js-cookie';
 
 // Store the endpoint in a variable
 const API_ENDPOINT = "https://api.stj-fertilityinstitute.com";
-
 
 
 // Function to style the Snackbar Alert
@@ -64,6 +65,7 @@ function Results() {
     const [selectedCourse, setSelectedCourse] = useState('');
     const [selectedClass, setSelectedClass] = useState('');
       const [token, setToken] = useState('');
+  const [studentData, setStudentData] = useState([]); // State for student data
 
 
 
@@ -182,12 +184,13 @@ useEffect(() => {
 
 
   // Funtion to Filter Exams
+// ...
 
+// Function to filter exams
 const handleApplyFilters = async () => {
   try {
-      setIsLoading(true);
-      console.log('Result Token:', token)
-    
+    setIsLoading(true);
+
     // Build the request body with selected filter values
     const requestBody = {
       program: selectedProgram,
@@ -195,18 +198,16 @@ const handleApplyFilters = async () => {
       classes: selectedClass
     };
 
-      console.log('Request body:', requestBody)
     // Make the POST request to fetch exam questions based on filters
     const response = await fetch(`${API_ENDPOINT}/api/check-result`, {
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json',
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
-
       },
       body: JSON.stringify(requestBody)
     });
-    
+
     if (!response.ok) {
       console.error('Failed to fetch exam results. Status:', response.status);
       return;
@@ -214,20 +215,45 @@ const handleApplyFilters = async () => {
 
     // Parse the response data
     const responseData = await response.json();
-    console.log('Response Result Data', responseData);
+    console.log('Result Data:', responseData);
 
-    // // Set the filtered exams in state
-    // setFilteredExams(responseData);
-    // console.log('Exam Filtered Successfully!:', responseData);
+    // Extract student IDs and grades
+    const studentIds = responseData.map(student => student.student);
+    const studentGrades = responseData.map(student => student.grade);
+    console.log('Student IDs:', studentIds);
+    console.log('Student Grades:', studentGrades);
 
-    // // Set the filterButtonClicked state to true when the filter button is clicked
-    // setFilterButtonClicked(true);
+    // Now, make a GET request to fetch student details using the student IDs
+    const studentDetailsResponse = await Promise.all(studentIds.map(async (studentId) => {
+      const response = await fetch(`${API_ENDPOINT}/api/users/${studentId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.ok ? response.json() : null;
+    }));
+
+    // Filter out null responses (failed requests)
+    const validStudentDetails = studentDetailsResponse.filter(response => response !== null);
+
+    // Extract student names from the valid responses
+    const studentNames = validStudentDetails.map(studentDetail => studentDetail.user.fullname);
+    console.log('Student Names:', studentNames);
+
+    // Save student names and grades in state
+    setStudentData(validStudentDetails.map((studentDetail, index) => ({
+      id: studentDetail.user._id,
+      name: studentDetail.user.fullname,
+      grade: studentGrades[index]
+    })));
+
   } catch (error) {
     console.error('Error applying filters:', error);
   } finally {
     setIsLoading(false);
   }
 };
+
 
 
 
@@ -245,8 +271,9 @@ const handleViewFilteredExam = (examId) => {
   } else {
     console.error('Selected exam not found.');
   }
-};
-
+    };
+    
+    
   return (
       <div>
           <Box sx={{ width: "80vw", padding: "2rem 4rem 4rem 4rem" }}>
@@ -317,7 +344,45 @@ const handleViewFilteredExam = (examId) => {
                 Apply Filters
                 </Box>
       </Button>
-    </Box>
+              </Box>
+              
+
+
+{/* DataGrid to display student names and grades */}
+           <Box style={{ height: 400, width: '100%', marginTop: '2rem' }}>
+  {
+    studentData.length > 0 ? (
+      <DataGrid
+        rows={studentData.map((student, index) => ({
+          id: student.id,
+          studentName: student.name,
+          grade: student.grade,
+        }))}
+        columns={[
+          { field: 'studentName', headerName: 'Student Name', flex: 1 },
+          { 
+            field: 'grade', 
+            headerName: 'Grade', 
+            flex: 1,
+            renderCell: (params) => (
+              <span style={{ color: params.value < 50 ? 'red' : 'green' }}>
+                {params.value}
+              </span>
+            )
+          },
+        ]}
+        pageSize={5}
+        rowsPerPageOptions={[5, 10, 20]}
+      />
+    ) : (
+      <Typography>No student result</Typography>
+    )
+  }
+</Box>
+
+
+
+
 
               </Box>
 
