@@ -173,6 +173,13 @@ function Sidebar() {
                                     selected={selected}
                                     setSelected={setSelected}
                                 />
+                                <Item
+                                    title='View Results'
+                                    to='/results'
+                                    icon={<QuizIcon />}
+                                    selected={selected}
+                                    setSelected={setSelected}
+                                />
 
                                 {/* Admissions Component Moved After Teacher Information */}
                                 <Item

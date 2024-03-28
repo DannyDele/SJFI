@@ -155,12 +155,57 @@ const columns = [
 
       // Recursive function to render form fields
 const renderFormFields = (data, parentKey = '') => {
-  return Object.keys(data).map((property) => (
-    <div key={parentKey + property} style={{ display: 'inline-block', marginRight: '1px' }}>
-      {property !== "_id" && ( // Exclude rendering if property is _id
-        Array.isArray(data[property]) ? (
+  // Mapping object for custom labels
+  const customLabels = {
+    sur_name: 'Last Name',
+    email: 'Email Address',
+    other_name: 'Other name',
+    frist_name: 'First name',
+    marital_status: 'Marital Status',
+    dob: 'Date of birth',
+    pob: 'Place of birth',
+    state: 'State',
+    nationality: 'Nationality',
+    address: 'Address',
+    phone_number: 'Phone Number',
+    office_number: 'Office Number',
+    mailing_address: 'Mailing Address',
+    institution: 'Institution',
+    level: 'Level',
+    subject: 'Subject',
+    grade: 'Grade',
+    date: 'Date',
+    name: 'Name',
+    nature: 'Nature',
+    position: 'Position',
+    rank: 'Rank',
+    phone: 'Phone Number',
+    explaination: 'What are you looking to achieve taking this Program',
+    // Add more custom labels as needed
+  };
+
+
+
+
+const elements = [];
+
+  // Render passport image at the top
+  if (data.passport) {
+    elements.push(
+      <div key={parentKey + 'passport'}>
+        <img src={data.passport} alt="Passport" style={{ maxWidth: '100px', display:'flex', position:'relative', marginLeft:'60rem' }} /> {/* Display passport as an image */}
+      </div>
+    );
+  }
+
+  // Render other form fields
+  Object.keys(data).forEach((property) => {
+  if (property !== 'passport' && !property.includes('_id')) { // Exclude properties with '_id'
+    elements.push(
+      <div key={parentKey + property} style={{ display: 'inline-block', marginRight: '1px', }}> {/* Adjust margin as needed */}
+        {Array.isArray(data[property]) ? (
           <>
-            <Typography style={{fontWeight: 'bold', fontSize: '1.5rem', color: 'grey'}} variant="subtitle1">{property.charAt(0).toUpperCase() + property.slice(1)} Info</Typography>
+            <Typography style={{ fontWeight: 'bold', fontSize: '1.5rem', color: 'grey' }} variant="subtitle1">{property.charAt(0).toUpperCase() + property.slice(1)} Info</Typography>
             {data[property].map((item) => (
               <div key={item._id}>
                 {renderFormFields(item, parentKey + property)}
@@ -171,18 +216,22 @@ const renderFormFields = (data, parentKey = '') => {
           renderFormFields(data[property], parentKey + property)
         ) : (
           <TextField
-            label={property.charAt(0).toUpperCase() + property.slice(1)}
+            label={customLabels[property] || property.charAt(0).toUpperCase() + property.slice(1)}
             value={data[property]}
             fullWidth
             margin="normal"
             key={parentKey + property}
           />
-        )
-      )}
-    </div>
-  ));
-};
+        )}
+      </div>
+    );
+  }
+});
 
+return elements;
+
+};
+    
     
 
     // Specify a custom getRowId function
@@ -198,7 +247,8 @@ const renderFormFields = (data, parentKey = '') => {
     <CircularProgress />
   </Box>
                 ) : (
-                        
+                                    data.length > 0 ? (
+
                         <DataGrid
                             rows={data}
                             columns={columns}
@@ -208,7 +258,10 @@ const renderFormFields = (data, parentKey = '') => {
                             }}
                             getRowId={getRowId}
 
-                    />
+                />
+                        ): (
+    <Typography variant="body1">No admitted students</Typography>
+  )
 )
                 }
                 
@@ -217,7 +270,7 @@ const renderFormFields = (data, parentKey = '') => {
 
             <Dialog open={open} onClose={() => setOpen(false)}  maxWidth="lg">
   <Box p={2} style={{ minWidth: '800px' }}>
-    <Typography style={{ fontWeight: 'bold', fontSize: '1.5rem', color: 'grey' }} variant="h6">Student Details</Typography>
+    <Typography style={{ fontWeight: 'bold', fontSize: '1.5rem', color: 'grey', position:'relative', marginBottom:'-3rem' }} variant="h6">Student Details</Typography>
     {selectedApplication && (
       <form style={{ display: 'flex', flexWrap: 'wrap' }}>
                   {renderFormFields(selectedApplication.student_application)}

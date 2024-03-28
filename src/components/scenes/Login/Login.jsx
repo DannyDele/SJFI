@@ -13,6 +13,13 @@ import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"; // Import js-cookie library
 
+
+
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://api.stj-fertilityinstitute.com";
+
 // Function to style the Snackbar Alert
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -40,7 +47,7 @@ function Login({ setIsLoggedIn }) {
     try {
       setIsLoading(true);
       const response = await fetch(
-        "https://api.stj-fertilityinstitute.com/api/login",
+        `${API_ENDPOINT}/api/login`,
         {
           method: "POST",
           headers: {
@@ -109,12 +116,6 @@ function Login({ setIsLoggedIn }) {
           autoPlaySpeed={1000} // Set auto play speed to 3 seconds (3000 milliseconds)
           style={{ width: "500px", height: "500px" }} // Adjusted padding
         >
-          <img
-            src={womanPic}
-            alt="Slide 1"
-            style={{ ...imageSize, objectFit: "cover", opacity: 0.85 }} // Add opacity
-            className="w-full lg:w-1/2 lg:h-screen lg:block hidden"
-          />
           <img
             src={manPic}
             alt="Slide 2"

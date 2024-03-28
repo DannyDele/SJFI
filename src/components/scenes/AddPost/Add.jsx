@@ -9,7 +9,7 @@ import Cookies from 'js-cookie';
 
 
 // Store the endpoint in a variable
-const API_ENDPOINT = "https://fis.metaforeignoption.com";
+const API_ENDPOINT = "https://api.stj-fertilityinstitute.com";
 
 
 
@@ -55,77 +55,77 @@ const handlePostContentChange = (event) => {
 
   // Function to submit post
 const handleSubmit = async (event) => {
-    event.preventDefault();
-    const authToken = Cookies.get('authToken');
+  event.preventDefault();
+  const authToken = Cookies.get('authToken');
 
-    if (!authToken) {
-      console.error('Authentication token not found');
-      return;
-    }
+  if (!authToken) {
+    console.error('Authentication token not found');
+    return;
+  }
 
-    if (postContent.length < 10) {
-      setErrorMessage('Post content must be at least 10 characters.');
-      return;
-    }
+  if (postContent.length < 10) {
+    setErrorMessage('Post content must be at least 10 characters.');
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      if (image) {
-        const formData = new FormData();
-        formData.append('file', image);
+  try {
+    let postData = {
+      post: postContent,
+      media: [], // Initialize media as an empty array
+    };
 
-        const uploadResponse = await fetch(`${API_ENDPOINT}/upload`, {
-          method: 'POST',
-          body: formData,
-        });
+    if (image) {
+      const formData = new FormData();
+      formData.append('file', image);
 
-        if (!uploadResponse.ok) {
-          throw new Error('Image upload failed');
-        }
+      const uploadResponse = await fetch(`${API_ENDPOINT}/upload`, {
+        method: 'POST',
+        body: formData,
+      });
 
-        const uploadData = await uploadResponse.json();
-        const imageLink = uploadData.path;
-
-        const postData = {
-          post: postContent,
-          media: [imageLink],
-        };
-
-        console.log('Post Data Content:', postData)
-
-        const response = await fetch(`${API_ENDPOINT}/api/posts`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`,
-          },
-          body: JSON.stringify(postData),
-        });
-
-        if (response.ok) {
-          const newPost = await response.json();
-          updatePosts(prevPosts => [newPost, ...prevPosts]);
-          console.log('Post made Successfuly Res Post!!:', newPost)
-
-          setSuccessMessageVisible(true);
-          setTimeout(() => {
-            setSuccessMessageVisible(false);
-          }, 5000);
-
-          setPostContent('');
-          setImage(null);
-          setErrorMessage('');
-        } else {
-          console.error('Error submitting post:', response.status);
-        }
+      if (!uploadResponse.ok) {
+        throw new Error('Image upload failed');
       }
-    } catch (error) {
-      console.error('Error submitting post:', error.message);
-    } finally {
-      setLoading(false);
+
+      const uploadData = await uploadResponse.json();
+      const imageLink = uploadData.path;
+
+      postData.media.push(imageLink); // Add image link to media array
     }
-  };
+
+    const response = await fetch(`${API_ENDPOINT}/api/posts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      body: JSON.stringify(postData),
+    });
+
+    if (response.ok) {
+      const newPost = await response.json();
+      updatePosts(prevPosts => [newPost, ...prevPosts]);
+      console.log('Post made successfully:', newPost)
+
+      setSuccessMessageVisible(true);
+      setTimeout(() => {
+        setSuccessMessageVisible(false);
+      }, 5000);
+
+      setPostContent('');
+      setImage(null);
+      setErrorMessage('');
+    } else {
+      console.error('Error submitting post:', response.status);
+    }
+  } catch (error) {
+    console.error('Error submitting post:', error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div> {/* Adjust the left margin according to your requirement */}

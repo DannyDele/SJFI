@@ -950,7 +950,7 @@ const handleCloseViewFilteredExamDialog = () => {
   filterButtonClicked && (
     <Box marginTop="2rem" style={{ marginLeft: '6rem' }}>
       <Typography variant="h5" gutterBottom>
-        No exam for this program: {getNamesByIds(selectedProgram, selectedCourse, selectedClass).program}
+        No exam for this class: {getNamesByIds(selectedProgram, selectedCourse, selectedClass).class}
       </Typography>
     </Box>
   )

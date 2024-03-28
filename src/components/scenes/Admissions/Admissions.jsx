@@ -32,8 +32,8 @@ const Admissions = () => {
     };
 
     return (
-        <Container>
-            <Box  className="container mx-auto p-6" style={{ width:"80vw", padding:"2rem 4rem 4rem 4rem" }}>
+        
+            <Box  style={{padding:"2rem 4rem 4rem 4rem", width:"80vw", height:"100vh"}}>
                 <h1 className="text-3xl font-bold text-gray-500 mb-6">
                     Admissions
                 </h1>
@@ -91,7 +91,7 @@ const Admissions = () => {
                 {showInterviews && <Interview />}
                 {showAdmitted && <Admitted />} {/* Render AdmittedApplications if showAdmitted is true */}
             </Box>
-        </Container>
+   
     );
 };
 

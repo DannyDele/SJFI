@@ -715,8 +715,8 @@ const getProgramNameById = (programId) => {
                 onChange={handleInputChange}
                 fullWidth
                 margin="normal"
-                 error={formSubmitted && !courseData.days.trim()}
-  helperText={formSubmitted && !courseData.days.trim() && "Course days cannot be empty"}
+                //  error={formSubmitted && !courseData.days.trim()}
+  // helperText={formSubmitted && !courseData.days.trim() && "Course days cannot be empty"}
               />
             </form>
           </DialogContent>

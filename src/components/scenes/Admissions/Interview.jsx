@@ -302,7 +302,8 @@ const columns = [
                         <Box display="flex" justifyContent="center" marginTop="2rem">
     <CircularProgress />
   </Box>
-          ) : (
+      ) : (
+            interviews.length > 0 ? (
           <DataGrid
             rows={interviews}
             columns={columns}
@@ -314,6 +315,9 @@ const columns = [
       }}
       getRowId={getRowId}
             />
+            ): (
+    <Typography variant="body1">No applications for interview</Typography>
+  )
               )
    }
 

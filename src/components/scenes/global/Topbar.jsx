@@ -16,7 +16,7 @@ import MuiAlert from '@mui/material/Alert';
 
 
 // Store the endpoint in a variable
-const API_ENDPOINT = "https://api.stj-fertilityinstitute.com";
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
 
 
 // Function to style the Snackbar Alert

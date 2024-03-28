@@ -10,6 +10,14 @@ import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 
+
+
+
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://fis.metaforeignoption.com";
+
 // Custom styled components for professional look
 const StyledBox = styled(Box)({
     marginTop: '2rem',
@@ -42,7 +50,7 @@ const handleSubmit = async () => {
   setIsLoading(true);
 
   try {
-    const response = await fetch('https://api.stj-fertilityinstitute.com/api/forgot-password', {
+    const response = await fetch(`${API_ENDPOINT}/api/forgot-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

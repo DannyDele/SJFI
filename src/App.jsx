@@ -17,6 +17,7 @@ import ViewPost from './components/scenes/ViewPost/ViewPost';
 import Notification from './components/scenes/Notifications/Notifications';
 import WhatsNew from './components/scenes/whatsNew/WhatsNew';
 import Exam from './components/scenes/exams/Exam';
+import Results from './components/scenes/Results/Results';
 import Announcement from './components/announcement/Announcement';
 import Admissions from './components/scenes/Admissions/Admissions';
 import Applications from './components/scenes/Admissions/Applications';
@@ -71,6 +72,7 @@ function App() {
                 <Route path='/whatsNew' element={<WhatsNew />} />
                 <Route path='/announcements' element={<Announcement />} />
                 <Route path='/exams' element={<Exam />} />
+                <Route path='/results' element={<Results/>} />
                 <Route path='/admissions' element={<Admissions />} />
                 <Route path='/applications' element={<Applications />} />
                 <Route path='/interview' element={<Interview />} />
