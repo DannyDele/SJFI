@@ -345,7 +345,7 @@ const columns = [
     headerName: 'Name',
     flex: 1,
     renderCell: (params) => (
-      <span>{`${params.row.student_application.first_name} ${params.row.student_application.sur_name}`}</span>
+      <span>{`${params.row.student_application?.first_name} ${params.row.student_application.sur_name}`}</span>
     ),
   },
   {
@@ -353,7 +353,7 @@ const columns = [
     headerName: 'Email',
     flex: 1,
     renderCell: (params) => (
-      <span>{params.row.student_application.email}</span>
+      <span>{params.row.student_application?.email}</span>
     ),
     },
   {
@@ -361,7 +361,7 @@ const columns = [
     headerName: 'Program',
     flex: 1,
     renderCell: (params) => (
-      <span>{params.row.program.title}</span>
+      <span>{params.row.program?.title}</span>
     ),
     },
 

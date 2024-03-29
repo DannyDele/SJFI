@@ -206,8 +206,8 @@ const columns = [
   },
   {
     field: 'studentName', headerName: 'Name', flex: 1,
-   renderCell: (params) => <span>{`${params.row.student_application.first_name} ${params.row.student_application.sur_name}`}</span> },
-  { field: 'programTitle', headerName: 'Program', flex: 1, renderCell: (params) => <span>{params.row.program.title}</span> },
+   renderCell: (params) => <span>{`${params.row.student_application?.first_name} ${params.row.student_application.sur_name}`}</span> },
+  { field: 'programTitle', headerName: 'Program', flex: 1, renderCell: (params) => <span>{params.row.program?.title}</span> },
   {
     field: 'actions',
     headerName: 'Actions',

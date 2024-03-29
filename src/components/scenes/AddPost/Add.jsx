@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, Button, Grid } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+// import TextField from '@mui/material/TextField';
   import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Cookies from 'js-cookie';
@@ -147,19 +148,20 @@ const handleSubmit = async (event) => {
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TextField
-              id=""
-              label="What's on your mind"
-              variant="outlined"
-              fullWidth
-              multiline
-             value={postContent}
-              onChange={handlePostContentChange}
-              margin="normal"
-              error={errorMessage && postContent.length < 10}
-              helperText={errorMessage && 'Post content must be at least 10 characters.'}
-              style={{ maxWidth: 'calc(100vw - 250px)' }} // Adjust this value according to your sidebar width
-            />
+         <TextField
+        id=""
+        label="What's on your mind?"
+        variant="outlined"
+        fullWidth
+        multiline
+         rows={4} // Set the number of rows to determine the initial height
+        value={postContent}
+        onChange={handlePostContentChange}
+        margin="normal"
+        error={errorMessage && postContent.length < 10}
+        helperText={errorMessage && 'Post content must be at least 10 characters.'}
+        style={{ maxWidth: 'calc(100vw - 250px)' }} // Adjust this value according to your sidebar width
+      />
           </Grid>
           <Grid item xs={12}>
             <input

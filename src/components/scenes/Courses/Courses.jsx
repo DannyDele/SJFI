@@ -705,8 +705,8 @@ const getProgramNameById = (programId) => {
                 onChange={handleInputChange}
                 fullWidth
                 margin="normal"
-                  error={formSubmitted && !courseData.credit.trim()}
-  helperText={formSubmitted && !courseData.credit.trim() && "Course credit cannot be empty"}
+  //                 error={formSubmitted && !courseData.credit.trim()}
+  // helperText={formSubmitted && !courseData.credit.trim() && "Course credit cannot be empty"}
               />
               <TextField
                 label="Days"

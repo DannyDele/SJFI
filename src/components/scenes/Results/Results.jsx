@@ -341,7 +341,7 @@ const handleViewFilteredExam = (examId) => {
         
               <Box display='flex' justifyContent='center' alignItems='center'>
                 {isLoading && <CircularProgress size={20} color="inherit"/>}
-                Apply Filters
+                View Results
                 </Box>
       </Button>
               </Box>
@@ -373,6 +373,9 @@ const handleViewFilteredExam = (examId) => {
         ]}
         pageSize={5}
         rowsPerPageOptions={[5, 10, 20]}
+                 components={{
+          Toolbar: GridToolbar,
+        }}
       />
     ) : (
       <Typography>No student result</Typography>

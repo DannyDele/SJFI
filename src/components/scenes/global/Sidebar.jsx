@@ -75,7 +75,7 @@ function Sidebar() {
             >
                 <Box display='flex' flexDirection='column' justifyContent='space-around'>
 
-                    <Box marginTop='.5rem'
+                    <Box marginTop='1rem'
                         fontSize='14px'
                         color='#FFF7F7'
                         display='flex'

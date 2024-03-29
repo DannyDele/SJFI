@@ -664,7 +664,7 @@ const handleCloseViewFilteredExamDialog = () => {
         
               <Box display='flex' justifyContent='center' alignItems='center'>
                 {isLoading && <CircularProgress size={20} color="inherit"/>}
-                Apply Filters
+                View Questions
                 </Box>
       </Button>
     </Box>

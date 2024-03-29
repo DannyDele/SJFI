@@ -128,17 +128,17 @@ const columns = [
     headerName: 'Name',
     flex: 0.5,
     renderCell: (params) => (
-      <span>{`${params.row.student_application.first_name} ${params.row.student_application.sur_name}`}</span>
+      <span>{`${params.row.student_application?.first_name} ${params.row.student_application.sur_name}`}</span>
     ),
            },
-  { field: 'programTitle', headerName: 'Program', flex: 0.5, renderCell: (params) => <span>{params.row.program.title}</span> },
+  { field: 'programTitle', headerName: 'Program', flex: 0.5, renderCell: (params) => <span>{params.row.program?.title}</span> },
         { field: '_id', headerName: 'Application ID', flex: 0.5 },
   {
     field: 'student_application.email',
     headerName: 'Email',
     flex: 0.5,
     renderCell: (params) => (
-      <span>{params.row.student_application.email}</span>
+      <span>{params.row.student_applicatio?.email}</span>
     ),
     },        {
             field: 'actions',
@@ -278,7 +278,7 @@ return elements;
                   
                    <TextField
               label="Program"
-              value={selectedApplication.program.title}
+              value={selectedApplication.program?.title}
               margin="normal"
                   />
                              
