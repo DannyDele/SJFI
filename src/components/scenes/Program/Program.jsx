@@ -8,6 +8,8 @@ import MenuItem from '@mui/material/MenuItem';
 import { DataGrid,  GridToolbar } from '@mui/x-data-grid';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import { FormHelperText } from '@mui/material';
+
 
 
 
@@ -362,7 +364,10 @@ useEffect(() => {
   error={formSubmitted && (typeof programData.price === 'string' ? !programData.price.trim() : !programData.price)}
   helperText={formSubmitted && (typeof programData.price === 'string' ? !programData.price.trim() && "Price cannot be empty" : !programData.price && "Price cannot be empty")}
   disabled={formMode === 'view'}
-/>
+              />
+               <FormHelperText>
+        Please do not use commas for thousands separator (e.g., 50,000, instead 50000)
+      </FormHelperText>
 
 <TextField
   label="Description"

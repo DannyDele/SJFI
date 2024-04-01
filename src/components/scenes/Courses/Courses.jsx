@@ -433,7 +433,7 @@ const handleAddCourse = async () => {
 
   openModal(course.id); // Assuming course.id is the unique identifier for the course
 };
-;
+
 
   // Fuctinon to get Programe name
 const getProgramNameById = (programId) => {

@@ -395,7 +395,7 @@ const formatDate = (dateTimeString) => {
 
 
 
-      <h2 variant="h6" className="mb-4 font-bold text-gray-500">Manage Posts</h2>
+      <h2  className="mb-4 font-bold text-gray-500">Manage Posts</h2>
       <TextField
         label="Search posts"
         variant="outlined"
@@ -442,6 +442,8 @@ const formatDate = (dateTimeString) => {
   name="post"
   value={editedPostContent}
   fullWidth
+rows={10} // Set the number of rows to determine the initial height
+
   margin="normal"
   onChange={handlePostInputChange}
 />

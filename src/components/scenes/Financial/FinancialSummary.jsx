@@ -1,10 +1,55 @@
-import React from 'react';
+import { Co2Sharp } from '@mui/icons-material';
+import React, {useState, useEffect} from 'react';
+
+
+
+
+
+
+// Store the endpoint in a variable
+const API_ENDPOINT = "https://api.stj-fertilityinstitute.com";
 
 const FinancialSummary = () => {
-  // Sample financial data
-  const totalBalance = 15000;
-  const totalSpent = 8500;
-  const amountNotSpent = totalBalance - totalSpent;
+const [totalBalance, setTotalBalance] = useState(0)
+const [totalSpent, setTotalSpent] = useState(0)
+  const [totalNotSpent, setTotalNotSpent] = useState(0)
+  
+  useEffect(() => {
+    const transactionSummary = async () => {
+
+      try{
+        const response = await fetch(`${API_ENDPOINT}/api/transactions`)
+
+        if (!response.ok) {
+          throw new Error ('Something went wrong Fetching transaction summary', response.status)
+        }
+    
+        const trxRes = await response.json()
+
+        const totalIncome = trxRes.totalIncome
+        setTotalBalance(totalIncome)
+        const totalNotSpent = trxRes.totalNOtSpent
+        setTotalSpent(totalNotSpent)
+        const totalStudentSpent = trxRes.totalStudentSpent
+        setTotalNotSpent(totalStudentSpent)
+        console.log('Transaction Response', trxRes)
+
+
+      } catch (error) {
+        console.log('Error Fetching transaction summary', error)
+        }
+      
+    }
+    transactionSummary()
+  }, [])
+
+
+
+
+  // // Sample financial data
+  // const totalBalance = 15000;
+  // const totalSpent = 8500;
+  // const amountNotSpent = totalBalance - totalSpent;
 
   return (
     <div className="header relative">
@@ -35,7 +80,7 @@ const FinancialSummary = () => {
           </svg>
           <div>
             <p className="text-sm text-black font-light">Total Not Spent</p>
-            <p className="font-light text-base text-black">&#8358;{amountNotSpent}</p>
+            <p className="font-light text-base text-black">&#8358;{totalNotSpent}</p>
           </div>
         </div>
       </div>

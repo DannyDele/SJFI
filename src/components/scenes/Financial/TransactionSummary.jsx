@@ -28,47 +28,89 @@ const TransactionSummary = () => {
       setToken(authToken);
       console.log('Token:', token)
     }
+    
 
+
+
+    // Funtion to fetch user transaction informations
     const fetchTransactions = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch(`${API_ENDPOINT}/api/trx`, {
-            headers: {
-                    "Authorization": `bearer ${token}`
-                }
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch transactions');
-        }
-        const data = await response.json();
-        console.log('Transaction data:', data);
-
-        const dataWithActualValues = data.map(transaction => ({
-          _id: transaction._id,
-          reference: transaction.reference,
-          session_id: transaction.session_id,
-          amount: parseFloat(transaction.amount),
-          fee: parseFloat(transaction.fee),
-        }));
-
-        setTransactions(dataWithActualValues);
-        setLoading(false);
-      } catch (error) {
-        console.log('Error fetching data:', error);
-        setLoading(false);
+  try {
+    setLoading(true);
+    const response = await fetch(`${API_ENDPOINT}/api/trx`, {
+      headers: {
+        "Authorization": `bearer ${token}`
       }
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch transactions');
+    }
+    const data = await response.json();
+    console.log('Transaction data:', data);
+
+    const transactionsWithUsernames = await Promise.all(data.map(async transaction => {
+  try {
+    const userResponse = await fetch(`${API_ENDPOINT}/api/users/${transaction.userid}`);
+    if (!userResponse.ok) {
+      throw new Error('Failed to fetch user data');
+    }
+    const userData = await userResponse.json();
+    console.log('User Data', userData.user.username);
+
+    // Check if username is undefined
+    const username = userData.user?.username || 'Unknown';
+
+    return {
+      ...transaction,
+      username: username
     };
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    // Handle error if necessary
+    return {
+      ...transaction,
+      username: 'Unknown' // Set a default username or handle the error appropriately
+    };
+  }
+}));
+
+const dataWithActualValues = transactionsWithUsernames.map(transaction => ({
+  _id: transaction._id,
+  reference: transaction.reference,
+  session_id: transaction.session_id,
+  amount: parseFloat(transaction.amount),
+   timestamp: new Date(transaction.timestamp).toLocaleString('en-US', {
+            year: '2-digit',
+            month: '2-digit',
+            day: '2-digit',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric'
+   }),
+            username: transaction.username
+}));
+
+setTransactions(dataWithActualValues);
+console.log('Transactions', transactions);
+
+    setLoading(false);
+  } catch (error) {
+    console.log('Error fetching data:', error);
+    setLoading(false);
+  }
+};
+
 
     fetchTransactions();
   }, []);
 
-  const columns = [
-    { field: '_id', headerName: 'ID', width: 150 },
-    { field: 'reference', headerName: 'Reference', width: 200 },
-    { field: 'session_id', headerName: 'Session ID', width: 250 },
-    { field: 'amount', headerName: 'Amount', width: 150 },
-    { field: 'fee', headerName: 'Fee', width: 150 },
-  ];
+const columns = [
+  { field: 'username', headerName: 'Username', width: 150 },
+  { field: 'reference', headerName: 'Reference', width: 200 },
+  { field: 'session_id', headerName: 'Session ID', width: 250 },
+  { field: 'amount', headerName: 'Amount', width: 150 },
+  { field: 'timestamp', headerName: 'Time', width: 200 },
+];
+
 
   const getRowId = (row) => row._id;
 
@@ -79,7 +121,7 @@ const TransactionSummary = () => {
         <div style={{ height: 400 }}>
           {loading ? (
             <Box display="flex" justifyContent="center" marginTop="2rem">
-              <CircularProgress />
+              <CircularProgress style={{ display: 'flex', marginTop:'30vh', marginLeft: '30vw'}} />
             </Box>
           ) : (
             <DataGrid
