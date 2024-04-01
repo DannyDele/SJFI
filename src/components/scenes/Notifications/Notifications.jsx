@@ -89,41 +89,54 @@ const adminNotifications = data.filter(notification => notification.receiver && 
 
 
   // Formated time
-  const formatCommentTime = (createdAt) => {
+  
+const formatCommentTime = (createdAt) => {
   const commentDate = new Date(createdAt);
   const currentDate = new Date();
+  const timeDifference = Math.abs(currentDate - commentDate);
+  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+  const oneWeek = 7 * oneDay;
 
-  // Check if the comment date is today
-  if (
-    commentDate.getDate() === currentDate.getDate() &&
-    commentDate.getMonth() === currentDate.getMonth() &&
-    commentDate.getFullYear() === currentDate.getFullYear()
-  ) {
-    // If it's today, return the time only
-    return commentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  } else {
-    // If it's not today, format the date as desired
-    const options = { weekday: 'short', month: 'short', day: 'numeric' };
-    const formattedDate = commentDate.toLocaleDateString('en-US', options);
-
-    // Append 'th', 'st', 'nd', 'rd' suffix to the day
-    let day = commentDate.getDate();
-    let suffix = 'th';
-    if (day === 1 || day === 21 || day === 31) {
-      suffix = 'st';
-    } else if (day === 2 || day === 22) {
-      suffix = 'nd';
-    } else if (day === 3 || day === 23) {
-      suffix = 'rd';
+  if (timeDifference < oneWeek) {
+    // Less than a week, show time elapsed in days
+    const days = Math.floor(timeDifference / oneDay);
+    if (days === 0) {
+      // Less than a day, show time elapsed in hours
+      const hours = Math.floor(timeDifference / (60 * 60 * 1000));
+      if (hours === 0) {
+        // Less than an hour, show time elapsed in minutes
+        const minutes = Math.floor(timeDifference / (60 * 1000));
+        if (minutes === 0) {
+          // Less than a minute, show time elapsed in seconds
+          const seconds = Math.floor(timeDifference / 1000);
+          return `${seconds} seconds ago`;
+        } else {
+          return `${minutes} minutes ago`;
+        }
+      } else {
+        return `${hours} hours ago`;
+      }
+    } else {
+      if (days === 1) {
+        return `1 day ago`;
+      } else {
+        return `${days} days ago`;
+      }
     }
-
-    // Format the time
-    const formattedTime = commentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    // Construct the final formatted string
-    return `${formattedDate}${suffix} ${commentDate.getFullYear()} ${formattedTime}`;
+  } else {
+    // More than a week, show the date and time in the format "Day, Month Day, HH:MM AM/PM"
+    const options = {
+      weekday: 'short',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    return commentDate.toLocaleDateString('en-US', options);
   }
 };
+
+
 
   
 
