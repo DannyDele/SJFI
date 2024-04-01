@@ -75,7 +75,7 @@ const TransactionSummary = () => {
 
 const dataWithActualValues = transactionsWithUsernames.map(transaction => ({
   _id: transaction._id,
-  reference: transaction.reference,
+  status: transaction.status,
   session_id: transaction.session_id,
   amount: parseFloat(transaction.amount),
    timestamp: new Date(transaction.timestamp).toLocaleString('en-US', {
@@ -105,11 +105,31 @@ console.log('Transactions', transactions);
 
 const columns = [
   { field: 'username', headerName: 'Username', width: 150 },
-  { field: 'reference', headerName: 'Reference', width: 200 },
   { field: 'session_id', headerName: 'Session ID', width: 250 },
+  { 
+    field: 'status', 
+    headerName: 'Status', 
+    width: 200, 
+    renderCell: (params) => (
+      <span style={{ color: getStatusColor(params.value) }}>{params.value}</span>
+    )
+  },
   { field: 'amount', headerName: 'Amount', width: 150 },
   { field: 'timestamp', headerName: 'Time', width: 200 },
 ];
+
+function getStatusColor(status) {
+  switch(status) {
+    case 'Completed':
+      return 'green';
+    case 'Failed':
+      return 'red';
+    case 'Pending':
+      return 'grey';
+    default:
+      return 'black';
+  }
+}
 
 
   const getRowId = (row) => row._id;
